@@ -1,75 +1,65 @@
-// MODULE 1: CORE SCORING ENGINE (LOCKED)
-// Pure business logic only — no external dependencies
+/**
+ * Nonresidential property/project readiness diagnostic.
+ *
+ * This runtime is intentionally property/project-only. It does not accept or
+ * score personal credit, personal/household income, DTI, personal liquidity,
+ * personal net worth, or other borrower financial-profile fields. A selected
+ * provider owns any borrower/business underwriting its program requires.
+ */
 
-export type ApplicantInput = {
-  creditScore: number;
-  liquidity: number;
-  experienceLevel: number;
-  collateralEquity: number;
-  acreage: number;
+export type PropertyProjectScoreInput = {
+  propertyReadiness: number;
+  programFit: number;
+  evidenceCompleteness: number;
+  executionReadiness: number;
+  environmentalReadiness: number;
+  propertyRisk: number;
 };
 
-export type ScoreOutput = {
-  credit: number;
-  liquidity: number;
-  experience: number;
-  collateral: number;
-  acreage: number;
-  sba: number;
+export type PropertyProjectScoreOutput = {
+  propertyReadiness: number;
+  programFit: number;
+  evidenceCompleteness: number;
+  executionReadiness: number;
+  environmentalReadiness: number;
+  propertyRisk: number;
+  propertyProject: number;
 };
 
 function clamp01(value: number): number {
+  if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.min(1, value));
 }
 
-function normalizeCredit(score: number): number {
-  // 300–850 scale
-  return clamp01((score - 300) / (850 - 300));
+function normalizePercent(value: number): number {
+  return clamp01(value / 100);
 }
 
-function normalizeLiquidity(liquidity: number): number {
-  // soft cap scaling (log-like behavior)
-  return clamp01(Math.log10(liquidity + 1) / 6);
-}
+export function calculatePropertyProjectScore(
+  input: PropertyProjectScoreInput,
+): PropertyProjectScoreOutput {
+  const propertyReadiness = normalizePercent(input.propertyReadiness);
+  const programFit = normalizePercent(input.programFit);
+  const evidenceCompleteness = normalizePercent(input.evidenceCompleteness);
+  const executionReadiness = normalizePercent(input.executionReadiness);
+  const environmentalReadiness = normalizePercent(input.environmentalReadiness);
+  const propertyRisk = normalizePercent(input.propertyRisk);
 
-function normalizeExperience(level: number): number {
-  // assume 0–10 scale
-  return clamp01(level / 10);
-}
-
-function normalizeCollateral(value: number): number {
-  return clamp01(Math.log10(value + 1) / 6);
-}
-
-function normalizeAcreage(acres: number): number {
-  // diminishing returns after ~200 acres
-  return clamp01(acres / 200);
-}
-
-/**
- * CORE SCORING FUNCTION (single responsibility)
- */
-export function calculatePropertyScore(input: ApplicantInput): ScoreOutput {
-  const credit = normalizeCredit(input.creditScore);
-  const liquidity = normalizeLiquidity(input.liquidity);
-  const experience = normalizeExperience(input.experienceLevel);
-  const collateral = normalizeCollateral(input.collateralEquity);
-  const acreage = normalizeAcreage(input.acreage);
-
-  // Equal-weight baseline model (NO external policy dependency in Module 1)
-  const sba =
-    credit * 0.35 +
-    liquidity * 0.15 +
-    experience * 0.15 +
-    collateral * 0.25 +
-    acreage * 0.10;
+  const positive =
+    propertyReadiness * 0.30 +
+    programFit * 0.25 +
+    evidenceCompleteness * 0.20 +
+    executionReadiness * 0.15 +
+    environmentalReadiness * 0.10;
+  const propertyProject = clamp01(positive - propertyRisk * 0.15);
 
   return {
-    credit,
-    liquidity,
-    experience,
-    collateral,
-    acreage,
-    sba,
+    propertyReadiness,
+    programFit,
+    evidenceCompleteness,
+    executionReadiness,
+    environmentalReadiness,
+    propertyRisk,
+    propertyProject,
   };
 }

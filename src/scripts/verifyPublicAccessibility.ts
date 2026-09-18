@@ -55,7 +55,7 @@ import * as path from "path";
 
 const DOC_REF   = "docs/DOCTRINE_PUBLIC_ACCESSIBILITY_WCAG_AA_V1.md";
 const VERSION   = "public-accessibility-wcag-aa-v1.0";
-const BUILD_PHASE = "Build 53 — Accessibility Support + Verification";
+const BUILD_PHASE = "September 8 customer experience — static accessibility checks";
 
 function readSrc(rel: string): string {
   const abs = path.join(process.cwd(), rel);
@@ -96,6 +96,8 @@ const watermark       = readSrc("src/components/brand/FurlongCompassWatermark.ts
 // publicShell alias now reads PublicSiteLayout (watermark + skip link source).
 const publicShell     = readSrc("src/components/public/PublicSiteLayout.tsx");
 const homepage        = readSrc("src/app/(public)/page.tsx");
+const startComponent = readSrc("src/components/public/FurlongStart.tsx");
+const experienceCss = readSrc("src/components/public/FurlongExperience.module.css");
 const stewardship   = readSrc("src/app/(public)/stewardship/page.tsx");
 const trust         = readSrc("src/app/(public)/trust/page.tsx");
 const dataRights    = readSrc("src/app/(public)/data-rights/page.tsx");
@@ -236,116 +238,36 @@ const results: CheckResult[] = [
   // C — Homepage Build 50 structural requirements
   // ════════════════════════════════════════════════════════════════════════════
 
-  check("C01", "C — Homepage Build 50",
-    "Homepage has exactly one exploration form (no duplicate CTAs)",
-    ((homepage.match(/fl-explore-form/g) ?? []).length >= 1 ||
-      (exploreDropdown.match(/fl-explore-form/g) ?? []).length >= 1) &&
-      !homepage.includes("fl-explore-grid"),
-    "Homepage must have a single explore entry point (dropdown form), not dual cards."
-  ),
-
-  check("C02", "C — Homepage Build 56",
-    "Single journey CTA on the map capstone → /explore (no second non-map CTA)",
-    // Build 56: the journey CTA is consolidated to ONE button on the map's
-    // capstone card ("Ready to begin your Journey?" → /explore). The homepage
-    // must not render a second, non-map journey CTA, and the /explore
-    // destination must exist (WCAG 2.4.4 — one clear, predictable journey link).
-    journeyTour.includes('href:     "/explore"') &&
-    journeyTour.includes("Ready to begin your Journey?") &&
-    !homepage.includes('href="/onboarding"') &&
-    srcExists("src/app/(public)/explore/page.tsx") &&
-    !homepage.includes("ExploreDropdown") &&
-    !homepage.includes("homepage-explore-select"),
-    "Build 56: the journey CTA must be a single button on the map capstone (href /explore, 'Ready to begin your Journey?'); the homepage must not have a second /onboarding journey CTA, and /explore must exist."
-  ),
-
-  check("C03", "C — Homepage Build 50",
-    "Homepage has no fl-category-card class (category wall removed)",
-    !homepage.includes("fl-category-card"),
-    "The category card grid must be removed in Build 50 (lighthouse architecture)."
-  ),
-
-  check("C04", "C — Homepage Build 50",
-    "Homepage has no fl-explore-card class (dual-choice removed)",
-    !homepage.includes("fl-explore-card"),
-    "The explore dual-card section must be removed in Build 50."
-  ),
-
-  check("C05", "C — Homepage Build 50",
-    "Homepage does not render StewardshipSection component",
-    !homepage.includes("StewardshipSection") ||
-      homepage.includes("// StewardshipSection removed"),
-    "StewardshipSection must not appear on homepage in Build 50."
-  ),
-
-  check("C06", "C — Homepage Build 50",
-    "Homepage has fl-map-section (map immediately below hero)",
-    homepage.includes("fl-map-section"),
-    "Map section must be immediately below hero in Build 50 hierarchy."
-  ),
-
-  check("C07", "C — Homepage Build 53",
-    "Compass watermark renders in PublicSiteLayout (shared public layout)",
-    // Build 53: PublicPageShell replaced by PublicSiteLayout.
-    publicShell.includes("FurlongCompassWatermark") &&
-    (publicShell.includes('position:') || publicShell.includes('"relative"')),
-    "Watermark must render in PublicSiteLayout (the (public) route group layout), not in individual pages."
-  ),
-
-  check("C08", "C — Homepage Build 50",
-    "Homepage CTA button has :focus-visible style",
-    homepage.includes("fl-cta-primary:focus-visible"),
-    "Primary CTA must be keyboard-accessible with visible focus (WCAG 2.4.7)."
-  ),
-
-  check("C09", "C — Homepage Build 53",
-    "Homepage CTA has :focus-visible style (ExploreDropdown removed)",
-    // Build 53: ExploreDropdown removed. The primary CTA (fl-cta-primary) must be accessible.
-    homepage.includes("fl-cta-primary:focus-visible"),
-    "Primary CTA must show a keyboard focus indicator (WCAG 2.4.7)."
-  ),
-
-  check("C10", "C — Homepage Build 53",
-    "ExploreDropdown still exists as a component (for onboarding page use)",
-    // The component file still exists even though it's no longer on the homepage.
-    srcExists("src/components/public/ExploreDropdown.tsx"),
-    "ExploreDropdown.tsx must still exist — it is used on /onboarding even though it was removed from homepage."
-  ),
-
-  check("C11", "C — Homepage Build 50",
-    "Homepage 'What Furlong Is Not' panel uses dark background (institutional blue)",
-    homepage.includes("fl-not-panel") &&
-      (homepage.includes("#162033") || homepage.includes("background: #0d")),
-    "What Furlong Is Not must use navy background, not white/yellow (Build 50)."
-  ),
-
-  check("C12", "C — Homepage Build 50",
-    "Homepage 'What Furlong Is Not' heading uses gold color",
-    homepage.includes("fl-not-heading") &&
-      homepage.includes("#c9a84c"),
-    "What Furlong Is Not heading must use gold color, not yellow warning styling."
-  ),
-
-  check("C13", "C — Homepage Build 53",
-    "Homepage CTA button has minimum touch-target height (≥ 48px)",
-    // Build 53: CTA is now an <a> with fl-cta-primary class.
-    // Check that fl-cta-primary CSS defines at least 48px min-height.
-    homepage.includes("min-height: 52px") ||
-      homepage.includes("minHeight: 52") ||
-      homepage.includes("min-height: 48px") ||
-      homepage.includes("minHeight: 48"),
-    "Primary CTA must have minimum 48px height for touch accessibility (WCAG 2.5.5)."
-  ),
-
-  check("C14", "C — Homepage Build 56",
-    "Homepage retains accessible CTA styling; journey CTA is on the map capstone",
-    // Build 56: the journey CTA moved entirely to the map capstone (→ /explore).
-    // The .fl-cta-primary class (with its focus-visible + touch-target styling)
-    // remains defined for shared button styling and accessibility checks below.
-    homepage.includes("fl-cta-primary") &&
-      journeyTour.includes('href:     "/explore"'),
-    "Homepage must retain fl-cta-primary styling and the single journey CTA must point to /explore (map capstone)."
-  ),
+  // Owner-approved Sept 8 experience supersedes the old map-first homepage.
+  // Test the actual mounted entry component/CSS, not retired class names.
+  check("C01", "C — Current homepage", "One open-question entry component",
+    homepage.includes("<FurlongStart />") && (startComponent.match(/<form/g) ?? []).length === 1),
+  check("C02", "C — Current homepage", "Full exploration remains reachable",
+    homepage.includes('href="/discover?mode=possibilities"') && srcExists("src/app/(public)/explore/page.tsx")),
+  check("C03", "C — Current homepage", "No mandatory category wall",
+    !homepage.includes("fl-category-card") && !startComponent.includes("<select")),
+  check("C04", "C — Current homepage", "Optional examples remain editable",
+    startComponent.includes("setQuestion(example)") && startComponent.includes('type="button"')),
+  check("C05", "C — Current homepage", "Address input remains a disclosure, not a forced path",
+    startComponent.includes("<details") && startComponent.includes("<HomePropertyFrontDoor")),
+  check("C06", "C — Current homepage", "Working entry precedes supporting sections",
+    homepage.indexOf("<FurlongStart />") < homepage.indexOf('<section')),
+  check("C07", "C — Current homepage", "Decorative compass stays in shared layout",
+    publicShell.includes("FurlongCompassWatermark")),
+  check("C08", "C — Current homepage", "Entry controls have visible keyboard focus",
+    experienceCss.includes(".page :focus-visible") && experienceCss.includes("outline: 3px")),
+  check("C09", "C — Current homepage", "Question textarea has visible label",
+    startComponent.includes('htmlFor="furlong-start-question"') && startComponent.includes('id="furlong-start-question"')),
+  check("C10", "C — Current homepage", "Existing onboarding input preserved",
+    srcExists("src/components/public/ExploreDropdown.tsx")),
+  check("C11", "C — Current homepage", "Key public sections have named headings",
+    homepage.includes('aria-labelledby="commercial-truth"') && homepage.includes('id="commercial-truth"')),
+  check("C12", "C — Current homepage", "Readable supporting text",
+    experienceCss.includes("font-size: 1rem") && experienceCss.includes("line-height: 1.65")),
+  check("C13", "C — Current homepage", "Primary action has 48px touch target",
+    experienceCss.includes("min-height: 48px")),
+  check("C14", "C — Current homepage", "Mobile layout adapts without fixed form width",
+    experienceCss.includes("@media(max-width: 600px)") && experienceCss.includes("box-sizing: border-box")),
 
   // ════════════════════════════════════════════════════════════════════════════
   // D — Navigation / focus / keyboard
@@ -394,9 +316,12 @@ const results: CheckResult[] = [
   // F — Form accessibility
   // ════════════════════════════════════════════════════════════════════════════
 
+  // The standalone readiness form was folded into the analysis workspace
+  // (founder direction 2026-07-17); the labels obligation moves with the
+  // inputs. /readiness is now a formless bridge page.
   check("F01", "F — Form Accessibility",
-    "Readiness form inputs are wrapped in <label> elements",
-    readiness.includes("<label"),
+    "Analysis workspace form inputs are wrapped in <label> elements",
+    readSrc("src/components/property/PropertyEvaluationWorkspace.tsx").includes("<label"),
     "Form inputs must be programmatically associated with labels (WCAG 3.3.2)."
   ),
 
@@ -530,17 +455,8 @@ const results: CheckResult[] = [
     "An Accessibility link to /accessibility must appear in the homepage or in the shared public layout footer (Build 53)."
   ),
 
-  check("I05", "I — Build 53 Accessibility",
-    "Hero brand text uses readable font-size (≥ 32px minimum)",
-    (() => {
-      // Check that fl-hero-brand does NOT use the old small sizes (13px, 17px)
-      // and DOES use a large clamp (≥ 32px as first argument)
-      const hasOldSmall = /\.fl-hero-brand\s*\{[^}]*font-size:\s*clamp\(1[0-9]px/.test(homepage);
-      const hasLarge    = /\.fl-hero-brand\s*\{[^}]*font-size:\s*clamp\([3-9][0-9]px/.test(homepage);
-      return !hasOldSmall && hasLarge;
-    })(),
-    "FURLONG hero brand text must be readable: clamp(32px+, ...) not clamp(13px, ...)."
-  ),
+  check("I05", "I — Current accessibility", "Opening heading is at least 2rem",
+    experienceCss.includes("font-size: clamp(2rem,4vw,3rem)") && startComponent.includes("<h1")),
 
   check("I06", "I — Build 53 Accessibility",
     "verify:accessibility script entry exists in package.json",
@@ -602,7 +518,7 @@ const wcagChecklist = [
 
 const output = {
   ok: fail === 0,
-  runtimeVersion:  "verify-public-accessibility-v1.0.0",
+  runtimeVersion:  "verify-public-accessibility-v1.1.0",
   specVersion:     VERSION,
   docRef:          DOC_REF,
   buildPhase:      BUILD_PHASE,
@@ -638,7 +554,7 @@ try {
   const today = new Date().toISOString().slice(0, 10);
   const dir   = path.join(process.cwd(), "docs", "build-records", today);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const outPath = path.join(dir, "public-accessibility.json");
+  const outPath = path.join(dir, "customer-experience-accessibility.json");
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
 } catch {
   // Non-fatal — record write failure does not affect exit code

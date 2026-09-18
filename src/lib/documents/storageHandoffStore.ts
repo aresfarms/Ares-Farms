@@ -4,8 +4,14 @@ import { eq } from "drizzle-orm";
 import {
   applications,
   documentStorageHandoffs,
+  syntheticFixtureLineageRecords,
 } from "@/db/schema";
 import { db } from "@/lib/db";
+import {
+  bindSyntheticFixtureLineage,
+  syntheticFixtureContextFromBoundLineage,
+} from "@/lib/testing/syntheticFixtureLineage";
+import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixtureLineageStore";
 
 /**
  * Canonical Document Storage Handoff Runtime
@@ -87,12 +93,22 @@ function normalizeByteSize(value: unknown): number | null {
 }
 
 function safePathSegment(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 96);
+  const input = value.trim().toLowerCase().slice(0, 512);
+  let output = "";
+  for (const character of input) {
+    const allowed =
+      (character >= "a" && character <= "z") ||
+      (character >= "0" && character <= "9") ||
+      character === "." ||
+      character === "_" ||
+      character === "-";
+    if (allowed) output += character;
+    else if (!output.endsWith("-")) output += "-";
+    if (output.length >= 96) break;
+  }
+  while (output.startsWith("-")) output = output.slice(1);
+  while (output.endsWith("-")) output = output.slice(0, -1);
+  return output;
 }
 
 function hashToken(token: string): string {
@@ -144,22 +160,37 @@ async function loadApplication(applicationId: string) {
 }
 
 export async function createDocumentStorageHandoff(
-  input: CreateDocumentStorageHandoffInput
+  input: CreateDocumentStorageHandoffInput,
 ): Promise<CreatedDocumentStorageHandoff> {
   const applicationId = normalizeRequiredText(
     input.applicationId,
-    "applicationId"
+    "applicationId",
   );
   const documentType = normalizeRequiredText(
     input.documentType,
-    "documentType"
+    "documentType",
   );
   const documentName = normalizeRequiredText(
     input.documentName,
-    "documentName"
+    "documentName",
   );
   const fileName = normalizeRequiredText(input.fileName, "fileName");
   const application = await loadApplication(applicationId);
+  const applicationLineage = await syntheticFixtureLineageForRecord(
+    "application",
+    applicationId,
+  );
+  const fixtureContext = applicationLineage
+    ? syntheticFixtureContextFromBoundLineage(applicationLineage.lineagePayload)
+    : null;
+  const handoffId = randomUUID();
+  const syntheticFixture = fixtureContext
+    ? bindSyntheticFixtureLineage(
+        fixtureContext,
+        "document_storage_handoff",
+        handoffId,
+      )
+    : null;
   const now = new Date();
   const handoffToken = createHandoffToken();
   const storageProvider =
@@ -173,57 +204,83 @@ export async function createDocumentStorageHandoff(
   });
   const storageUri = `governed://document-storage/${objectKey}`;
 
-  const inserted = await db
-    .insert(documentStorageHandoffs)
-    .values({
-      applicationId,
-      borrowerId: normalizeText(input.borrowerId) ?? application.borrowerId,
-      tenantId: normalizeText(input.tenantId) ?? application.tenantId,
-      propertyId: application.propertyId,
-      documentType,
-      documentName,
-      fileName,
-      mimeType: normalizeText(input.mimeType),
-      byteSize: normalizeByteSize(input.byteSize),
-      checksum: normalizeText(input.checksum),
-      storageProvider,
-      storageBucket: normalizeText(input.storageBucket),
-      objectKey,
-      storageUri,
-      uploadMethod: DEFAULT_UPLOAD_METHOD,
-      uploadUrl: null,
-      uploadTokenHash: hashToken(handoffToken),
-      handoffStatus: providerConfigured
-        ? "PENDING_UPLOAD"
-        : "PENDING_PROVIDER_CONFIGURATION",
-      rawContentAccepted: false,
-      providerConfigured,
-      humanReviewRequired: true,
-      governanceVersion: GOVERNANCE_VERSION,
-      classification: CLASSIFICATION,
-      replayRef: input.traceId,
-      traceId: input.traceId,
-      source: HANDOFF_SOURCE,
-      metadata: {
-        ...(input.metadata ?? {}),
-        traceId: input.traceId,
-        source: input.source,
-        documentStorageHandoffVersion:
-          "document-storage-handoff-runtime-v0.1.0",
+  const handoff = await db.transaction(async (tx) => {
+    const [inserted] = await tx
+      .insert(documentStorageHandoffs)
+      .values({
+        id: handoffId,
+        applicationId,
+        borrowerId: normalizeText(input.borrowerId) ?? application.borrowerId,
+        tenantId: normalizeText(input.tenantId) ?? application.tenantId,
+        propertyId: application.propertyId,
+        documentType,
+        documentName,
+        fileName,
+        mimeType: normalizeText(input.mimeType),
+        byteSize: normalizeByteSize(input.byteSize),
+        checksum: normalizeText(input.checksum),
+        storageProvider,
+        storageBucket: normalizeText(input.storageBucket),
+        objectKey,
+        storageUri,
+        uploadMethod: DEFAULT_UPLOAD_METHOD,
+        uploadUrl: null,
+        uploadTokenHash: hashToken(handoffToken),
+        handoffStatus: providerConfigured
+          ? "PENDING_UPLOAD"
+          : "PENDING_PROVIDER_CONFIGURATION",
         rawContentAccepted: false,
         providerConfigured,
-        handoffTtlMinutes: HANDOFF_TTL_MINUTES,
-      },
-      expiresAt: expiresAt(now),
-      consumedAt: null,
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning();
+        humanReviewRequired: true,
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: CLASSIFICATION,
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: HANDOFF_SOURCE,
+        metadata: {
+          ...(input.metadata ?? {}),
+          traceId: input.traceId,
+          source: input.source,
+          documentStorageHandoffVersion:
+            "document-storage-handoff-runtime-v0.1.0",
+          rawContentAccepted: false,
+          providerConfigured,
+          handoffTtlMinutes: HANDOFF_TTL_MINUTES,
+          syntheticFixture,
+        },
+        expiresAt: expiresAt(now),
+        consumedAt: null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
-  return {
-    application,
-    handoff: inserted[0],
-    handoffToken,
-  };
+    if (syntheticFixture) {
+      await tx.insert(syntheticFixtureLineageRecords).values({
+        syntheticPersonaId: syntheticFixture.syntheticPersonaId,
+        humanVisibleName: syntheticFixture.humanVisibleName,
+        testRunId: syntheticFixture.testRunId,
+        fixtureVersion: syntheticFixture.fixtureVersion,
+        registryVersion: syntheticFixture.registryVersion,
+        lineageVersion: syntheticFixture.lineageVersion,
+        environment: syntheticFixture.environment,
+        operatorIdentity: syntheticFixture.operatorIdentity,
+        fixtureCreatedAt: new Date(syntheticFixture.createdAt),
+        scenarioId: syntheticFixture.scenarioId,
+        providerTargets: [...syntheticFixture.providerTargets],
+        recordType: syntheticFixture.recordType,
+        recordId: syntheticFixture.recordId,
+        lineageSha256: syntheticFixture.lineageSha256,
+        lineagePayload: syntheticFixture,
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: "RESTRICTED",
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: "document-storage-handoff.synthetic-fixture",
+      });
+    }
+    return inserted;
+  });
+
+  return { application, handoff, handoffToken };
 }

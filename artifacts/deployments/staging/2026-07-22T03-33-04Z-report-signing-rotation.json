@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "event": "CONTROLLED_SECRET_ROTATION",
+  "environment": "staging",
+  "gcpProjectId": "furlong-staging-499102",
+  "secret": "REPORT_SIGNING_SECRET",
+  "activatedSecretVersion": "3",
+  "retainedVerificationVersions": [
+    "1",
+    "2"
+  ],
+  "rotatedAtUtc": "2026-07-22T03:33:04Z",
+  "sourceGitHead": "1a35d40",
+  "cloudRunService": "furlong-core",
+  "cloudRunRevision": "furlong-core-00106-w2w",
+  "secretRevisionEpoch": 3,
+  "iapEnabled": true,
+  "anonymousInvocationAllowed": false,
+  "stagingSeedEnabled": false,
+  "stagingSeedSecretMounted": false,
+  "secretValueDisplayed": false,
+  "combinedProductionReady": false,
+  "notes": "A new random signing key was added as Secret Manager version 3. Prior versions remain enabled solely for historical attestation verification and controlled retirement. Terraform minted revision furlong-core-00106-w2w and reasserted direct IAP."
+}

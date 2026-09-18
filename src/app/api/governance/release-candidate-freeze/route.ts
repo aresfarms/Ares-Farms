@@ -5,6 +5,7 @@ import {
   evaluateReleaseCandidateFreezePlan,
 } from "@/lib/governance/releaseCandidateFreezePlan";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { latestReleaseGovernanceEvidence, recordReleaseGovernanceEvidence, releaseGovernanceEvidenceFor } from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -156,31 +157,13 @@ async function handleReleaseCandidateFreeze(
       ],
     });
     const result = evaluateReleaseCandidateFreezePlan({ releaseScope });
-    const freezeHold =
-      req.method === "POST"
-        ? {
-            freezeHoldId: `release-candidate-freeze-hold-${Date.now()}`,
-            releaseScope: releaseScope ?? "platform",
-            reviewStatus: "RELEASE_CANDIDATE_FREEZE_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            releaseCandidateFreezeApproved: false,
-            releaseCandidateFrozen: false,
-            releaseCandidateApproved: false,
-            deploymentExecuted: false,
-            environmentPromotionAllowed: false,
-            productionSecretsActivated: false,
-            publicDnsCutoverAllowed: false,
-            databaseMigrationAllowed: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            qualifiedReleaseManagerRequired: true,
-            replayRef: traceId,
-          }
-        : null;
+    const resolvedScope = releaseScope ?? "platform";
+    const freezeEvidence =
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({ kind: "RELEASE_CANDIDATE_FREEZE_HOLD", scope: resolvedScope, actorId, reviewNote: body.reviewNote, replayRef: traceId })
+        : latestReleaseGovernanceEvidence(resolvedScope, "RELEASE_CANDIDATE_FREEZE_HOLD");
+    const freezeHold = freezeEvidence ? { ...freezeEvidence, freezeHoldId: freezeEvidence.evidenceId, releaseScope: freezeEvidence.scope, reviewStatus: "RELEASE_CANDIDATE_FREEZE_HOLD_RECORDED", releaseCandidateFreezeApproved: false, releaseCandidateFrozen: false, releaseCandidateApproved: false, environmentPromotionAllowed: false, qualifiedReleaseManagerRequired: true } : null;
+    const freezeHistory = releaseGovernanceEvidenceFor(resolvedScope, "RELEASE_CANDIDATE_FREEZE_HOLD");
     const classifiedOutput = classifyRecord(
       {
         count: result.releaseCandidateFreezePlans.length,
@@ -189,6 +172,7 @@ async function handleReleaseCandidateFreeze(
         disclosures: result.disclosures,
         freezePosture: result.freezePosture,
         freezeHold,
+        freezeHistory,
         productionBlocked: true,
         releaseCandidateFreezeApproved: false,
         releaseCandidateFrozen: false,
@@ -285,6 +269,7 @@ async function handleReleaseCandidateFreeze(
       disclosures: classifiedOutput.disclosures,
       freezePosture: classifiedOutput.freezePosture,
       freezeHold: classifiedOutput.freezeHold,
+      freezeHistory: classifiedOutput.freezeHistory,
       productionBlocked: classifiedOutput.productionBlocked,
       releaseCandidateFreezeApproved:
         classifiedOutput.releaseCandidateFreezeApproved,

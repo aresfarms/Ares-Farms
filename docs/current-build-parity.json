@@ -1,0 +1,207 @@
+{
+  "mirrorId": "master-volume-current-build-parity-v1.3.0",
+  "effectiveDate": "2026-09-16",
+  "controllingAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+  "canonicalSchemaTarget": "0065",
+  "capitalNetwork": {
+    "runtimeVersion": "capital-network-runtime-v1.1.0",
+    "sellsBorrowerLeads": false,
+    "auctionsBorrowerFiles": false,
+    "compensationInfluencesRanking": false,
+    "affiliationInfluencesRanking": false,
+    "shotgunRoutingAllowed": false,
+    "borrowerChoosesRecipients": true,
+    "exactRecipientConsentRequired": true,
+    "nonResidentialPersonalFinancialScoring": false,
+    "executionHistoryMayOnlyTieBreakAfterMinimumVerifiedSample": true
+  },
+  "executionReliability": {
+    "runtimeVersion": "capital-network-execution-reliability-v1.0.0",
+    "publicMinimumVerifiedOutcomes": 5,
+    "rankingTieBreakMinimumProviderDecisionOutcomes": 10,
+    "rankingUse": "tie-break-only-after-equal-suitability",
+    "borrowerOrExternalExitsExcludedFromProviderCloseRate": true,
+    "personalFinancialProfileInfluence": false,
+    "compensationInfluence": false,
+    "affiliationInfluence": false,
+    "interestRateInfluence": false
+  },
+  "programRegistry": {
+    "propertyProgramFitIsNotBorrowerApproval": true,
+    "personSideCriteriaVerifiableByFurlong": false,
+    "selectedProviderOwnsBorrowerBusinessUnderwriting": true
+  },
+  "nonResidential": {
+    "propertyProjectRankingOnly": true,
+    "personalCreditScoring": false,
+    "personalIncomeScoring": false,
+    "householdDtiScoring": false,
+    "personalAssetLiquidityNetWorthScoring": false,
+    "residentialExceptionPreserved": true
+  },
+  "valuation": {
+    "assetTypeSpecific": true,
+    "fhfaResidentialOnly": true,
+    "unsupportedNumericEstimateProhibited": true
+  },
+  "governance": {
+    "ownerControlledPlatform": true,
+    "retainedExternalBrokerHasPlatformGovernanceAuthority": false,
+    "providerAccessIsCaseScoped": true,
+    "providerAccessRequiresConsent": true
+  },
+  "changeRegister": "docs/MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+  "sourceSnapshot": "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
+  "buildProtocol": "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+  "activeNonResidentialScoring": {
+    "rankRoute": "/api/rank",
+    "rankRuntimeVersion": "ranking-runtime-v0.2.0",
+    "diagnosticRoute": "/api/test-score",
+    "diagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
+    "propertyProjectOnly": true,
+    "personalFinancialInputsRejected": true,
+    "personalFinancialScoring": false,
+    "legacyPersonalFinancialScoringReachableFromAppRoutes": false,
+    "selectedProviderOwnsBorrowerBusinessUnderwriting": true
+  },
+  "optionalCustomerCalculators": {
+    "farmFinancialSelfCheck": {
+      "clientSideOnly": true,
+      "sendsInputsToFurlongServer": false,
+      "persistsInputsAtFurlong": false,
+      "influencesNonResidentialPropertyScore": false,
+      "influencesFinancingPathwayRank": false,
+      "influencesProviderMatch": false
+    }
+  },
+  "parityImplementationCommit": "19e654b",
+  "propertyUseIntegrity": {
+    "runtimeVersion": "farm-use-integrity-v2.0.0",
+    "currentUseClassificationIsNotHighestBestUse": true,
+    "agriculturalEnterpriseScreenIsNotPropertyWideHighestBestUse": true,
+    "verifiedAcreageRequiredBeforeAgriculturalLeaderClaim": true,
+    "importedParcelAcreageReconciledBeforeFarmScreen": true,
+    "primeSoilAloneCannotMakeCommodityRowCropsBest": true,
+    "grossNetStartupEconomicsNotDirectlyInterchangeable": true,
+    "propertyWideUseMustTestLegalPhysicalEntitlementMarketEconomics": true,
+    "unsupportedZoningInterpretationFailsClosed": true,
+    "developmentMayNotBeDowngradedFromRuralLocationAlone": true
+  },
+  "customerExperience": {
+    "answerFirstProgressiveDisclosure": true,
+    "customerSequence": [
+      "what-found",
+      "why-it-matters",
+      "what-next",
+      "evidence-and-detail"
+    ],
+    "addressFirstEntry": true,
+    "unsupportedRecommendationsFailClosed": true,
+    "amendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md",
+    "releaseMirror": "docs/customer-experience-release.json",
+    "answerVersion": "furlong-answer-v1.0.0",
+    "exportVersion": "furlong-answer-export-v1.0.0",
+    "status": "controlled-testing-deployed",
+    "providerSharingOnSave": false,
+    "assessmentFallback": false,
+    "cloudCertification": false
+  },
+  "customerEconomics": {
+    "borrowerCoreDirectFree": true,
+    "freeCoreMeansSnapshotAndFinancingAccessNotEveryAnalysisDepth": true,
+    "freeCore": [
+      "property-snapshot",
+      "financing-readiness",
+      "verified-provider-comparison",
+      "customer-controlled-case",
+      "exact-recipient-case-room-handoff",
+      "closing-status-through-keys-logbook"
+    ],
+    "propertyAnalysisDepthMayBePaid": true,
+    "institutionFundedPrimaryModel": true,
+    "leadSale": false,
+    "fileAuction": false,
+    "payToRank": false,
+    "hiddenReferralEconomics": false,
+    "successPercentage": false,
+    "transactionPercentage": false,
+    "customerDataSale": false
+  },
+  "publicReportCommerce": {
+    "amendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md",
+    "catalogVersion": "furlong-public-product-catalog-v2.0.0",
+    "freeSnapshot": true,
+    "propertyReportProposedCents": 4900,
+    "decisionReportBaseProposedCents": 24900,
+    "monthlySubscriptionAuthorized": false,
+    "neutralSmallestSufficientRecommendation": true,
+    "samePropertyUpgradeCreditCents": 4900,
+    "upgradeCreditValidDays": 30,
+    "professionalServicesSeparatelyScoped": true,
+    "automatedArtifactRequiredBeforePayment": true,
+    "decisionReportSecureArtifactDeliverySourceImplemented": true,
+    "decisionReportDeployedEndToEndVerified": false,
+    "observedProductionRevision": "furlong-core-access-main-0908",
+    "observedTestingRevision": "furlong-core-coherence-8b1a348",
+    "deployedStateObservedAt": "2026-09-16",
+    "salesActivated": false,
+    "cloudDeploymentVerified": false
+  },
+  "livingCase": {
+    "runtimeVersion": "furlong-case-v1.0.0",
+    "customerControlled": true,
+    "saveSharesProviderData": false,
+    "appendOrientedTimeline": true,
+    "actualOutcomeLearning": true,
+    "operatingLogbookContinuity": true
+  },
+  "managedProviderHandoff": {
+    "boundedPrivateComparison": true,
+    "separateConsentPerProvider": true,
+    "expiringProviderCaseRooms": true,
+    "structuredProviderResponse": true,
+    "closingMilestonesEndAtKeysAndLogbook": true
+  },
+  "providerPublishedBox": {
+    "sourceReferencesPreserved": true,
+    "verificationTimestampPreserved": true,
+    "publishedExpectationsSeparatedFromMeasuredExecution": true,
+    "personalCreditAuthorityRemainsProvider": true,
+    "administrativeVerificationStatusRankingAdvantage": false
+  },
+  "marketSpecializationSequence": [
+    "USDA_BI",
+    "SBA_504",
+    "SBA_7A",
+    "FSA_FARM_OWNERSHIP_AND_OPERATING",
+    "USDA_CF_AND_REAP",
+    "CONVENTIONAL_COMMERCIAL",
+    "RESIDENTIAL_CONVENTIONAL_WHEN_PROPERTY_JOURNEY_REQUIRES"
+  ],
+  "securityAssurance": {
+    "architectureAloneEqualsProductionAssurance": false,
+    "productionEvidenceGateRequired": true,
+    "unpromotedMigrations": [
+      "0058",
+      "0059",
+      "0060",
+      "0061",
+      "0062",
+      "0063",
+      "0064",
+      "0065"
+    ]
+  },
+  "platformExperienceEconomicsAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+  "calculationIntegrity": {
+    "amendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-07_CALCULATION_INTEGRITY.md",
+    "version": "calculation-math-v1.0.0",
+    "updatedAt": "2026-09-08",
+    "allPlatformCalculationsCertified": false,
+    "assessmentAsMarketValue": false,
+    "unverifiedCropRanking": false,
+    "missingEvidenceAsZero": false,
+    "governmentCandidatesAreVerifiedComparables": false,
+    "nyDeCurrentBatchImported": false
+  }
+}

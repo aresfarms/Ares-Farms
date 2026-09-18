@@ -184,10 +184,10 @@ const ROUTES: RouteSpec[] = [
     route:            "/readiness",
     filePath:         "src/app/(public)/readiness/page.tsx",
     requiredIdentity: [
-      /[Rr]eadiness\s+review/,
-      /ReadinessAssessmentInput/,
+      /Readiness lives inside your property analysis now\./,
+      /Start with a property/,
     ],
-    identityLabel:    "readiness assessment identity",
+    identityLabel:    "readiness bridge into property analysis",
   },
   {
     route:            "/onboarding",

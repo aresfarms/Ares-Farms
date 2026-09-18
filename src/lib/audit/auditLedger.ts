@@ -1,64 +1,78 @@
-import { writeAuditLedger } from "./writeAuditLedger";
+import { listAuditLedgerAdminRecords } from "@/lib/ledger/auditLedgerAdminStore";
 
-/**
- * Audit Ledger Runtime Surface
- *
- * Master Volume Governance:
- * - Vol I: Constitutional Backbone
- *   Establishes governed audit trace authority.
- *
- * - Vol II: Regulatory Governance
- *   Supports compliance-grade trace reconstruction.
- *
- * - Vol III: Technical Infrastructure
- *   Provides stable audit ledger runtime exports.
- *
- * - Vol IV: Operational Runbooks
- *   Supports replay loading, inspection, and recovery workflows.
- *
- * - Vol V: Canonical Platform Doctrines
- *   Enables replayability, observability, explainability,
- *   anomaly review, versioning, and citation lineage.
- */
+import { writeAuditLedger } from "./writeAuditLedger";
 
 export type AuditEvent = {
   traceId: string;
   eventType?: string;
   event_type?: string;
   payload?: unknown;
-  metadata?: Record<string, unknown>;
+  metadata?: unknown;
   timestamp?: string;
-  createdAt?: string;
+  createdAt?: string | Date | null;
+  sourceTable?: string;
   [key: string]: unknown;
 };
 
 export const auditLedger = {
   async write(event: AuditEvent) {
-    const enrichedEvent = {
+    return writeAuditLedger("audit_events", {
       ...event,
+      traceId: event.traceId,
+      metadata:
+        event.metadata &&
+        typeof event.metadata === "object" &&
+        !Array.isArray(event.metadata)
+          ? (event.metadata as Record<string, unknown>)
+          : undefined,
       timestamp: event.timestamp ?? new Date().toISOString(),
-    };
-
-    return writeAuditLedger("pipeline_events", enrichedEvent);
+    });
   },
 };
 
-/**
- * Temporary migration replay loader.
- *
- * Full database-backed trace retrieval will be attached after the
- * canonical audit event schema and replay registry are finalized.
- */
 export async function getTrace(traceId: string): Promise<AuditEvent[]> {
+  const normalized = traceId.trim();
+  if (!normalized) return [];
+
+  const records = await listAuditLedgerAdminRecords({
+    traceId: normalized,
+    includeCanonicalLedger: true,
+    includeCanonicalMeta: false,
+    includeReplay: true,
+    includeObservability: true,
+    limit: 250,
+  });
+
   return [
-    {
-      traceId,
-      eventType: "TRACE_REPLAY_PLACEHOLDER",
-      payload: {
-        message:
-          "Trace retrieval placeholder active during canonical backend stabilization.",
-      },
-      timestamp: new Date().toISOString(),
-    },
-  ];
+    ...records.auditEvents.map((row) => ({
+      ...row,
+      traceId: normalized,
+      eventType: row.eventType ?? undefined,
+      timestamp: row.createdAt?.toISOString(),
+      sourceTable: "audit_events",
+    })),
+    ...records.canonicalLedgerRows.map((row) => ({
+      ...row,
+      traceId: normalized,
+      eventType: row.eventType ?? undefined,
+      timestamp: row.createdAt?.toISOString(),
+      sourceTable: "canonical_ledger",
+    })),
+    ...records.replayRows.map((row) => ({
+      ...row,
+      traceId: row.traceId,
+      eventType: "REPLAY_VERIFICATION",
+      timestamp: row.createdAt?.toISOString(),
+      sourceTable: "replay_verification",
+    })),
+    ...records.observabilityRows.map((row) => ({
+      ...row,
+      traceId: row.traceId,
+      eventType: row.eventType,
+      timestamp: row.createdAt?.toISOString(),
+      sourceTable: "observability_events",
+    })),
+  ].sort((a, b) =>
+    String(a.timestamp ?? "").localeCompare(String(b.timestamp ?? "")),
+  );
 }

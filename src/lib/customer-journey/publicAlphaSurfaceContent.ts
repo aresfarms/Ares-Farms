@@ -165,8 +165,8 @@ export type ContentRequirementId =
   | "verbatim-deletion-language"
   | "pathway-discovery-categories"
   | "six-financing-reality-classifications"
-  | "readiness-three-sections"
-  | "readiness-human-review-notice"
+  | "readiness-property-context-bridge"
+  | "readiness-human-review-boundary"
   | "four-intake-questions"
   | "four-stage-escalation"
   | "human-review-paths"
@@ -396,21 +396,22 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
     pageFilePath: "src/app/(public)/readiness/page.tsx",
     requiredContent: [
       {
-        id: "readiness-three-sections",
-        label: "Three sections: indicators, missing items, doc recommendations",
-        sourceDoctrine: "Customer Journey §4",
+        id: "readiness-property-context-bridge",
+        label: "Readiness is presented in property context",
+        sourceDoctrine: "Founder direction 2026-07-17 + Customer Journey §4",
         requiredPatterns: [
-          /readiness\s+indicators/i,
-          /missing\s+items/i,
-          /documentation\s+recommendations/i,
+          /readiness lives inside your property analysis now/i,
+          /there is no separate readiness score to chase/i,
+          /missing/i,
+          /documents/i,
         ],
       },
       {
-        id: "readiness-human-review-notice",
-        label: "Human review notice",
+        id: "readiness-human-review-boundary",
+        label: "Advisory and human-review boundary",
         sourceDoctrine: "Customer Journey §4 + Customer Trust Profile §3",
         requiredPatterns: [
-          /(named\s+credentialed\s+reviewer|human\s+(can\s+)?review)/i,
+          /human review is required/i,
           /advisory/i,
         ],
       },

@@ -1,0 +1,68 @@
+name: Staging passive DAST
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "17 7 * * *"
+
+# Dynamic scanning uses a short-lived GitHub OIDC identity. No Google key or
+# long-lived bearer token is stored. The bounded passive scan does not submit
+# portal forms or perform active attacks against licensed workflows.
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: staging-passive-dast
+  cancel-in-progress: false
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TARGET_URL: https://furlong-core-mwei3cj3jq-uc.a.run.app
+      TARGET_HOST: furlong-core-mwei3cj3jq-uc.a.run.app
+
+    steps:
+      - name: Mint short-lived staging invocation identity
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          token_format: id_token
+          workload_identity_provider: projects/859763772114/locations/global/workloadIdentityPools/github-actions/providers/ares-farms
+          service_account: furlong-dast@furlong-staging-499102.iam.gserviceaccount.com
+          id_token_audience: https://furlong-core-mwei3cj3jq-uc.a.run.app
+          id_token_include_email: true
+
+      - name: Verify authenticated target reachability
+        env:
+          DAST_ID_TOKEN: ${{ steps.auth.outputs.id_token }}
+        run: |
+          curl --fail --silent --show-error --output /dev/null \
+            --header "Authorization: Bearer ${DAST_ID_TOKEN}" \
+            "${TARGET_URL}/"
+
+      - name: Run bounded OWASP ZAP baseline
+        env:
+          DAST_ID_TOKEN: ${{ steps.auth.outputs.id_token }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/zap"
+          chmod 0777 "${RUNNER_TEMP}/zap"
+          timeout 9m docker run --rm \
+            --env ZAP_AUTH_HEADER=Authorization \
+            --env "ZAP_AUTH_HEADER_VALUE=Bearer ${DAST_ID_TOKEN}" \
+            --env "ZAP_AUTH_HEADER_SITE=${TARGET_HOST}" \
+            --volume "${RUNNER_TEMP}/zap:/zap/wrk:rw" \
+            zaproxy/zap-stable@sha256:8d387b1a63e3425beef4846e39719f5af2a787753af2d8b6558c6257d7a577a2 \
+            zap-baseline.py -t "${TARGET_URL}" -m 1 -I \
+            -J zap-report.json -w zap-report.md -r zap-report.html
+
+      - name: Preserve DAST evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-zap-${{ github.run_id }}
+          path: ${{ runner.temp }}/zap/zap-report.*
+          if-no-files-found: error
+          retention-days: 30

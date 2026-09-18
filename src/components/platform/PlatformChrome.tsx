@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
+import { FurlongLogo } from "@/components/brand/FurlongLogo";
 import { ModuleNav } from "@/components/platform/ModuleNav";
 import { isInternalChromeRoute } from "@/lib/auth/protectedRoutes";
 
@@ -63,13 +64,16 @@ export function PlatformChrome({
             gap: 12,
           }}
         >
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>
-              Furlong Governed Platform
-            </div>
-            <div style={{ color: "#cbd5e1", fontSize: 13, marginTop: 3 }}>
-              {internalCount} internal surfaces, {translationCount} translated
-              surfaces, production-live controls still gated
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <FurlongLogo size="compact" href="/" />
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>
+                Furlong Governed Platform
+              </div>
+              <div style={{ color: "#cbd5e1", fontSize: 13, marginTop: 3 }}>
+                {internalCount} internal surfaces, {translationCount} translated
+                surfaces, production-live controls still gated
+              </div>
             </div>
           </div>
           <div

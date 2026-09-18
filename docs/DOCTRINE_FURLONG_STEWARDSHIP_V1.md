@@ -43,9 +43,9 @@ steward change never moves a page.
 
 | Domain | Title | Current Steward | Route |
 |---|---|---|---|
-| Financing & Capital | Steward of Financing & Capital | Stuart Fraass | `/stewardship/financing-capital` |
+| Financing & Capital | Steward of Financing & Capital | Furlong Capital Desk | `/stewardship/financing-capital` |
 | Environmental & Compliance | Steward of Environmental & Compliance | Caitlin Hudson | `/stewardship/environmental-compliance` |
-| Communications & Public Trust | Steward of Communications & Public Trust | Frances Fraass | `/stewardship/communications-public-trust` |
+| Communications & Public Trust | Steward of Communications & Public Trust | Furlong Trust Desk | `/stewardship/communications-public-trust` |
 
 Future domains may be added without changing homepage architecture.
 

@@ -14,11 +14,14 @@ export type AccessRole =
   | "anonymous"
   | "user"
   | "borrower"
+  | "broker"
   | "lender"
   | "sponsor"
   | "operator"
   | "underwriter"
   | "auditor"
+  | "government_official"
+  | "attorney"
   | "admin"
   | "governance";
 
@@ -38,11 +41,17 @@ const ROLE_ALIASES: Record<string, AccessRole> = {
   anonymous: "anonymous",
   user: "user",
   borrower: "borrower",
+  broker: "broker",
   lender: "lender",
   sponsor: "sponsor",
   operator: "operator",
   underwriter: "underwriter",
   auditor: "auditor",
+  government_official: "government_official",
+  regulator: "government_official",
+  government: "government_official",
+  attorney: "attorney",
+  counsel: "attorney",
   admin: "admin",
   governance: "governance",
 };

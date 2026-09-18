@@ -1,0 +1,91 @@
+substitutions:
+  _SOURCE_BUCKET: furlong-staging-499102-iac-source
+  _SOURCE_OBJECT: unset.tgz
+  _SOURCE_GENERATION: "0"
+  _SOURCE_SHA256: unset
+  _PLAN_BUCKET: furlong-staging-499102-iac-plans
+
+steps:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: verify-controlled-source
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        uri="gs://${_SOURCE_BUCKET}/${_SOURCE_OBJECT}#${_SOURCE_GENERATION}"
+        gcloud storage cp "$${uri}" /workspace/iac-source.tgz
+        actual="$$(sha256sum /workspace/iac-source.tgz | awk '{print $$1}')"
+        test "$${actual}" = "${_SOURCE_SHA256}"
+        mkdir -p /workspace/source
+        tar -xzf /workspace/iac-source.tgz -C /workspace/source
+        test -f /workspace/source/infra/staging/versions.tf
+        test -f /workspace/source/infra/staging/terraform.tfvars
+        if find /workspace/source -name 'terraform.tfstate*' -o -name '.terraform' | grep -q .; then
+          echo 'FATAL: local Terraform state/provider cache entered controlled source'
+          exit 1
+        fi
+  - name: hashicorp/terraform:1.15.8
+    id: terraform-plan
+    entrypoint: sh
+    args:
+      - -ceu
+      - |
+        cd /workspace/source/infra/staging
+        terraform init -input=false
+        terraform validate
+        terraform state pull > /workspace/state-before.json
+        terraform plan -lock=false -input=false -out=/workspace/plan.tfplan
+        terraform show -no-color /workspace/plan.tfplan > /workspace/plan.txt
+        terraform show -json /workspace/plan.tfplan > /workspace/plan.json
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: publish-plan
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        python3 - <<'PY'
+        import hashlib, json, os, pathlib
+        state=json.load(open('/workspace/state-before.json'))
+        plan=json.load(open('/workspace/plan.json'))
+        source_root=pathlib.Path('/workspace/source')
+        service=(source_root/'infra/staging/service.tf').read_text()
+        plan_sha=hashlib.sha256(open('/workspace/plan.tfplan','rb').read()).hexdigest()
+        changes=[]
+        for r in plan.get('resource_changes',[]):
+            actions=r.get('change',{}).get('actions',[])
+            if actions != ['no-op']:
+                changes.append({'address':r.get('address'),'actions':actions})
+        manifest={
+          'schemaVersion':'furlong-infra-plan-v1',
+          'planId':'${BUILD_ID}',
+          'projectId':'furlong-staging-499102',
+          'controlledSource':{
+            'uri':'gs://${_SOURCE_BUCKET}/${_SOURCE_OBJECT}',
+            'generation':'${_SOURCE_GENERATION}',
+            'sha256':'${_SOURCE_SHA256}',
+          },
+          'terraform':{
+            'backend':'gcs','stateBucket':'furlong-staging-499102-tfstate',
+            'statePrefix':'staging/core','serial':state.get('serial'),
+            'lineage':state.get('lineage'),
+          },
+          'planSha256':plan_sha,
+          'changeCount':len(changes),
+          'changes':changes,
+          'sourceControls':{
+            'stagingSeedExplicitSwitchDeclared':'STAGING_SEED_ENABLED' in service,
+          },
+        }
+        json.dump(manifest,open('/workspace/plan-manifest.json','w'),indent=2,sort_keys=True)
+        PY
+        dest="gs://${_PLAN_BUCKET}/plans/${BUILD_ID}"
+        gcloud storage cp /workspace/plan.tfplan "$${dest}/plan.tfplan"
+        gcloud storage cp /workspace/plan.txt "$${dest}/plan.txt"
+        gcloud storage cp /workspace/plan.json "$${dest}/plan.json"
+        gcloud storage cp /workspace/plan-manifest.json "$${dest}/plan-manifest.json"
+        echo "PLAN_ID=${BUILD_ID}"
+        cat /workspace/plan-manifest.json
+
+options:
+  logging: CLOUD_LOGGING_ONLY

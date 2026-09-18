@@ -5,6 +5,7 @@ import {
   evaluateSourcePromotionPacketGate,
 } from "@/lib/governance/sourcePromotionPacketGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { latestSourceReviewEvidence, recordSourceReviewEvidence, sourceReviewEvidenceFor } from "@/lib/governance/sourceReviewEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -142,20 +143,15 @@ async function handleSourcePromotionPacket(
     });
     const result = evaluateSourcePromotionPacketGate({ sourceId });
     const promotionHold =
-      req.method === "POST"
-        ? {
-            promotionHoldId: `source-promotion-packet-hold-${Date.now()}`,
-            sourceId: sourceId ?? null,
-            reviewStatus: "SOURCE_PROMOTION_PACKET_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            legalAdviceProvided: false,
-            liveFetchPerformed: false,
-            externalActionPerformed: false,
-            productionBlocked: true,
-            humanReviewRequired: true,
-            replayRef: traceId,
-          }
-        : null;
+      req.method === "POST" && sourceId && actorId
+        ? recordSourceReviewEvidence({ kind: "PROMOTION_PACKET_HOLD", sourceId, actorId, reviewNote: body.reviewNote, replayRef: traceId })
+        : sourceId
+          ? latestSourceReviewEvidence(sourceId, "PROMOTION_PACKET_HOLD")
+          : null;
+    const promotionHistory = sourceReviewEvidenceFor(sourceId, "PROMOTION_PACKET_HOLD");
+    const legalReviewEvidence = sourceId
+      ? latestSourceReviewEvidence(sourceId, "LEGAL_REVIEW_HOLD")
+      : null;
     const classifiedOutput = classifyRecord(
       {
         count: result.sourcePromotionPackets.length,
@@ -164,6 +160,8 @@ async function handleSourcePromotionPacket(
         disclosures: result.disclosures,
         promotionPosture: result.promotionPosture,
         promotionHold,
+        promotionHistory,
+        legalReviewEvidence,
         productionBlocked: true,
         liveFetchPerformed: false,
         externalActionPerformed: false,
@@ -229,6 +227,8 @@ async function handleSourcePromotionPacket(
       disclosures: classifiedOutput.disclosures,
       promotionPosture: classifiedOutput.promotionPosture,
       promotionHold: classifiedOutput.promotionHold,
+      promotionHistory: classifiedOutput.promotionHistory,
+      legalReviewEvidence: classifiedOutput.legalReviewEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       liveFetchPerformed: classifiedOutput.liveFetchPerformed,
       externalActionPerformed: classifiedOutput.externalActionPerformed,

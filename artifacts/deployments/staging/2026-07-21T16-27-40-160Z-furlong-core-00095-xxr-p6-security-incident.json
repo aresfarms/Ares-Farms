@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "p6-security-incident-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00095-xxr",
+  "productionAuthorized": false,
+  "blockerId": "P5-B08",
+  "blockerStatus": "EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",
+  "outcome": "PASS",
+  "checks": [
+    {
+      "name": "expected P6 revision live",
+      "pass": true,
+      "actual": "furlong-core-00095-xxr",
+      "evidence": "furlong-core-00095-xxr"
+    },
+    {
+      "name": "image is digest pinned",
+      "pass": true,
+      "actual": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:59b2d3a6684a793a5b8583dcf8b67f4af6f0de9bebc104225004c696a55261c3",
+      "evidence": "Cloud Run service image"
+    },
+    {
+      "name": "live API authentication enforcement required",
+      "pass": true,
+      "actual": "required",
+      "evidence": "Cloud Run environment"
+    },
+    {
+      "name": "live rate limiting enabled",
+      "pass": true,
+      "actual": "true",
+      "evidence": "Cloud Run environment"
+    },
+    {
+      "name": "incident response control model passes",
+      "pass": true,
+      "actual": "smoke passed",
+      "evidence": "Module 34 fail-closed model"
+    },
+    {
+      "name": "required alert families enabled",
+      "pass": true,
+      "actual": "furlong staging app 5xx responses | furlong staging sql authentication failure | furlong staging unexpected secret access | furlong staging privileged job failure | furlong staging source refresh failure | furlong staging cloud sql admin operation failure | furlong staging edge 403 probe activity",
+      "evidence": "Cloud Monitoring policies"
+    },
+    {
+      "name": "security notification channel enabled",
+      "pass": true,
+      "actual": "[{\"type\":\"email\",\"enabled\":true}]",
+      "evidence": "Cloud Monitoring channels"
+    },
+    {
+      "name": "project audit logging configured",
+      "pass": true,
+      "actual": "2",
+      "evidence": "IAM audit configs"
+    },
+    {
+      "name": "IAP enabled",
+      "pass": true,
+      "actual": "true",
+      "evidence": "Cloud Run annotation"
+    },
+    {
+      "name": "non-destructive incident tabletop complete",
+      "pass": true,
+      "actual": "TABLETOP_PASS",
+      "evidence": "P6 tabletop drill"
+    }
+  ],
+  "tabletopDrill": {
+    "scenario": "credential-exposure-plus-5xx-spike",
+    "detectedBy": [
+      "unexpected secret access alert",
+      "app 5xx alert"
+    ],
+    "actions": [
+      "declare SEV-1",
+      "freeze deployments",
+      "rotate affected secret",
+      "review audit logs",
+      "validate IAP and runtime restrictions",
+      "prepare human-approved communications"
+    ],
+    "executedActions": [],
+    "productionChangesMade": false,
+    "outcome": "TABLETOP_PASS"
+  },
+  "generatedAtUtc": "2026-07-21T16:27:40.160Z"
+}

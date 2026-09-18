@@ -9,10 +9,10 @@
  * action) on top of the empty COUNSEL_CLEARED_STATES default.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { appendAuditEvent, readAuditEvents } from "@/lib/property/auditLedger";
 import { COUNSEL_CLEARED_STATES } from "./listingSourceActivation";
 
 const STATE_PATH = path.join(process.cwd(), "data", "listing-review-state.json");
@@ -53,7 +53,7 @@ export function recordCounselClearance(input: { state: string; reviewerId: strin
   const st = input.state.toUpperCase();
   if (!o.counselClearedStates.includes(st)) o.counselClearedStates.push(st);
   writeOverlay(o);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.reviewerId, actorName: input.reviewerName, domain: LISTING_AUDIT_DOMAIN,
     subject: `counsel-clearance:${st}`, decision: "COUNSEL_CLEARED", reason: input.reason,
     detail: { state: st, note: "Real estate attorney confirmed free-venue posture for this state." },
@@ -112,7 +112,7 @@ export function recordListingDecision(input: {
   o.listings[input.listingId] = { status, reviewedBy: input.reviewerId, reviewedByName: input.reviewerName, reviewedAt: now, reason: input.reason || null };
   writeOverlay(o);
 
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.reviewerId, actorName: input.reviewerName, domain: LISTING_AUDIT_DOMAIN,
     subject: input.listingId, decision: input.decision, reason: input.reason,
     detail: { status, listingState: input.listingState.toUpperCase(), counselCleared: isStateCounselCleared(input.listingState) },
@@ -121,5 +121,5 @@ export function recordListingDecision(input: {
 }
 
 export function readListingAudit(listingId: string, limit = 10) {
-  return readAuditEvents({ domain: LISTING_AUDIT_DOMAIN, subject: listingId }).slice(-limit).reverse();
+  return canonicalLandRegisterAuthority.read({ domain: LISTING_AUDIT_DOMAIN, subject: listingId }).slice(-limit).reverse();
 }

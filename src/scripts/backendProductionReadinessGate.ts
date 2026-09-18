@@ -69,7 +69,7 @@ function check(
     passDetail: string;
     failDetail: string;
     productionOnlyBlock?: boolean;
-  }
+  },
 ): void {
   const block =
     input.productionOnlyBlock === true && !productionProfile
@@ -123,6 +123,9 @@ function templateContainsRequiredKeys(template: string): boolean {
     "AUTH_CREDENTIAL_EMAIL_ALLOWLIST",
     "AUTH_CREDENTIAL_SHARED_SECRET",
     "ROLE_PROVISIONING_MODE",
+    "FURLONG_DEPLOYMENT_ENVIRONMENT",
+    "SYNTHETIC_FIXTURES_ENABLED",
+    "PROFESSIONAL_TEST_PERSONAS_ENABLED",
     "BACKEND_SMOKE_BASE_URL",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
@@ -215,8 +218,7 @@ function main() {
     id: "backend-production.database-ssl",
     area: "database",
     passed: databasePosture.productionSafe,
-    summary:
-      "Production database traffic must use certificate-verifying SSL.",
+    summary: "Production database traffic must use certificate-verifying SSL.",
     passDetail: databasePosture.reason,
     failDetail: databasePosture.reason,
     productionOnlyBlock: true,
@@ -227,8 +229,7 @@ function main() {
     area: "auth",
     passed:
       secretLooksStrong(nextAuthSecret) &&
-      (!productionProfile ||
-        !isLocalDevelopmentNextAuthSecret(nextAuthSecret)),
+      (!productionProfile || !isLocalDevelopmentNextAuthSecret(nextAuthSecret)),
     summary: "Production auth requires a strong, non-local NextAuth secret.",
     passDetail: productionProfile
       ? "NEXTAUTH_SECRET is configured for production."
@@ -244,8 +245,7 @@ function main() {
     passed: productionProfile
       ? nextAuthUrlProductionSafe(process.env.NEXTAUTH_URL)
       : true,
-    summary:
-      "Production auth requires an HTTPS non-localhost NEXTAUTH_URL.",
+    summary: "Production auth requires an HTTPS non-localhost NEXTAUTH_URL.",
     passDetail: productionProfile
       ? "NEXTAUTH_URL is production safe."
       : "Local profile permits localhost URL posture.",
@@ -280,8 +280,7 @@ function main() {
     passed:
       positiveIntegerEnv("API_RATE_LIMIT_WINDOW_SECONDS") &&
       positiveIntegerEnv("API_RATE_LIMIT_MAX"),
-    summary:
-      "Production API rate limiting must have explicit positive limits.",
+    summary: "Production API rate limiting must have explicit positive limits.",
     passDetail:
       "API_RATE_LIMIT_WINDOW_SECONDS and API_RATE_LIMIT_MAX are configured.",
     failDetail:
@@ -308,10 +307,42 @@ function main() {
     id: "backend-production.role-provisioning",
     area: "auth",
     passed: roleProvisioningMode() === "governed-admin-only",
-    summary:
-      "Production role changes must go through governed provisioning.",
+    summary: "Production role changes must go through governed provisioning.",
     passDetail: "ROLE_PROVISIONING_MODE is governed-admin-only.",
     failDetail: "ROLE_PROVISIONING_MODE is not governed-admin-only.",
+    productionOnlyBlock: true,
+  });
+
+  check(checks, {
+    id: "backend-production.synthetic-fixture-startup-guard",
+    area: "test-boundary",
+    passed:
+      exists("src/instrumentation.ts") &&
+      read("src/instrumentation.ts").includes(
+        "Production startup refused: synthetic test controls are enabled",
+      ),
+    summary:
+      "Production must refuse startup when synthetic fixtures or professional test personas are enabled.",
+    passDetail:
+      "The server startup hook fails closed when either synthetic-test switch is active in production.",
+    failDetail:
+      "A fail-closed production startup boundary for synthetic fixtures is missing.",
+  });
+
+  check(checks, {
+    id: "backend-production.synthetic-fixtures-disabled",
+    area: "test-boundary",
+    passed:
+      !productionProfile ||
+      (process.env.FURLONG_DEPLOYMENT_ENVIRONMENT === "production" &&
+        process.env.SYNTHETIC_FIXTURES_ENABLED !== "true" &&
+        process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED !== "true"),
+    summary:
+      "Synthetic fixtures must be explicitly disabled in the production profile.",
+    passDetail:
+      "Production environment identity is explicit and all synthetic fixture switches are disabled.",
+    failDetail:
+      "Production requires FURLONG_DEPLOYMENT_ENVIRONMENT=production with both synthetic fixture switches disabled.",
     productionOnlyBlock: true,
   });
 
@@ -321,13 +352,13 @@ function main() {
     passed:
       exists("docs/BACKEND_COVERAGE_MATRIX.md") &&
       read("docs/BACKEND_COVERAGE_MATRIX.md").includes(
-        "Real USDA/SBA/property external calls"
+        "Real USDA/SBA/property external calls",
       ) &&
       read("docs/BACKEND_COVERAGE_MATRIX.md").includes(
-        "External notice provider sends"
+        "External notice provider sends",
       ) &&
       read("docs/BACKEND_COVERAGE_MATRIX.md").includes(
-        "Production payment capture"
+        "Production payment capture",
       ),
     summary:
       "Live external actions must remain explicitly controlled before public exposure.",

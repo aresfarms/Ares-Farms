@@ -90,6 +90,8 @@ function institutionalRole(role: AccessRole): boolean {
     role === "operator" ||
     role === "underwriter" ||
     role === "auditor" ||
+    role === "government_official" ||
+    role === "attorney" ||
     role === "lender" ||
     role === "sponsor" ||
     privilegedRole(role)

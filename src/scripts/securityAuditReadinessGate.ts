@@ -4,13 +4,15 @@ import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
-import {
-  getPostgresSslPosture,
-} from "@/lib/db/postgresSsl";
+import { getPostgresSslPosture } from "@/lib/db/postgresSsl";
 import {
   isLocalDevelopmentNextAuthSecret,
   resolveNextAuthSecret,
 } from "@/lib/auth/nextAuthSecurity";
+import {
+  externalSecretInventory,
+  validateExternalSecretInventory,
+} from "@/lib/security/externalSecretInventory";
 
 /**
  * Security & Audit Readiness Gate
@@ -37,7 +39,9 @@ type GateCheck = {
 };
 
 const repoRoot = process.cwd();
-const profile = (process.env.SECURITY_GATE_PROFILE ?? "development").toLowerCase();
+const profile = (
+  process.env.SECURITY_GATE_PROFILE ?? "development"
+).toLowerCase();
 const productionProfile = profile === "production";
 
 function file(pathname: string): string {
@@ -62,11 +66,12 @@ function check(
     passDetail: string;
     failDetail: string;
     productionOnlyBlock?: boolean;
-  }
+  },
 ) {
-  const block = input.productionOnlyBlock === true && !productionProfile
-    ? false
-    : !input.passed;
+  const block =
+    input.productionOnlyBlock === true && !productionProfile
+      ? false
+      : !input.passed;
 
   checks.push({
     id: input.id,
@@ -124,6 +129,10 @@ function suspiciousCredentialEnvKeys(keys: string[]): string[] {
     "AUTH_CREDENTIAL_EMAIL_ALLOWLIST",
     "AUTH_CREDENTIAL_SHARED_SECRET",
     "ROLE_PROVISIONING_MODE",
+    "FURLONG_DEPLOYMENT_ENVIRONMENT",
+    "SYNTHETIC_FIXTURES_ENABLED",
+    "PROFESSIONAL_TEST_PERSONAS_ENABLED",
+    "SYNTHETIC_FIXTURE_OPERATOR_ALLOWLIST",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
     "OPENAI_API_KEY",
@@ -135,7 +144,7 @@ function suspiciousCredentialEnvKeys(keys: string[]): string[] {
     }
 
     return /(PASSWORD|SECRET|TOKEN|PRIVATE_KEY|ACCESS_KEY|API_KEY|CREDENTIAL)/i.test(
-      key
+      key,
     );
   });
 }
@@ -162,8 +171,23 @@ function main() {
   const checks: GateCheck[] = [];
   const databasePosture = getPostgresSslPosture();
   const nextAuthSecret = resolveNextAuthSecret();
-  const envKeys = parseEnvFileKeys(".env");
-  const suspiciousKeys = suspiciousCredentialEnvKeys(envKeys);
+  const localEnvFiles = [
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.development.local",
+    ".env.test",
+    ".env.test.local",
+  ].filter(exists);
+  const suspiciousKeys = localEnvFiles.flatMap((pathname) =>
+    suspiciousCredentialEnvKeys(parseEnvFileKeys(pathname)).map(
+      (key) => `${pathname}:${key}`,
+    ),
+  );
+  const secretInventoryIssues = validateExternalSecretInventory();
+  const pendingSecretRotations = externalSecretInventory.secrets.filter(
+    (entry) => entry.rotationStatus !== "ROTATED",
+  );
   const dbIndex = exists("src/lib/db/index.ts")
     ? read("src/lib/db/index.ts")
     : "";
@@ -173,7 +197,9 @@ function main() {
   const authInitRoute = exists("src/app/api/auth/init/route.ts")
     ? read("src/app/api/auth/init/route.ts")
     : "";
-  const roleProvisioningRoute = exists("src/app/api/auth/role-provisioning/route.ts")
+  const roleProvisioningRoute = exists(
+    "src/app/api/auth/role-provisioning/route.ts",
+  )
     ? read("src/app/api/auth/role-provisioning/route.ts")
     : "";
   const apiSecurityPolicy = exists("src/lib/security/apiSecurityPolicy.ts")
@@ -201,22 +227,40 @@ function main() {
   check(checks, {
     id: "security.env-file-ignored",
     area: "secrets",
-    passed: !exists(".env") || gitCheckIgnored(".env"),
-    summary: ".env must not be committed.",
-    passDetail: ".env is ignored by git.",
-    failDetail: ".env exists but is not ignored by git.",
+    passed: localEnvFiles.every(gitCheckIgnored),
+    summary: "Local environment files must not be committed.",
+    passDetail: "Every detected local environment file is ignored by git.",
+    failDetail: `One or more local environment files are not ignored: ${localEnvFiles
+      .filter((pathname) => !gitCheckIgnored(pathname))
+      .join(", ")}`,
   });
 
   check(checks, {
     id: "security.env-no-raw-agency-credentials",
     area: "secrets",
     passed: suspiciousKeys.length === 0,
-    summary: "Environment file must not contain raw agency credentials.",
+    summary: "Local environment files must not contain raw agency credentials.",
     passDetail:
-      "No suspicious raw agency credential keys were found in the local .env file.",
-    failDetail: `Suspicious credential-like keys found in .env: ${suspiciousKeys.join(
-      ", "
+      "No suspicious raw agency credential keys were found in local environment files.",
+    failDetail: `Suspicious credential-like keys found in local environment files: ${suspiciousKeys.join(
+      ", ",
     )}`,
+  });
+
+  check(checks, {
+    id: "security.external-secret-rotation-evidence",
+    area: "secrets",
+    passed:
+      secretInventoryIssues.length === 0 && pendingSecretRotations.length === 0,
+    summary: "Migrated secrets must have recorded rotation evidence.",
+    passDetail:
+      "Every governed migrated secret has recorded rotation evidence.",
+    failDetail: [
+      ...secretInventoryIssues,
+      ...pendingSecretRotations.map(
+        (entry) => `${entry.name}:${entry.rotationStatus}`,
+      ),
+    ].join(", "),
   });
 
   check(checks, {
@@ -231,7 +275,9 @@ function main() {
   check(checks, {
     id: "security.database-ssl-policy",
     area: "database",
-    passed: databasePosture.configured && databasePosture.rejectUnauthorized !== false,
+    passed:
+      databasePosture.configured &&
+      databasePosture.rejectUnauthorized !== false,
     summary: "PostgreSQL SSL must be explicit and certificate-verifying.",
     passDetail: databasePosture.reason,
     failDetail: databasePosture.reason,
@@ -254,8 +300,7 @@ function main() {
       dbIndex.includes("createPostgresSslConfig") &&
       dbIndex.includes("ssl: createPostgresSslConfig()"),
     summary: "Application database pool must use the governed SSL helper.",
-    passDetail:
-      "The application database pool uses createPostgresSslConfig().",
+    passDetail: "The application database pool uses createPostgresSslConfig().",
     failDetail:
       "The application database pool is not wired to createPostgresSslConfig().",
   });
@@ -265,8 +310,7 @@ function main() {
     area: "auth",
     passed:
       secretLooksStrong(nextAuthSecret) &&
-      (!productionProfile ||
-        !isLocalDevelopmentNextAuthSecret(nextAuthSecret)),
+      (!productionProfile || !isLocalDevelopmentNextAuthSecret(nextAuthSecret)),
     summary: "NextAuth secret must be configured with a strong value.",
     passDetail: productionProfile
       ? "NEXTAUTH_SECRET is configured for production profile."
@@ -288,8 +332,7 @@ function main() {
     passDetail: productionProfile
       ? "NEXTAUTH_URL is production safe."
       : "Local profile allows the governed localhost fallback.",
-    failDetail:
-      "NEXTAUTH_URL is missing or is not an HTTPS production URL.",
+    failDetail: "NEXTAUTH_URL is missing or is not an HTTPS production URL.",
     productionOnlyBlock: true,
   });
 
@@ -301,8 +344,7 @@ function main() {
       authRoute.includes("ensureLocalNextAuthUrl") &&
       authRoute.includes("secret: resolveNextAuthSecret()"),
     summary: "NextAuth route must use governed runtime security helpers.",
-    passDetail:
-      "NextAuth route is wired to governed URL and secret helpers.",
+    passDetail: "NextAuth route is wired to governed URL and secret helpers.",
     failDetail:
       "NextAuth route is missing governed URL or secret helper wiring.",
   });
@@ -333,8 +375,7 @@ function main() {
       "Elevated roles must be provisioned through governed session authority.",
     passDetail:
       "Governed role provisioning route and durable store are present.",
-    failDetail:
-      "Governed role provisioning route or durable store is missing.",
+    failDetail: "Governed role provisioning route or durable store is missing.",
   });
 
   check(checks, {
@@ -344,7 +385,9 @@ function main() {
       exists("src/scripts/productionAuthActivationGate.ts") &&
       exists("src/scripts/authActivationPolicySmokeTest.ts") &&
       Boolean(packageJson.scripts?.["auth:activation"]) &&
-      Boolean(packageJson.scripts?.["verify:backend"]?.includes("auth:activation")),
+      Boolean(
+        packageJson.scripts?.["verify:backend"]?.includes("auth:activation"),
+      ),
     summary:
       "Production Auth Activation Gate must be wired into backend verification.",
     passDetail:
@@ -379,7 +422,8 @@ function main() {
       apiSecurityProxy.includes("apiAuthEnforcementRequired") &&
       apiSecurityProxy.includes("apiRateLimitingEnabled") &&
       apiSecurityProxy.includes("roleClaimConflictsWithSession") &&
-      apiSecurityProxy.includes("matcher: \"/api/:path*\""),
+      apiSecurityProxy.includes("matcher: [") &&
+      apiSecurityProxy.includes("_next/static"),
     summary:
       "Protected API routes must have a perimeter proxy for session authority and abuse control.",
     passDetail:
@@ -396,8 +440,8 @@ function main() {
       Boolean(packageJson.scripts?.["smoke:security-policy"]) &&
       Boolean(
         packageJson.scripts?.["verify:backend"]?.includes(
-          "smoke:security-policy"
-        )
+          "smoke:security-policy",
+        ),
       ),
     summary:
       "API security policy must have smoke coverage wired into verify:backend.",
@@ -431,6 +475,25 @@ function main() {
   });
 
   check(checks, {
+    id: "security.synthetic-fixture-production-boundary",
+    area: "test-boundary",
+    passed:
+      exists("src/instrumentation.ts") &&
+      (!productionProfile ||
+        (process.env.FURLONG_DEPLOYMENT_ENVIRONMENT === "production" &&
+          process.env.SYNTHETIC_FIXTURES_ENABLED !== "true" &&
+          process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED !== "true")),
+    summary:
+      "Synthetic identities must be cryptographically marked in staging and impossible to activate in production.",
+    passDetail: productionProfile
+      ? "Production fixture switches are disabled and startup enforcement is present."
+      : "The fail-closed production startup boundary is present; non-production may run signed synthetic fixtures.",
+    failDetail:
+      "Synthetic fixtures are enabled in production or the fail-closed startup boundary is missing.",
+    productionOnlyBlock: true,
+  });
+
+  check(checks, {
     id: "security.audit-ledger-admin-read",
     area: "audit",
     passed:
@@ -447,9 +510,16 @@ function main() {
     id: "security.smoke-backend-wired",
     area: "verification",
     passed:
-      Boolean(packageJson.scripts?.["smoke:backend"]?.includes("smoke:ledger-admin-read")) &&
-      Boolean(packageJson.scripts?.["verify:backend"]?.includes("security:audit")),
-    summary: "Security-relevant smoke coverage must be wired into package scripts.",
+      Boolean(
+        packageJson.scripts?.["smoke:backend"]?.includes(
+          "smoke:ledger-admin-read",
+        ),
+      ) &&
+      Boolean(
+        packageJson.scripts?.["verify:backend"]?.includes("security:audit"),
+      ),
+    summary:
+      "Security-relevant smoke coverage must be wired into package scripts.",
     passDetail:
       "Backend smoke includes ledger admin-read coverage and verify:backend includes the security audit gate.",
     failDetail:

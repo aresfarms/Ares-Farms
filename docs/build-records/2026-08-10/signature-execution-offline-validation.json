@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "recordType": "signature-execution-offline-validation",
+  "recordVersion": "v1.0.0",
+  "doctrineVersion": "signature-execution-v1.0.0",
+  "reviewDate": "2026-08-10",
+  "sourceCommit": "07d358ea72749224dc1c138e7fbddfeb51b5ff76",
+  "testMode": "signature-mock-v1",
+  "legallyOperative": false,
+  "fixtures": [
+    {
+      "name": "furlong-authored-executed-offline-test.pdf",
+      "pages": 1,
+      "sha256": "35040c547fa24243395b6f15c860ab1057968781d394e54b554de49da58a68a2",
+      "testLabelVisible": true
+    },
+    {
+      "name": "third-party-executed-offline-test.pdf",
+      "pages": 2,
+      "sha256": "ed95fd32c04fd96dae32b3a23d5be4e8e6517bcf97ccc2a8ac843687a5b72dba",
+      "testLabelVisible": true,
+      "sourcePagePreserved": true
+    }
+  ],
+  "lineage": {
+    "sourceSha256": "60bfc1ad9df0e71fd2bb137b564537171e38bf7a0faee5d25d621e1ef7db544a",
+    "executedSha256": "aa72b65f4a46de285a97ebdcd017c92633eb65977f3f9f1f7870a7cb5622f987"
+  },
+  "verification": {
+    "command": "npm run verify:signature-execution",
+    "structuralValidation": "PASS",
+    "renderedEveryPage": true,
+    "visualValidation": "PASS",
+    "clippingOrOverlapFound": false
+  },
+  "storagePosture": {
+    "generatedDirectory": "tmp/signature-execution-fixtures",
+    "generatedFilesCommitted": false,
+    "durableEvidence": "hashes-and-validation-record",
+    "reproducible": true
+  }
+}

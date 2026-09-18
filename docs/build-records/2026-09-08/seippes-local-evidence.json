@@ -1,0 +1,2895 @@
+{
+  "checkedAt": "2026-09-08T02:18:12.907Z",
+  "environment": "local-production-build",
+  "elapsedMs": 5131,
+  "httpStatus": 200,
+  "subject": "3835 Seippes Road, Federalsburg, MD 21632",
+  "landUse": "Agricultural",
+  "acreageText": "59.34 acres across 1 resolved parcel",
+  "price": null,
+  "propertyValueScreen": {
+    "status": "context-only",
+    "profileId": "farm",
+    "methodCode": "farm-state-acreage-context",
+    "valuationRole": "contextual-benchmark",
+    "displayLabel": "Valuation context",
+    "confidence": "screening-low",
+    "lowUsd": null,
+    "midUsd": null,
+    "highUsd": null,
+    "contextBenchmarkUsd": 579000,
+    "evidenceClasses": [
+      "AG_BENCHMARK"
+    ],
+    "appraisalStatus": "NOT_AN_APPRAISAL",
+    "divergence": null,
+    "method": "Agricultural context benchmark: 59.34 acres × USDA NASS 2025 MD average farm real-estate value ($9,750/acre) = about $579,000. Furlong does not wrap that state average in an invented percentage band or call it this parcel's market value.",
+    "cautions": [
+      "USDA NASS farm real-estate value is a STATE average for land and buildings, not a comparable-sale appraisal of this parcel.",
+      "A parcel-level value screen needs verified recent closed farm/land comparables with property-specific adjustments, or a qualified professional appraisal.",
+      "Soils, productive acres, irrigation/water, buildings, easements, development pressure, conservation restrictions, access and local closed sales can move an individual farm materially away from the state benchmark."
+    ],
+    "sources": [
+      "USDA NASS — Ag Land Asset Value ($/acre), 2025; snapshot 2026-07-17."
+    ],
+    "requiredInputs": [
+      "at least three verified recent closed farm/land comparables with property-specific adjustment bases, or a qualified professional appraisal"
+    ]
+  },
+  "soil": {
+    "mapUnitName": "Fallsington sandy loams, 0 to 2 percent slopes, Northern Tidewater Area; Hambrook sandy loam, 0 to 2 percent slopes; Ingleside loamy sand, 2 to 5 percent slopes; Woodstown sandy loam, 0 to 2 percent slopes, Northern Tidewater Area; Corsica mucky loam, 0 to 2 percent slopes; Zekiah sandy loam, frequently flooded; Woodstown loam, 0 to 2 percent slopes, Northern Tidewater Area",
+    "farmlandClass": null,
+    "dominantComponent": null,
+    "componentPct": null,
+    "drainageClass": null,
+    "slopePct": null,
+    "capabilityClass": null,
+    "spatialScope": "parcel-map-units",
+    "parcelCoveragePct": null,
+    "components": [
+      {
+        "mapUnitKey": "1600076",
+        "componentKey": "27486894",
+        "name": "Hambrook",
+        "componentPct": 80,
+        "drainageClass": "Well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093307",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093309",
+            "topCm": 25,
+            "bottomCm": 36,
+            "phLow": 4.3,
+            "phRepresentative": 6.5,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093310",
+            "topCm": 36,
+            "bottomCm": 71,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093308",
+            "topCm": 71,
+            "bottomCm": 165,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093306",
+            "topCm": 165,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600101",
+        "componentKey": "27486942",
+        "name": "Woodstown",
+        "componentPct": 80,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093468",
+            "topCm": 0,
+            "bottomCm": 18,
+            "phLow": 4.3,
+            "phRepresentative": 5.7,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093470",
+            "topCm": 18,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093467",
+            "topCm": 28,
+            "bottomCm": 74,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093471",
+            "topCm": 74,
+            "bottomCm": 114,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093469",
+            "topCm": 114,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2950702",
+        "componentKey": "27487132",
+        "name": "Woodstown",
+        "componentPct": 80,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82094164",
+            "topCm": 0,
+            "bottomCm": 18,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82094162",
+            "topCm": 18,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82094160",
+            "topCm": 28,
+            "bottomCm": 74,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82094163",
+            "topCm": 74,
+            "bottomCm": 114,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82094161",
+            "topCm": 114,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600079",
+        "componentKey": "27486915",
+        "name": "Ingleside",
+        "componentPct": 75,
+        "drainageClass": "Well drained",
+        "slopePct": 3,
+        "horizons": [
+          {
+            "horizonKey": "82093360",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093361",
+            "topCm": 25,
+            "bottomCm": 38,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093362",
+            "topCm": 38,
+            "bottomCm": 84,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093363",
+            "topCm": 84,
+            "bottomCm": 109,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093364",
+            "topCm": 109,
+            "bottomCm": 143,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093365",
+            "topCm": 143,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452687",
+        "componentKey": "27487059",
+        "name": "Zekiah",
+        "componentPct": 75,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093941",
+            "topCm": 0,
+            "bottomCm": 8,
+            "phLow": 4,
+            "phRepresentative": 4.8,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093943",
+            "topCm": 8,
+            "bottomCm": 51,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093940",
+            "topCm": 51,
+            "bottomCm": 69,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093944",
+            "topCm": 69,
+            "bottomCm": 93,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093942",
+            "topCm": 93,
+            "bottomCm": 127,
+            "phLow": 4,
+            "phRepresentative": 5,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093939",
+            "topCm": 127,
+            "bottomCm": 203,
+            "phLow": 4,
+            "phRepresentative": 5.2,
+            "phHigh": 5.5
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452643",
+        "componentKey": "27486971",
+        "name": "Corsica",
+        "componentPct": 55,
+        "drainageClass": "Very poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093587",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093589",
+            "topCm": 5,
+            "bottomCm": 30,
+            "phLow": 4.3,
+            "phRepresentative": 5.9,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093591",
+            "topCm": 30,
+            "bottomCm": 46,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.3
+          },
+          {
+            "horizonKey": "82093586",
+            "topCm": 46,
+            "bottomCm": 102,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093590",
+            "topCm": 102,
+            "bottomCm": 122,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093588",
+            "topCm": 122,
+            "bottomCm": 203,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.3
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600074",
+        "componentKey": "27486887",
+        "name": "Fallsington",
+        "componentPct": 48,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093272",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4.3,
+            "phRepresentative": 5.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093271",
+            "topCm": 5,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093273",
+            "topCm": 25,
+            "bottomCm": 81,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093274",
+            "topCm": 81,
+            "bottomCm": 100,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093275",
+            "topCm": 100,
+            "bottomCm": 117,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093270",
+            "topCm": 117,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600074",
+        "componentKey": "27486888",
+        "name": "Fallsington",
+        "componentPct": 27,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093280",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093278",
+            "topCm": 25,
+            "bottomCm": 81,
+            "phLow": 4.3,
+            "phRepresentative": 5.9,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093276",
+            "topCm": 81,
+            "bottomCm": 100,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093277",
+            "topCm": 100,
+            "bottomCm": 117,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093279",
+            "topCm": 117,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452643",
+        "componentKey": "27486972",
+        "name": "Corsica",
+        "componentPct": 25,
+        "drainageClass": "Very poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093594",
+            "topCm": 0,
+            "bottomCm": 30,
+            "phLow": 4.3,
+            "phRepresentative": 5.9,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093596",
+            "topCm": 30,
+            "bottomCm": 46,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.3
+          },
+          {
+            "horizonKey": "82093592",
+            "topCm": 46,
+            "bottomCm": 102,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093595",
+            "topCm": 102,
+            "bottomCm": 122,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093593",
+            "topCm": 122,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452687",
+        "componentKey": "27487060",
+        "name": "Longmarsh",
+        "componentPct": 10,
+        "drainageClass": "Very poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093948",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4,
+            "phRepresentative": 4,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093945",
+            "topCm": 5,
+            "bottomCm": 48,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093946",
+            "topCm": 48,
+            "bottomCm": 86,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093947",
+            "topCm": 86,
+            "bottomCm": 203,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.5
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600074",
+        "componentKey": "27486884",
+        "name": "Woodstown",
+        "componentPct": 9,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093257",
+            "topCm": 0,
+            "bottomCm": 18,
+            "phLow": 4.3,
+            "phRepresentative": 5.7,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093258",
+            "topCm": 18,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093260",
+            "topCm": 28,
+            "bottomCm": 74,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093259",
+            "topCm": 74,
+            "bottomCm": 114,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093256",
+            "topCm": 114,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600074",
+        "componentKey": "27486885",
+        "name": "Hammonton",
+        "componentPct": 8,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093263",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093261",
+            "topCm": 28,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093262",
+            "topCm": 76,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600074",
+        "componentKey": "27486886",
+        "name": "Othello",
+        "componentPct": 8,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093265",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4,
+            "phRepresentative": 4,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093268",
+            "topCm": 5,
+            "bottomCm": 10,
+            "phLow": 4,
+            "phRepresentative": 4,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093269",
+            "topCm": 10,
+            "bottomCm": 25,
+            "phLow": 4,
+            "phRepresentative": 4,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093266",
+            "topCm": 25,
+            "bottomCm": 74,
+            "phLow": 4,
+            "phRepresentative": 4.1,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093267",
+            "topCm": 74,
+            "bottomCm": 90,
+            "phLow": 4,
+            "phRepresentative": 4.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093264",
+            "topCm": 90,
+            "bottomCm": 203,
+            "phLow": 4,
+            "phRepresentative": 4,
+            "phHigh": 5.3
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600101",
+        "componentKey": "27486943",
+        "name": "Fallsington",
+        "componentPct": 6,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093475",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4.3,
+            "phRepresentative": 5.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093476",
+            "topCm": 5,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093477",
+            "topCm": 25,
+            "bottomCm": 81,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093472",
+            "topCm": 81,
+            "bottomCm": 100,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093473",
+            "topCm": 100,
+            "bottomCm": 117,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093474",
+            "topCm": 117,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600101",
+        "componentKey": "27486944",
+        "name": "Hammonton",
+        "componentPct": 6,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093479",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093480",
+            "topCm": 28,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093478",
+            "topCm": 76,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2950702",
+        "componentKey": "27487133",
+        "name": "Fallsington",
+        "componentPct": 6,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82094167",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4.3,
+            "phRepresentative": 5.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82094170",
+            "topCm": 5,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82094166",
+            "topCm": 25,
+            "bottomCm": 81,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82094168",
+            "topCm": 81,
+            "bottomCm": 100,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82094169",
+            "topCm": 100,
+            "bottomCm": 117,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82094165",
+            "topCm": 117,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2950702",
+        "componentKey": "27487136",
+        "name": "Hammonton",
+        "componentPct": 6,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82094181",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82094182",
+            "topCm": 28,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82094183",
+            "topCm": 76,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600076",
+        "componentKey": "27486895",
+        "name": "Cedartown",
+        "componentPct": 5,
+        "drainageClass": "Somewhat excessively drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093312",
+            "topCm": 0,
+            "bottomCm": 15,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6.5
+          },
+          {
+            "horizonKey": "82093316",
+            "topCm": 15,
+            "bottomCm": 36,
+            "phLow": 4.3,
+            "phRepresentative": 4.7,
+            "phHigh": 6.5
+          },
+          {
+            "horizonKey": "82093313",
+            "topCm": 36,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093314",
+            "topCm": 76,
+            "bottomCm": 107,
+            "phLow": 4.3,
+            "phRepresentative": 4.8,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093315",
+            "topCm": 107,
+            "bottomCm": 163,
+            "phLow": 4.3,
+            "phRepresentative": 5.1,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093311",
+            "topCm": 163,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5.2,
+            "phHigh": 5.5
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600076",
+        "componentKey": "27486896",
+        "name": "Hammonton",
+        "componentPct": 5,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093317",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093318",
+            "topCm": 28,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093319",
+            "topCm": 76,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600076",
+        "componentKey": "27486897",
+        "name": "Sassafras",
+        "componentPct": 5,
+        "drainageClass": "Well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093320",
+            "topCm": 0,
+            "bottomCm": 23,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093323",
+            "topCm": 23,
+            "bottomCm": 38,
+            "phLow": 4.3,
+            "phRepresentative": 6.5,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093322",
+            "topCm": 38,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093321",
+            "topCm": 76,
+            "bottomCm": 94,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093324",
+            "topCm": 94,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.8,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600076",
+        "componentKey": "27486898",
+        "name": "Woodstown",
+        "componentPct": 5,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093325",
+            "topCm": 0,
+            "bottomCm": 18,
+            "phLow": 4.3,
+            "phRepresentative": 5.7,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093329",
+            "topCm": 18,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093326",
+            "topCm": 28,
+            "bottomCm": 74,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093327",
+            "topCm": 74,
+            "bottomCm": 114,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093328",
+            "topCm": 114,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600079",
+        "componentKey": "27486910",
+        "name": "Woodstown",
+        "componentPct": 5,
+        "drainageClass": null,
+        "slopePct": null,
+        "horizons": []
+      },
+      {
+        "mapUnitKey": "1600079",
+        "componentKey": "27486911",
+        "name": "Cedartown",
+        "componentPct": 5,
+        "drainageClass": null,
+        "slopePct": null,
+        "horizons": []
+      },
+      {
+        "mapUnitKey": "1600079",
+        "componentKey": "27486912",
+        "name": "Downer",
+        "componentPct": 5,
+        "drainageClass": null,
+        "slopePct": null,
+        "horizons": []
+      },
+      {
+        "mapUnitKey": "1600079",
+        "componentKey": "27486913",
+        "name": "Evesboro",
+        "componentPct": 5,
+        "drainageClass": null,
+        "slopePct": null,
+        "horizons": []
+      },
+      {
+        "mapUnitKey": "1600079",
+        "componentKey": "27486914",
+        "name": "Hammonton",
+        "componentPct": 5,
+        "drainageClass": null,
+        "slopePct": null,
+        "horizons": []
+      },
+      {
+        "mapUnitKey": "2452643",
+        "componentKey": "27486973",
+        "name": "Fallsington",
+        "componentPct": 5,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093601",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 5.7,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093598",
+            "topCm": 25,
+            "bottomCm": 81,
+            "phLow": 4.3,
+            "phRepresentative": 5.9,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093597",
+            "topCm": 81,
+            "bottomCm": 100,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093599",
+            "topCm": 100,
+            "bottomCm": 117,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093600",
+            "topCm": 117,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452643",
+        "componentKey": "27486974",
+        "name": "Kentuck",
+        "componentPct": 5,
+        "drainageClass": "Very poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093604",
+            "topCm": 0,
+            "bottomCm": 8,
+            "phLow": 4,
+            "phRepresentative": 4.5,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093607",
+            "topCm": 8,
+            "bottomCm": 33,
+            "phLow": 4,
+            "phRepresentative": 4.3,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093603",
+            "topCm": 33,
+            "bottomCm": 61,
+            "phLow": 4,
+            "phRepresentative": 4.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093602",
+            "topCm": 61,
+            "bottomCm": 114,
+            "phLow": 4,
+            "phRepresentative": 4.1,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093605",
+            "topCm": 114,
+            "bottomCm": 145,
+            "phLow": 4,
+            "phRepresentative": 4.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093606",
+            "topCm": 145,
+            "bottomCm": 203,
+            "phLow": 4,
+            "phRepresentative": 4,
+            "phHigh": 5.3
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452643",
+        "componentKey": "27486975",
+        "name": "Hurlock",
+        "componentPct": 5,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093608",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093609",
+            "topCm": 25,
+            "bottomCm": 33,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093611",
+            "topCm": 33,
+            "bottomCm": 64,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093612",
+            "topCm": 64,
+            "bottomCm": 160,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093610",
+            "topCm": 160,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452643",
+        "componentKey": "27486976",
+        "name": "Woodstown",
+        "componentPct": 5,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093613",
+            "topCm": 0,
+            "bottomCm": 18,
+            "phLow": 4.3,
+            "phRepresentative": 5.7,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093617",
+            "topCm": 18,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093614",
+            "topCm": 28,
+            "bottomCm": 74,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093615",
+            "topCm": 74,
+            "bottomCm": 114,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093616",
+            "topCm": 114,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452687",
+        "componentKey": "27487061",
+        "name": "Askecksy",
+        "componentPct": 5,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093953",
+            "topCm": 0,
+            "bottomCm": 8,
+            "phLow": 4,
+            "phRepresentative": 5.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093949",
+            "topCm": 8,
+            "bottomCm": 20,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093950",
+            "topCm": 20,
+            "bottomCm": 53,
+            "phLow": 4.3,
+            "phRepresentative": 5.4,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093951",
+            "topCm": 53,
+            "bottomCm": 74,
+            "phLow": 4.3,
+            "phRepresentative": 4.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093952",
+            "topCm": 74,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.3,
+            "phHigh": 5.5
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452687",
+        "componentKey": "27487062",
+        "name": "Hammonton",
+        "componentPct": 5,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093954",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6.2,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093955",
+            "topCm": 28,
+            "bottomCm": 76,
+            "phLow": 4.3,
+            "phRepresentative": 5.8,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093956",
+            "topCm": 76,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2452687",
+        "componentKey": "27487063",
+        "name": "Fallsington",
+        "componentPct": 5,
+        "drainageClass": "Poorly drained",
+        "slopePct": 0,
+        "horizons": [
+          {
+            "horizonKey": "82093961",
+            "topCm": 0,
+            "bottomCm": 5,
+            "phLow": 4.3,
+            "phRepresentative": 5.2,
+            "phHigh": 5.3
+          },
+          {
+            "horizonKey": "82093962",
+            "topCm": 5,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093958",
+            "topCm": 25,
+            "bottomCm": 81,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.5
+          },
+          {
+            "horizonKey": "82093957",
+            "topCm": 81,
+            "bottomCm": 100,
+            "phLow": 4.3,
+            "phRepresentative": 5.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093959",
+            "topCm": 100,
+            "bottomCm": 117,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093960",
+            "topCm": 117,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.6,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600101",
+        "componentKey": "27486945",
+        "name": "Mattapex",
+        "componentPct": 4,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093483",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093481",
+            "topCm": 28,
+            "bottomCm": 38,
+            "phLow": 4.3,
+            "phRepresentative": 6.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093485",
+            "topCm": 38,
+            "bottomCm": 91,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 6.3
+          },
+          {
+            "horizonKey": "82093482",
+            "topCm": 91,
+            "bottomCm": 152,
+            "phLow": 4.3,
+            "phRepresentative": 4.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093484",
+            "topCm": 152,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.4,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "1600101",
+        "componentKey": "27486946",
+        "name": "Hambrook",
+        "componentPct": 4,
+        "drainageClass": "Well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82093486",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093490",
+            "topCm": 25,
+            "bottomCm": 36,
+            "phLow": 4.3,
+            "phRepresentative": 6.5,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82093489",
+            "topCm": 36,
+            "bottomCm": 71,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82093488",
+            "topCm": 71,
+            "bottomCm": 102,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82093487",
+            "topCm": 102,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2950702",
+        "componentKey": "27487134",
+        "name": "Mattapex",
+        "componentPct": 4,
+        "drainageClass": "Moderately well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82094171",
+            "topCm": 0,
+            "bottomCm": 28,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82094172",
+            "topCm": 28,
+            "bottomCm": 38,
+            "phLow": 4.3,
+            "phRepresentative": 6.3,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82094173",
+            "topCm": 38,
+            "bottomCm": 91,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 6.3
+          },
+          {
+            "horizonKey": "82094174",
+            "topCm": 91,
+            "bottomCm": 152,
+            "phLow": 4.3,
+            "phRepresentative": 4.3,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82094175",
+            "topCm": 152,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.4,
+            "phHigh": 5.8
+          }
+        ]
+      },
+      {
+        "mapUnitKey": "2950702",
+        "componentKey": "27487135",
+        "name": "Hambrook",
+        "componentPct": 4,
+        "drainageClass": "Well drained",
+        "slopePct": 1,
+        "horizons": [
+          {
+            "horizonKey": "82094180",
+            "topCm": 0,
+            "bottomCm": 25,
+            "phLow": 4.3,
+            "phRepresentative": 6,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82094176",
+            "topCm": 25,
+            "bottomCm": 36,
+            "phLow": 4.3,
+            "phRepresentative": 6.5,
+            "phHigh": 6.8
+          },
+          {
+            "horizonKey": "82094177",
+            "topCm": 36,
+            "bottomCm": 71,
+            "phLow": 4.3,
+            "phRepresentative": 5.5,
+            "phHigh": 6
+          },
+          {
+            "horizonKey": "82094179",
+            "topCm": 71,
+            "bottomCm": 102,
+            "phLow": 4.3,
+            "phRepresentative": 5,
+            "phHigh": 5.8
+          },
+          {
+            "horizonKey": "82094178",
+            "topCm": 102,
+            "bottomCm": 203,
+            "phLow": 4.3,
+            "phRepresentative": 4.5,
+            "phHigh": 5.8
+          }
+        ]
+      }
+    ],
+    "sourceUrl": "https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest",
+    "fieldPh": null,
+    "retrievedAt": "2026-09-08T02:17:27.716Z",
+    "mapUnits": [
+      {
+        "key": "1600074",
+        "name": "Fallsington sandy loams, 0 to 2 percent slopes, Northern Tidewater Area",
+        "farmlandClass": "Farmland of statewide importance",
+        "capabilityClass": 5
+      },
+      {
+        "key": "1600076",
+        "name": "Hambrook sandy loam, 0 to 2 percent slopes",
+        "farmlandClass": "All areas are prime farmland",
+        "capabilityClass": 1
+      },
+      {
+        "key": "1600079",
+        "name": "Ingleside loamy sand, 2 to 5 percent slopes",
+        "farmlandClass": "All areas are prime farmland",
+        "capabilityClass": 2
+      },
+      {
+        "key": "1600101",
+        "name": "Woodstown sandy loam, 0 to 2 percent slopes, Northern Tidewater Area",
+        "farmlandClass": "All areas are prime farmland",
+        "capabilityClass": 2
+      },
+      {
+        "key": "2452643",
+        "name": "Corsica mucky loam, 0 to 2 percent slopes",
+        "farmlandClass": "Farmland of statewide importance",
+        "capabilityClass": 5
+      },
+      {
+        "key": "2452687",
+        "name": "Zekiah sandy loam, frequently flooded",
+        "farmlandClass": "Not prime farmland",
+        "capabilityClass": 5
+      },
+      {
+        "key": "2950702",
+        "name": "Woodstown loam, 0 to 2 percent slopes, Northern Tidewater Area",
+        "farmlandClass": "All areas are prime farmland",
+        "capabilityClass": 2
+      }
+    ],
+    "boundaryEvidence": {
+      "parcelId": "0605011922",
+      "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_ParcelBoundaries/MapServer/0/query?f=geojson&where=ACCTID+%3D+%270605011922%27&outFields=ACCTID%2CPOLYDATE%2CPOLYACRES&returnGeometry=true&outSR=4326&resultRecordCount=2",
+      "sourceDate": "2023DEC",
+      "geometryHash": "8763793b4b86f82010614849c07e1472722e991359c532834ee8a96d73c6f4bf",
+      "queryHash": "5164f6e44875bab91f663eeed4abd6bff7323443797e0c1139c04496016052f6"
+    }
+  },
+  "comparableDiscovery": {
+    "version": "government-comparable-discovery-v2.0.0",
+    "status": "comparable-evidence-pending",
+    "retrievalStatus": "candidates-found",
+    "subjectId": "3835 Seippes Road, Federalsburg, MD 21632",
+    "asOf": "2026-09-08T02:17:23.654Z",
+    "retrievedAt": "2026-09-08T02:17:27.837Z",
+    "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0/query?f=json&where=CONSIDR1+%3E+0+AND+TRADATE+%3E%3D+%2720250309%27+AND+TRADATE+%3C%3D+%2720260908%27+AND+DESCLU+%3D+%27Agricultural%27&geometry=-75.830496837193%2C38.711979195572&geometryType=esriGeometryPoint&inSR=4326&distance=40233.6&units=esriSRUnit_Meter&outFields=JURSCODE%2CACCTID%2CADDRESS%2CPREMCITY%2CPREMZIP%2CTRADATE%2CCONSIDR1%2CDR1LIBER%2CDR1FOLIO%2CDESCLU%2CSQFTSTRC%2CACRES%2CSDATDATE&returnGeometry=false&orderByFields=TRADATE+DESC%2CACCTID&resultRecordCount=75",
+    "candidates": [
+      {
+        "id": "0602024888:2026-04-22:580000",
+        "parcelId": "0602024888",
+        "transactionId": "CARO:01782:0484",
+        "address": "12459 KIBLER RD, GREENSBORO, MD, 21639",
+        "saleDate": "2026-04-22",
+        "recordedConsiderationUsd": 580000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1651,
+        "acres": 16.54,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2103159124:2026-04-21:2687753",
+        "parcelId": "2103159124",
+        "transactionId": "TALB:03260:0212",
+        "address": "3750 WINDY HILL RD, TRAPPE, MD, 21673",
+        "saleDate": "2026-04-21",
+        "recordedConsiderationUsd": 2687753,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1966,
+        "acres": 223.695,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2101045067:2026-04-17:3000000",
+        "parcelId": "2101045067",
+        "transactionId": "TALB:03259:0365",
+        "address": "8515 DEEP COVE RD, EASTON, MD, 21601",
+        "saleDate": "2026-04-17",
+        "recordedConsiderationUsd": 3000000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 4665,
+        "acres": 17.7,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0602008637:2026-04-16:710000",
+        "parcelId": "0602008637",
+        "transactionId": "CARO:01781:0449",
+        "address": "15184 JARRELL RD, GOLDSBORO, MD, 21636",
+        "saleDate": "2026-04-16",
+        "recordedConsiderationUsd": 710000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 4929,
+        "acres": 12.12,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0604017374:2026-04-15:457500",
+        "parcelId": "0604017374",
+        "transactionId": "CARO:01781:0101",
+        "address": "PRESTON, MD, 21655",
+        "saleDate": "2026-04-15",
+        "recordedConsiderationUsd": 457500,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 63.16,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0602032902:2026-04-10:713000",
+        "parcelId": "0602032902",
+        "transactionId": "CARO:01780:0447",
+        "address": "12618 KNIFE BOX RD, GREENSBORO, MD, 21639",
+        "saleDate": "2026-04-10",
+        "recordedConsiderationUsd": 713000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 2342,
+        "acres": 21.82,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2302004623:2026-04-02:325000",
+        "parcelId": "2302004623",
+        "transactionId": "WICO:05695:0376",
+        "address": "HEBRON, MD, 21830",
+        "saleDate": "2026-04-02",
+        "recordedConsiderationUsd": 325000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 27.51,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2302003651:2026-03-31:425000",
+        "parcelId": "2302003651",
+        "transactionId": "WICO:05693:0470",
+        "address": "6817 QUANTICO RD, HEBRON, MD, 21830",
+        "saleDate": "2026-03-31",
+        "recordedConsiderationUsd": 425000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1884,
+        "acres": 8.14,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1007130252:2026-03-27:520000",
+        "parcelId": "1007130252",
+        "transactionId": "DORC:02005:0106",
+        "address": "CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 520000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 230.9,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1007130260:2026-03-27:540000",
+        "parcelId": "1007130260",
+        "transactionId": "DORC:02005:0097",
+        "address": "CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 540000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 233,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1007130279:2026-03-27:540000",
+        "parcelId": "1007130279",
+        "transactionId": "DORC:02005:0110",
+        "address": "5110 STONE BOUNDARY RD, CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 540000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 142.88,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1007193297:2026-03-27:230000",
+        "parcelId": "1007193297",
+        "transactionId": "DORC:02005:0101",
+        "address": "MD, 00000",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 230000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 199.172,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1013003513:2026-03-27:20000",
+        "parcelId": "1013003513",
+        "transactionId": "DORC:02005:0122",
+        "address": "MD, 00000",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 20000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 10,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1013007586:2026-03-27:550000",
+        "parcelId": "1013007586",
+        "transactionId": "DORC:02005:0117",
+        "address": "CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 550000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 312.382,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2309062602:2026-03-27:162000",
+        "parcelId": "2309062602",
+        "transactionId": "WICO:05692:0322",
+        "address": "SALISBURY, MD, 21801",
+        "saleDate": "2026-03-27",
+        "recordedConsiderationUsd": 162000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 35.92,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1009201378:2026-03-25:300000",
+        "parcelId": "1009201378",
+        "transactionId": "DORC:02004:0001",
+        "address": "MD",
+        "saleDate": "2026-03-25",
+        "recordedConsiderationUsd": 300000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 47.25,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1009199047:2026-03-16:850000",
+        "parcelId": "1009199047",
+        "transactionId": "DORC:02002:0095",
+        "address": "1829 BRANNOCK NECK RD, CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-03-16",
+        "recordedConsiderationUsd": 850000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1240,
+        "acres": 112.32,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1001016970:2026-03-10:350000",
+        "parcelId": "1001016970",
+        "transactionId": "DORC:02001:0065",
+        "address": "5936 NEWHART MILL RD, RHODESDALE, MD, 21659",
+        "saleDate": "2026-03-10",
+        "recordedConsiderationUsd": 350000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 19.47,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2301002767:2026-03-10:300000",
+        "parcelId": "2301002767",
+        "transactionId": "WICO:05682:0356",
+        "address": "MARDELA SPRINGS, MD, 21837",
+        "saleDate": "2026-03-10",
+        "recordedConsiderationUsd": 300000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 55.5,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2104145275:2026-03-09:428666",
+        "parcelId": "2104145275",
+        "transactionId": "TALB:03249:0426",
+        "address": "11010 PLUGGE RD, CORDOVA, MD, 21625",
+        "saleDate": "2026-03-09",
+        "recordedConsiderationUsd": 428666,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1048,
+        "acres": 64.32,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0602000334:2026-03-04:300000",
+        "parcelId": "0602000334",
+        "transactionId": "CARO:01775:0248",
+        "address": "13095 GREENSBORO RD, GREENSBORO, MD, 21639",
+        "saleDate": "2026-03-04",
+        "recordedConsiderationUsd": 300000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1887,
+        "acres": 36.5,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2101116630:2026-03-04:5250000",
+        "parcelId": "2101116630",
+        "transactionId": "TALB:03248:0111",
+        "address": "11977 BILLYS POINT LN, EASTON, MD, 21601",
+        "saleDate": "2026-03-04",
+        "recordedConsiderationUsd": 5250000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 8835,
+        "acres": 37.63,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2104151291:2026-03-02:2700000",
+        "parcelId": "2104151291",
+        "transactionId": "TALB:03247:0128",
+        "address": "WYE MILLS, MD, 21679",
+        "saleDate": "2026-03-02",
+        "recordedConsiderationUsd": 2700000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 112.57,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0602018446:2026-02-27:1200000",
+        "parcelId": "0602018446",
+        "transactionId": "CARO:01774:0344",
+        "address": "14271 CEDAR LN, GREENSBORO, MD, 21639",
+        "saleDate": "2026-02-27",
+        "recordedConsiderationUsd": 1200000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 3756,
+        "acres": 86,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "0602027070:2026-02-27:1200000",
+        "parcelId": "0602027070",
+        "transactionId": "CARO:01774:0344",
+        "address": "GREENSBORO, MD, 21639",
+        "saleDate": "2026-02-27",
+        "recordedConsiderationUsd": 1200000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 13.81,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "2102080699:2026-02-26:1600000",
+        "parcelId": "2102080699",
+        "transactionId": "TALB:03246:0319",
+        "address": "23869 NEW LAND DR, ST MICHAELS, MD, 21663",
+        "saleDate": "2026-02-26",
+        "recordedConsiderationUsd": 1600000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 2717,
+        "acres": 15.417,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1012002076:2026-02-24:170000",
+        "parcelId": "1012002076",
+        "transactionId": "DORC:01998:0186",
+        "address": "5106 MOUNT ZION RD, HURLOCK, MD, 21643",
+        "saleDate": "2026-02-24",
+        "recordedConsiderationUsd": 170000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 2128,
+        "acres": 38.06,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0605005183:2026-02-18:355000",
+        "parcelId": "0605005183",
+        "transactionId": "CARO:01773:0148",
+        "address": "3871 LAUREL GROVE RD, FEDERALSBURG, MD, 21632",
+        "saleDate": "2026-02-18",
+        "recordedConsiderationUsd": 355000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 2114,
+        "acres": 20,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2301003194:2026-02-13:25000",
+        "parcelId": "2301003194",
+        "transactionId": "WICO:05672:0094",
+        "address": "MARDELA SPRINGS, MD, 21837",
+        "saleDate": "2026-02-13",
+        "recordedConsiderationUsd": 25000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 19,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1013007535:2026-02-11:39040",
+        "parcelId": "1013007535",
+        "transactionId": "DORC:01996:0425",
+        "address": "CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-02-11",
+        "recordedConsiderationUsd": 39040,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 4.88,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1803002373:2026-02-11:3000000",
+        "parcelId": "1803002373",
+        "transactionId": "QUEE:04725:0039",
+        "address": "360 ROLLING BRIDGE RD, CENTREVILLE, MD, 21617",
+        "saleDate": "2026-02-11",
+        "recordedConsiderationUsd": 3000000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1344,
+        "acres": 258.658,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2103132145:2026-02-10:725000",
+        "parcelId": "2103132145",
+        "transactionId": "TALB:03243:0100",
+        "address": "TRAPPE, MD, 21673",
+        "saleDate": "2026-02-10",
+        "recordedConsiderationUsd": 725000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 26.49,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0603015386:2026-02-03:230000",
+        "parcelId": "0603015386",
+        "transactionId": "CARO:01771:0310",
+        "address": "DENTON, MD, 21629",
+        "saleDate": "2026-02-03",
+        "recordedConsiderationUsd": 230000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 3.06,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "0603015416:2026-02-03:230000",
+        "parcelId": "0603015416",
+        "transactionId": "CARO:01771:0310",
+        "address": "DENTON, MD, 21629",
+        "saleDate": "2026-02-03",
+        "recordedConsiderationUsd": 230000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 15,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "1013000549:2026-02-03:1500000",
+        "parcelId": "1013000549",
+        "transactionId": "DORC:01995:0124",
+        "address": "CAMBRIDGE, MD, 21613",
+        "saleDate": "2026-02-03",
+        "recordedConsiderationUsd": 1500000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 184.88,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1806002412:2026-02-02:476613",
+        "parcelId": "1806002412",
+        "transactionId": "QUEE:04718:0233",
+        "address": "QUEEN ANNE, MD, 21657",
+        "saleDate": "2026-02-02",
+        "recordedConsiderationUsd": 476613,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 131.95,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0605003016:2026-01-29:415000",
+        "parcelId": "0605003016",
+        "transactionId": "CARO:01770:0431",
+        "address": "5225 PRESTON RD, FEDERALSBURG, MD, 21632",
+        "saleDate": "2026-01-29",
+        "recordedConsiderationUsd": 415000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 2160,
+        "acres": 55,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2305089441:2026-01-28:500000",
+        "parcelId": "2305089441",
+        "transactionId": "WICO:05663:0453",
+        "address": "31407 S MELSON RD, DELMAR, MD, 21875",
+        "saleDate": "2026-01-28",
+        "recordedConsiderationUsd": 500000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1609,
+        "acres": 6.28,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1012286689:2026-01-23:2100000",
+        "parcelId": "1012286689",
+        "transactionId": "DORC:01993:0294",
+        "address": "7003 HYNSON RD, HURLOCK, MD, 21643",
+        "saleDate": "2026-01-23",
+        "recordedConsiderationUsd": 2100000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 29.65,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2301003585:2026-01-23:200000",
+        "parcelId": "2301003585",
+        "transactionId": "WICO:05662:0005",
+        "address": "MARDELA SPRINGS, MD, 21837",
+        "saleDate": "2026-01-23",
+        "recordedConsiderationUsd": 200000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 130.81,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2305106931:2026-01-23:820000",
+        "parcelId": "2305106931",
+        "transactionId": "WICO:05662:0038",
+        "address": "31411 MELSON RD, DELMAR, MD, 21875",
+        "saleDate": "2026-01-23",
+        "recordedConsiderationUsd": 820000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1632,
+        "acres": 37.6,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2104146417:2026-01-22:739000",
+        "parcelId": "2104146417",
+        "transactionId": "TALB:03239:0211",
+        "address": "11340 LONGWOODS RD, EASTON, MD, 21601",
+        "saleDate": "2026-01-22",
+        "recordedConsiderationUsd": 739000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1822,
+        "acres": 21.554,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1002019515:2026-01-20:900000",
+        "parcelId": "1002019515",
+        "transactionId": "DORC:01992:0317",
+        "address": "MD, 00000",
+        "saleDate": "2026-01-20",
+        "recordedConsiderationUsd": 900000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 135.31,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "1002022028:2026-01-20:900000",
+        "parcelId": "1002022028",
+        "transactionId": "DORC:01992:0317",
+        "address": "MD, 00000",
+        "saleDate": "2026-01-20",
+        "recordedConsiderationUsd": 900000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 103.59,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "1002022036:2026-01-20:900000",
+        "parcelId": "1002022036",
+        "transactionId": "DORC:01992:0317",
+        "address": "MD, 00000",
+        "saleDate": "2026-01-20",
+        "recordedConsiderationUsd": 900000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 114.21,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "2301009354:2026-01-16:27370",
+        "parcelId": "2301009354",
+        "transactionId": "WICO:05659:0331",
+        "address": "MARDELA SPRINGS, MD, 21837",
+        "saleDate": "2026-01-16",
+        "recordedConsiderationUsd": 27370,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 2.91,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1017001892:2026-01-15:70000",
+        "parcelId": "1017001892",
+        "transactionId": "DORC:01992:0003",
+        "address": "CAMBRIDGE, MD, 00000",
+        "saleDate": "2026-01-15",
+        "recordedConsiderationUsd": 70000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 10,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1001000284:2026-01-14:650000",
+        "parcelId": "1001000284",
+        "transactionId": "DORC:01991:0301",
+        "address": "RHODESDALE, MD, 21659",
+        "saleDate": "2026-01-14",
+        "recordedConsiderationUsd": 650000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 64.004,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "1001014625:2026-01-14:650000",
+        "parcelId": "1001014625",
+        "transactionId": "DORC:01991:0301",
+        "address": "5152 EAST NEW MARKET RHODESDALE RD, RHODESDALE, MD, 21659",
+        "saleDate": "2026-01-14",
+        "recordedConsiderationUsd": 650000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 792,
+        "acres": 80.443,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "1805011957:2026-01-14:2693500",
+        "parcelId": "1805011957",
+        "transactionId": "QUEE:04709:0114",
+        "address": "CENTREVILLE, MD, 21617",
+        "saleDate": "2026-01-14",
+        "recordedConsiderationUsd": 2693500,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 102.14,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1803046206:2026-01-13:750000",
+        "parcelId": "1803046206",
+        "transactionId": "QUEE:04708:0079",
+        "address": "CENTREVILLE, MD, 21617",
+        "saleDate": "2026-01-13",
+        "recordedConsiderationUsd": 750000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 20,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2103116239:2026-01-12:450000",
+        "parcelId": "2103116239",
+        "transactionId": "TALB:03237:0211",
+        "address": "27293 ISLAND CREEK RD, TRAPPE, MD, 21673",
+        "saleDate": "2026-01-12",
+        "recordedConsiderationUsd": 450000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 57.956,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2103133214:2026-01-08:340000",
+        "parcelId": "2103133214",
+        "transactionId": "TALB:03236:0241",
+        "address": "27293 ISLAND CREEK RD, TRAPPE, MD, 21673",
+        "saleDate": "2026-01-08",
+        "recordedConsiderationUsd": 340000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 47.19,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2301005111:2026-01-07:1225000",
+        "parcelId": "2301005111",
+        "transactionId": "WICO:05654:0088",
+        "address": "24688 PORTER MILL RD, HEBRON, MD, 21830",
+        "saleDate": "2026-01-07",
+        "recordedConsiderationUsd": 1225000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1152,
+        "acres": 23.5,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2315006994:2026-01-07:1300000",
+        "parcelId": "2315006994",
+        "transactionId": "WICO:05654:0146",
+        "address": "HEBRON, MD, 21830",
+        "saleDate": "2026-01-07",
+        "recordedConsiderationUsd": 1300000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 187.97,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1803011011:2026-01-06:388680",
+        "parcelId": "1803011011",
+        "transactionId": "QUEE:04703:0138",
+        "address": "CENTREVILLE, MD, 00000",
+        "saleDate": "2026-01-06",
+        "recordedConsiderationUsd": 388680,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 97.17,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "1803030210:2026-01-06:942900",
+        "parcelId": "1803030210",
+        "transactionId": "QUEE:04703:0102",
+        "address": "328 ROLLING BRIDGE RD, CENTREVILLE, MD, 00000",
+        "saleDate": "2026-01-06",
+        "recordedConsiderationUsd": 942900,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 134.7,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2103198637:2026-01-02:234000",
+        "parcelId": "2103198637",
+        "transactionId": "TALB:03235:0278",
+        "address": "27293 ISLAND CREEK RD, TRAPPE, MD, 21673",
+        "saleDate": "2026-01-02",
+        "recordedConsiderationUsd": 234000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 42.858,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0605008891:2025-12-30:700000",
+        "parcelId": "0605008891",
+        "transactionId": "CARO:01766:0089",
+        "address": "505 W CENTRAL AVE, FEDERALSBURG, MD, 21632",
+        "saleDate": "2025-12-30",
+        "recordedConsiderationUsd": 700000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": 1954,
+        "acres": 27.4,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "0605009359:2025-12-26:475000",
+        "parcelId": "0605009359",
+        "transactionId": "CARO:01765:0201",
+        "address": "4288 LAUREL GROVE RD, FEDERALSBURG, MD, 21632",
+        "saleDate": "2025-12-26",
+        "recordedConsiderationUsd": 475000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 61,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented."
+        ]
+      },
+      {
+        "id": "2103130703:2025-12-23:600000",
+        "parcelId": "2103130703",
+        "transactionId": "TALB:03234:0005",
+        "address": "28912 LLANDAFF RD, EASTON, MD, 21601",
+        "saleDate": "2025-12-23",
+        "recordedConsiderationUsd": 600000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 43.749,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      },
+      {
+        "id": "2103198824:2025-12-23:600000",
+        "parcelId": "2103198824",
+        "transactionId": "TALB:03234:0005",
+        "address": "EASTON, MD, 21601",
+        "saleDate": "2025-12-23",
+        "recordedConsiderationUsd": 600000,
+        "propertyUse": "Agricultural",
+        "buildingSqft": null,
+        "acres": 14.442,
+        "sourceDate": "2026MAY",
+        "sourceUrl": "https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0",
+        "reviewRequired": [
+          "Verify arm's-length status, concessions and deed scope.",
+          "Review asset/use, condition, location, improvements and agricultural acreage comparability.",
+          "Source-backed subject-specific adjustments are required; none were invented.",
+          "Multiple parcel rows share this deed; consideration must not be counted once per parcel."
+        ]
+      }
+    ],
+    "truncated": true,
+    "notes": [
+      "Public recorded transfers within 25 miles, assessor-classified Agricultural only, up to 75 latest rows, within an 18-month discovery window. These are candidate records, NOT verified comparables or a value range.",
+      "Source-published SDAT data dates remain attached; retrieval today does not remove publication lag. Consideration may include multiple parcels or non-market transfers.",
+      "Comparable evidence pending until a reviewer verifies deed scope, asset comparability, condition, concessions and justified adjustments. No state HPI, generic size factor or assessment is used to fabricate adjusted comps."
+    ],
+    "productionRelianceAllowed": false,
+    "contentHash": "5eceb1261d60450f7723b207f503326a43e353390874fa6f9598a9f07374b46a",
+    "replayRef": "government-comparable-discovery-v2.0.0:5eceb1261d60450f7723b207f503326a43e353390874fa6f9598a9f07374b46a"
+  },
+  "limitations": [
+    "Map-unit intersection is not clipped acreage weighting.",
+    "Transfer records are candidates, not reviewed adjusted comparables.",
+    "This is local proof, not proof of cloud deployment."
+  ]
+}

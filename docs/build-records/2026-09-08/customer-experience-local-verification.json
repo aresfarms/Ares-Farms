@@ -1,0 +1,494 @@
+{
+  "date": "2026-09-08",
+  "scope": "local pre-cloud verification",
+  "baseline": "cc46a1ceeaad1b0ec8e51441c4a490ae44472962",
+  "releaseGates": [
+    {
+      "command": "npm run verify:cloud-upload-context",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:borrower-financial-controls",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-assurance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:master-volume-mirror",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:scanner-image-policy",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:secret-rotation-workflow",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:external-connector-auth",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:navigator-state-integrity",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:canonical-domain",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:canonical-domain-fail-closed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-source-legal",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-financing-authority",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-connector-activation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-official-report-authority",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-payments-treasury-authorization",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-domain-cutover-authorization",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:consolidated-launch-authorization",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:launch-authorization-decisions",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run smoke:production-data-classification",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:cloud-build-release-rule",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-roadmap",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-source-governance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-refresh-writer",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-durable-refresh",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-connector-registry",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-connector-durability",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-connector-change-control",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-connector-implementation-binding",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-refresh-provenance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-read-provenance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-quarantine",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-quarantine-resolution",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-downstream-invalidation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-automatic-dependency-capture",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-recomputation-orchestration",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-scheduled-recomputation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-durable-handler-governance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-signed-replay",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-replay-key-rotation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-deterministic-replay",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-production-replay-review",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-production-activation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-activation-ceremony",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-scheduler-release",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-live-bootstrap",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-batch-replay",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-approval-packet",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-approval-completion",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-review-handoff",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-final-canary-packet",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-canary-transcript",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-post-resume-watchdog",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-steady-state-incident",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-incident-sla",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-incident-notification",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-connector",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-dry-run",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-activation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-delivery",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-assurance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-reinstatement",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-retirement",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-retirement-closure",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-retirement-tombstone",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-tombstone-incident",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-corrective-action",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-corrective-action-effectiveness",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-evidence-external-notification-institutional-closure",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:controlled-promotion-readiness-reconciliation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:public-alpha-signoff-ceremony-packet",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:governed-evidence-review-portal",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-credential-verification",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-legal-authority",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-abac-disclosure",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:compelled-disclosure-ceremony",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-access-surveillance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-access-runtime-enforcement",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-access-surveillance-orchestration",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-access-surveillance-activation-ceremony",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-access-surveillance-canary-release",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:institutional-access-surveillance-scheduler-provisioning",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:governed-ultimate-proforma",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:federal-loan-authority-monitor",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:federal-loan-authority-reconciliation",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:federal-loan-authority-refresh-reliability",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:federal-loan-authority-change-triage",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:controlled-public-surface-promotion",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:production-promotion-readiness",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:final-production-promotion-decision",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:internal-change-verification",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:three-founder-release-authority",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:founder-change-review-workspace",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:founder-pilot-test-gate",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-profile-classification",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:customer-property-experience",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:customer-experience",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:calculation-integrity",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:farm-use-integrity",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-value-indication",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-operating-model",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:financing-program-fit",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-facts-latency",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:lender-submission-bola",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:lender-delivery-conformance",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:three-lane-consumer-command-center",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:compass-lane-entry-routing",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-data-resolution",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:deed-verification-access",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:integrated-pre-promotion-features",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:official-property-source-adapters",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:structured-official-evidence",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-evidence-ingestion",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-evidence-panel",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-evidence-manifest",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:public-action-evidence",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:water-insurance-evidence",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:unified-property-risk",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:tax-aware-top-three",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:post-sale-tax",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:property-entry-parity",
+      "exitCode": 0
+    }
+  ],
+  "focusedChecks": 38,
+  "staticAccessibilityChecks": 56,
+  "pdfVisualQA": "two-page fixture inspected; no overlap/clipping; ZIP archive check passed",
+  "typescript": "PASS",
+  "productionBuild": "PASS - 252 pages",
+  "database": "in-memory double; live case workflow not certified",
+  "externalBrowserCertification": false
+}

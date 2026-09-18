@@ -302,7 +302,7 @@ export function FurlongStoryTimeline() {
     setPlaying(true);
     startTick();
     return () => stopTick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [reduceMotion]);
 
   function goTo(n: number) {

@@ -209,6 +209,15 @@ async function evidenceCounts(pool: Pool, traceId: string) {
 }
 
 async function main(): Promise<void> {
+  // Confirm the target is THIS app (200 + brand marker) before smoke assertions:
+  // a foreign/stale server yields confusing API-404 failures and no server yields
+  // opaque connection errors. Fail CLEARLY instead — a smoke gate must never pass
+  // vacuously, so this is a loud exit 1, not a skip.
+  const smokeHome = await fetch(`${baseUrl}/`).then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") })).catch(() => null);
+  if (!smokeHome || smokeHome.status !== 200 || !/Furlong/.test(smokeHome.body)) {
+    console.error(`✗ ${baseUrl} is not a confirmed Furlong server (status ${smokeHome?.status ?? "unreachable"}) — refusing to smoke-test a foreign/stale/absent server.`);
+    process.exit(1);
+  }
   if (!process.env.DATABASE_URL) {
     throw new Error(
       "DATABASE_URL is required for billing admin read smoke testing."
@@ -387,7 +396,7 @@ async function main(): Promise<void> {
       [tenantId]
     );
 
-    if (billingRows.rowCount < 2) {
+    if ((billingRows.rowCount ?? 0) < 2) {
       throw new Error("Billing event rows were not persisted.");
     }
 

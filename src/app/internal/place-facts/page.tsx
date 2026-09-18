@@ -9,10 +9,7 @@ import {
   HUBZONE_SNAPSHOT_PROVENANCE,
   isCurrentAsOf,
 } from "@/lib/place-facts/hubzoneSnapshot";
-import {
-  OZ_PLACE_FACT_ACTIVATION,
-  HUBZONE_PLACE_FACT_ACTIVATION,
-} from "@/lib/place-facts/placeFactActivation";
+import { canonicalPlaceAuthority } from "@/lib/platform/authorities/place";
 
 /**
  * Place-Facts — Opportunity Zones (public reference surface).
@@ -60,7 +57,7 @@ export default function PlaceFactsPage() {
         </p>
         <p style={{ margin: 0, fontSize: 13, color: "#7a8aa0" }}>
           {OZ_SNAPSHOT_PROVENANCE.designatedTractCount.toLocaleString("en-US")} designated tracts ·
-          source: {OZ_PLACE_FACT_ACTIVATION.sourceName} ({OZ_SNAPSHOT_PROVENANCE.license}) ·
+          source: {canonicalPlaceAuthority.opportunityZone.sourceName} ({OZ_SNAPSHOT_PROVENANCE.license}) ·
           as of {OZ_SNAPSHOT_PROVENANCE.asOf}
         </p>
         <p style={{ margin: 0, fontSize: 14, color: "#5d687a" }}>
@@ -84,7 +81,7 @@ export default function PlaceFactsPage() {
           effective date and any expiration, and expired designations are labeled historical.
         </p>
         <p style={{ margin: 0, fontSize: 13, color: "#7a8aa0" }}>
-          source: {HUBZONE_PLACE_FACT_ACTIVATION.sourceName} ({HUBZONE_SNAPSHOT_PROVENANCE.license}) ·
+          source: {canonicalPlaceAuthority.hubzone.sourceName} ({HUBZONE_SNAPSHOT_PROVENANCE.license}) ·
           dataset effective {HUBZONE_SNAPSHOT_PROVENANCE.datasetEffective} · snapshot as of{" "}
           {HUBZONE_SNAPSHOT_PROVENANCE.asOf} · verify current at {HUBZONE_SNAPSHOT_PROVENANCE.authoritativeLiveSource}
         </p>

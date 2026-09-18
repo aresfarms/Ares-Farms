@@ -11,7 +11,7 @@ import { LENDER_WORKFLOW_V2_RUNTIME_VERSION } from "@/lib/lender/workflowV2Runti
 import { eventContractRegistry } from "@/lib/modules/eventContractRegistry";
 import { crossModuleHandoffMap } from "@/lib/modules/handoffMap";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
-import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/opportunity/discoveryV2Runtime";
+import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/platform/authorities/opportunity";
 import { REGISTRY_FRAMEWORK_RUNTIME_VERSION } from "@/lib/registry/frameworkRuntime";
 import {
   REGISTRY_FRAMEWORK_V2_CATALOG_IDS,

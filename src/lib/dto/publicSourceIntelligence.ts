@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import {
   GEO_SUITABILITY_PROFILES,
   MARKETPLACE_ITEMS,
@@ -10,9 +12,8 @@ import {
   EQUIPMENT_REGISTRY,
   SOURCE_STACK_REGISTRY,
   SOURCE_STACK_REQUIRED_DISCLOSURES,
-  SOURCE_STACK_SOURCES,
   SOURCE_STACK_VERSION,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 import { REQUIRED_SURFACE_STATUS_MESSAGES } from "@/lib/dto/shared";
 
 /**
@@ -36,8 +37,8 @@ export type PublicSourceIntelligenceItem = {
   id: string;
   title: string;
   category: string;
-  sourceRefs: string[];
-  replayRefs: string[];
+  sourceAliases: string[];
+  provenance: { sourceCount: number; replayEvidenceAvailable: boolean };
   reviewStatus: string;
   authorityPosture: string;
   advisoryOnly: true;
@@ -47,7 +48,7 @@ export type PublicSourceIntelligenceItem = {
 export type PublicSourceIntelligencePayload = {
   kind: PublicSourceIntelligenceKind;
   runtimeVersion: typeof SOURCE_STACK_VERSION;
-  sourceDocuments: string[];
+  authorityCatalog: { version: typeof SOURCE_STACK_VERSION; sourceCount: number };
   items: PublicSourceIntelligenceItem[];
   statusMessages: string[];
   disclosures: string[];
@@ -104,6 +105,10 @@ function sourceAuthorityPosture(sourceRefs: string[]): string {
   return "advisory-source-review-required";
 }
 
+function publicAlias(namespace: "item" | "source", value: string): string {
+  return `${namespace}-${createHash("sha256").update(value).digest("hex").slice(0, 16)}`;
+}
+
 function publicItem(input: {
   id: string;
   title: string;
@@ -113,13 +118,17 @@ function publicItem(input: {
   reviewStatus: string;
 }): PublicSourceIntelligenceItem {
   const sourceRefs = input.sourceRefs ?? [];
+  const replayRefs = input.replayRefs ?? [];
 
   return {
-    id: input.id,
+    id: publicAlias("item", input.id),
     title: input.title,
     category: input.category,
-    sourceRefs,
-    replayRefs: input.replayRefs ?? [],
+    sourceAliases: [...new Set(sourceRefs.map((ref) => publicAlias("source", ref)))],
+    provenance: {
+      sourceCount: sourceRefs.length,
+      replayEvidenceAvailable: replayRefs.length > 0,
+    },
     reviewStatus: input.reviewStatus,
     authorityPosture: sourceAuthorityPosture(sourceRefs),
     advisoryOnly: true,
@@ -243,7 +252,7 @@ export function buildPublicSourceIntelligencePayload(
   return {
     kind,
     runtimeVersion: SOURCE_STACK_VERSION,
-    sourceDocuments: [...SOURCE_STACK_SOURCES],
+    authorityCatalog: { version: SOURCE_STACK_VERSION, sourceCount: SOURCE_STACK_REGISTRY.length },
     items: itemsByKind[kind],
     statusMessages: [...REQUIRED_SURFACE_STATUS_MESSAGES],
     disclosures: [
@@ -278,5 +287,10 @@ export function publicSourceIntelligencePayloadIsRedacted(
     "secret",
     "raw",
     "underwriting_",
+    "sourcerefs",
+    "replayrefs",
+    "sourcedocuments",
+    ".pdf",
+    ".docx",
   ].some((prohibited) => serialized.includes(prohibited));
 }

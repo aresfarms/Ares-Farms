@@ -9,12 +9,12 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 
 import type { CanonicalProperty } from "./propertyTypes";
+import { runtimeStatePath } from "./runtimeStatePath";
 
-const DIR = path.join(process.cwd(), "data", "property-live");
-const filePath = (sourceId: string) => path.join(DIR, `${sourceId}.json`);
+const DIR = runtimeStatePath("property-live");
+const filePath = (sourceId: string) => runtimeStatePath("property-live", `${sourceId}.json`);
 
 export interface LiveOverlay {
   sourceId: string;

@@ -19,7 +19,7 @@ import {
 import { ENVIRONMENTAL_INTAKE_V2_RUNTIME_VERSION } from "@/lib/environmental/intakeV2Runtime";
 import { ENVIRONMENTAL_RISK_ASSESSMENT_V2_RUNTIME_VERSION } from "@/lib/environmental/riskAssessmentV2Runtime";
 import { FINANCING_PATHWAY_ENGINE_V2_RUNTIME_VERSION } from "@/lib/financing/pathwayEngineV2Runtime";
-import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/opportunity/discoveryV2Runtime";
+import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/platform/authorities/opportunity";
 import {
   READINESS_ASSESSMENT_V2_RUNTIME_VERSION,
   ReadinessAssessmentV2Result,

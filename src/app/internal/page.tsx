@@ -51,6 +51,20 @@ const portalSurfaces = [
     runtime: "queue review, assignment posture, escalation posture",
   },
   {
+    href: "/internal/public-orders",
+    label: "Public Order Fulfillment",
+    status: "Paid-report operations",
+    runtime:
+      "verified payment queue, processing start, refund holds, delivery evidence",
+  },
+  {
+    href: "/internal/public-product-pricing",
+    label: "Public Product Pricing",
+    status: "Price approval gate",
+    runtime:
+      "catalog-locked price, cost evidence, margin validation, expiring approval",
+  },
+  {
     href: "/applications",
     label: "Application Operations",
     status: "Module 03 active",

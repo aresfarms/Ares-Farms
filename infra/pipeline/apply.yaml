@@ -1,0 +1,165 @@
+substitutions:
+  _SOURCE_BUCKET: furlong-staging-499102-iac-source
+  _SOURCE_OBJECT: unset.tgz
+  _SOURCE_GENERATION: "0"
+  _SOURCE_SHA256: unset
+  _PLAN_BUCKET: furlong-staging-499102-iac-plans
+  _PLAN_ID: unset
+  _APPROVAL_OBJECT: unset.json
+  _APPROVAL_GENERATION: "0"
+  _APPROVAL_SHA256: unset
+
+steps:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: fetch-authorized-artifacts
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        uri="gs://${_SOURCE_BUCKET}/${_SOURCE_OBJECT}#${_SOURCE_GENERATION}"
+        gcloud storage cp "$${uri}" /workspace/iac-source.tgz
+        actual="$$(sha256sum /workspace/iac-source.tgz | awk '{print $$1}')"
+        test "$${actual}" = "${_SOURCE_SHA256}"
+        mkdir -p /workspace/source
+        tar -xzf /workspace/iac-source.tgz -C /workspace/source
+        base="gs://${_PLAN_BUCKET}/plans/${_PLAN_ID}"
+        gcloud storage cp "$${base}/plan.tfplan" /workspace/plan.tfplan
+        gcloud storage cp "$${base}/plan-manifest.json" /workspace/plan-manifest.json
+        approval_uri="gs://${_PLAN_BUCKET}/${_APPROVAL_OBJECT}#${_APPROVAL_GENERATION}"
+        gcloud storage cp "$${approval_uri}" /workspace/approval.json
+        approval_actual="$$(sha256sum /workspace/approval.json | awk '{print $$1}')"
+        test "$${approval_actual}" = "${_APPROVAL_SHA256}"
+        python3 - <<'PY'
+        import hashlib,json
+        m=json.load(open('/workspace/plan-manifest.json'))
+        assert m['schemaVersion']=='furlong-infra-plan-v1'
+        assert m['planId']=='${_PLAN_ID}'
+        assert m['controlledSource']['uri']=='gs://${_SOURCE_BUCKET}/${_SOURCE_OBJECT}'
+        assert m['controlledSource']['generation']=='${_SOURCE_GENERATION}'
+        assert m['controlledSource']['sha256']=='${_SOURCE_SHA256}'
+        actual=hashlib.sha256(open('/workspace/plan.tfplan','rb').read()).hexdigest()
+        assert actual==m['planSha256'], (actual,m['planSha256'])
+        approval=json.load(open('/workspace/approval.json'))
+        assert approval['schemaVersion']=='furlong-infra-human-approval-v1'
+        assert approval['planId']=='${_PLAN_ID}'
+        assert approval['planSha256']==m['planSha256']
+        assert approval['controlledSource']==m['controlledSource']
+        assert approval['decision']=='APPROVE_APPLY'
+        assert approval.get('authorizedBy')
+        assert m['sourceControls']['stagingSeedExplicitSwitchDeclared'] is True
+        PY
+  - name: hashicorp/terraform:1.15.8
+    id: init-approved-source
+    dir: /workspace/source/infra/staging
+    entrypoint: terraform
+    args:
+      - init
+      - -input=false
+
+  - name: hashicorp/terraform:1.15.8
+    id: apply-approved-plan
+    dir: /workspace/source/infra/staging
+    entrypoint: terraform
+    args:
+      - apply
+      - -input=false
+      - /workspace/plan.tfplan
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: reassert-core-iap
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        gcloud run services update furlong-core \
+          --project=furlong-staging-499102 \
+          --region=us-central1 \
+          --iap \
+          --quiet
+
+  - name: hashicorp/terraform:1.15.8
+    id: verify-post-apply-state
+    entrypoint: sh
+    args:
+      - -ceu
+      - |
+        cd /workspace/source/infra/staging
+        terraform state pull > /workspace/state-after.json
+        set +e
+        terraform plan -lock=false -input=false -detailed-exitcode > /workspace/post-apply-plan.txt 2>&1
+        rc=$$?
+        set -e
+        cat /workspace/post-apply-plan.txt
+        test $$rc -eq 0
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: emit-live-authority
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        python3 - <<'PY'
+        import json, subprocess
+        def gj(*args):
+            raw=subprocess.check_output(['gcloud',*args,'--format=json'],text=True)
+            return json.loads(raw)
+        state=json.load(open('/workspace/state-after.json'))
+        plan=json.load(open('/workspace/plan-manifest.json'))
+        core=gj('run','services','describe','furlong-core','--region=us-central1','--project=furlong-staging-499102')
+        sql=gj('sql','instances','describe','furlong-staging-pg','--project=furlong-staging-499102')
+        bucket=gj('storage','buckets','describe','gs://furlong-staging-499102-tfstate')
+        policy=gj('container','binauthz','policy','export','--project=furlong-staging-499102')
+        annotations=core.get('metadata',{}).get('annotations',{})
+        containers=core.get('spec',{}).get('template',{}).get('spec',{}).get('containers',[])
+        env={}
+        if containers:
+            for item in containers[0].get('env',[]):
+                if 'value' in item: env[item.get('name')]=item.get('value')
+        admission=policy.get('defaultAdmissionRule',{})
+        live={
+          'schemaVersion':'furlong-infra-authority-manifest-v1',
+          'projectId':'furlong-staging-499102',
+          'authority':'GCP_LIVE_STATE',
+          'applyBuildId':'${BUILD_ID}',
+          'approvedPlanId':'${_PLAN_ID}',
+          'controlledSource':plan['controlledSource'],
+          'terraform':{
+            'backend':'gcs','stateBucket':'furlong-staging-499102-tfstate',
+            'statePrefix':'staging/core','serial':state.get('serial'),
+            'lineage':state.get('lineage'),
+          },
+          'controls':{
+            'stagingSeedExplicitSwitchDeclared':plan['sourceControls']['stagingSeedExplicitSwitchDeclared'],
+            'binaryAuthorizationEnforced':admission.get('enforcementMode')=='ENFORCED_BLOCK_AND_AUDIT_LOG' and admission.get('evaluationMode')=='REQUIRE_ATTESTATION',
+            'iapEnabled':str(annotations.get('run.googleapis.com/iap-enabled','')).lower()=='true',
+            'cloudSqlPrivateOnly':sql.get('settings',{}).get('ipConfiguration',{}).get('ipv4Enabled') is False,
+            'stateVersioningEnabled':bucket.get('versioning_enabled') is True,
+            'statePublicAccessPrevention':bucket.get('public_access_prevention')=='enforced',
+            'stateCmekEnabled':bool(bucket.get('default_kms_key')),
+            'apiAuthRequired':env.get('API_AUTH_ENFORCEMENT')=='required',
+            'quarantineMode':env.get('QUARANTINE_MODE'),
+          },
+          'live':{
+            'core':{
+              'latestReadyRevision':core.get('status',{}).get('latestReadyRevisionName'),
+              'latestCreatedRevision':core.get('status',{}).get('latestCreatedRevisionName'),
+              'traffic':core.get('status',{}).get('traffic',[]),
+              'image':containers[0].get('image') if containers else None,
+            },
+            'sql':{'name':'furlong-staging-pg','state':sql.get('state')},
+            'binaryAuthorization':admission,
+            'stateBucket':{
+              'name':bucket.get('name'),'versioning':bucket.get('versioning_enabled'),
+              'pap':bucket.get('public_access_prevention'),'kms':bucket.get('default_kms_key'),
+            },
+          },
+        }
+        json.dump(live,open('/workspace/infra-authority-manifest.json','w'),indent=2,sort_keys=True)
+        PY
+        immutable="gs://${_PLAN_BUCKET}/live/${BUILD_ID}.json"
+        canonical="gs://${_PLAN_BUCKET}/live/staging-infra-authority.json"
+        gcloud storage cp /workspace/infra-authority-manifest.json "$${immutable}"
+        gcloud storage cp /workspace/infra-authority-manifest.json "$${canonical}"
+        cat /workspace/infra-authority-manifest.json
+
+options:
+  logging: CLOUD_LOGGING_ONLY

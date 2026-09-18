@@ -14,9 +14,11 @@
 
 import { createHash } from "node:crypto";
 
+import { stripHtmlMarkup } from "@/lib/security/htmlText";
 import type { CanonicalProperty, PropertySourceRecord, PropertyType } from "./propertyTypes";
 import { computeAuctionCurrent } from "./propertyTypes";
 import { STATE_NAMES } from "./stateNames";
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export const TREASURY_FEED_URL = "https://www.treasury.gov/auctions/treasury/rp/realprop.shtml";
 export const TREASURY_UA =
@@ -59,10 +61,7 @@ function stateAbbr(name: string): string {
 }
 
 function stripTags(html: string): string {
-  return html
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
+  return stripHtmlMarkup(html)
     .replace(/&nbsp;/g, " ")
     .replace(/&plusmn;/g, "+/-")
     .replace(/&amp;/g, "&")
@@ -152,7 +151,9 @@ export interface TreasuryFetchResult {
 /** Pull + parse the official Treasury upcoming-auctions page into canonical records. */
 export async function fetchTreasuryRealProperty(): Promise<TreasuryFetchResult> {
   const fetchedAt = new Date().toISOString();
-  const res = await fetch(TREASURY_FEED_URL, { headers: { "User-Agent": TREASURY_UA } });
+  const res = await governedFetch(TREASURY_FEED_URL, {
+    headers: { "User-Agent": TREASURY_UA },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status} for Treasury auctions feed`);
   const text = stripTags(await res.text());
 

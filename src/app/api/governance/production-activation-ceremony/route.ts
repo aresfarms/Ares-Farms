@@ -5,6 +5,7 @@ import {
   evaluateProductionActivationCeremonyGate,
 } from "@/lib/governance/productionActivationCeremonyGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { latestReleaseGovernanceEvidence, recordReleaseGovernanceEvidence, releaseGovernanceEvidenceFor } from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -170,33 +171,28 @@ async function handleProductionActivationCeremony(
     const result = evaluateProductionActivationCeremonyGate({
       ceremonyScope,
     });
+    const scope = ceremonyScope ?? "platform";
     const ceremonyPacket =
-      req.method === "POST"
-        ? {
-            ceremonyPacketId: `production-activation-ceremony-${Date.now()}`,
-            ceremonyScope: ceremonyScope ?? "platform",
-            reviewStatus: "PRODUCTION_ACTIVATION_CEREMONY_PACKET_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            activationCeremonyApprovalGranted: false,
-            activationCeremonyExecuted: false,
-            productionActivationExecuted: false,
-            postActivationVerificationStarted: false,
-            postActivationVerificationCompleted: false,
-            finalAuthorityApprovalGranted: false,
-            goLiveApproved: false,
-            productionLaunchAuthorized: false,
-            launchHoldReleased: false,
-            deploymentHoldReleased: false,
-            freezeHoldReleased: false,
-            deploymentExecuted: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_ACTIVATION_CEREMONY_PACKET",
+            scope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_ACTIVATION_CEREMONY_PACKET"
+          );
+    const ceremonyHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_ACTIVATION_CEREMONY_PACKET"
+    );
+    const finalAuthorityEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_FINAL_AUTHORITY_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionActivationCeremonyReviews.length,
@@ -206,6 +202,8 @@ async function handleProductionActivationCeremony(
         disclosures: result.disclosures,
         ceremonyPosture: result.ceremonyPosture,
         ceremonyPacket,
+        ceremonyHistory,
+        finalAuthorityEvidence,
         productionBlocked: true,
         activationCeremonyApprovalGranted: false,
         activationCeremonyExecuted: false,
@@ -339,6 +337,8 @@ async function handleProductionActivationCeremony(
       disclosures: classifiedOutput.disclosures,
       ceremonyPosture: classifiedOutput.ceremonyPosture,
       ceremonyPacket: classifiedOutput.ceremonyPacket,
+      ceremonyHistory: classifiedOutput.ceremonyHistory,
+      finalAuthorityEvidence: classifiedOutput.finalAuthorityEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       activationCeremonyApprovalGranted:
         classifiedOutput.activationCeremonyApprovalGranted,

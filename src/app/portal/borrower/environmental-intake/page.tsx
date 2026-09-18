@@ -24,6 +24,10 @@ import {
  *   documents, applications, readiness, and data rights.
  * - Vol V-VII: preserves public-surface disclosures, source authority,
  *   conformance, provider-license boundaries, and no-live-action posture.
+ *
+ * Chart Table cohesion rollout (founder 2026-07-17): the intake sits on the
+ * surveyor-green stage via chartSurface("environmental") — shared tokens,
+ * presentation only; intake routing and copy unchanged.
  */
 
 type ApiResponse = {
@@ -47,6 +51,46 @@ type ApiResponse = {
   };
 };
 
+// Self-contained surveyor-green surface. Previously chartSurface("environmental")
+// from the source-intelligence unit; inlined here so this borrower-experience
+// page holds no cross-unit import (verify:module-separability). Values resolved
+// from the environmental CHART_THEME.
+const ENV = {
+  stage: "linear-gradient(180deg, #0e2620, #0a1e18 60%, #07160f)",
+  plate: "linear-gradient(160deg, #163d30, #103023)",
+  plateBorder: "#2f6b52",
+  accent: "#8fd0a2",
+  cellBg: "rgba(9, 30, 22, 0.8)",
+  cellBorder: "#255040",
+  ink: "#ecf5ef",
+  inkSoft: "#b3d0bd",
+} as const;
+
+const surface = {
+  theme: { ink: ENV.ink, inkSoft: ENV.inkSoft },
+  container: { maxWidth: 1180, margin: "0 auto", padding: "28px 24px 48px", display: "grid", gap: 18, background: ENV.stage, borderRadius: 20, color: ENV.ink },
+  panel: { background: ENV.plate, border: `1px solid ${ENV.plateBorder}`, borderRadius: 12 },
+  cell: { background: ENV.cellBg, border: `1px solid ${ENV.cellBorder}`, borderRadius: 10 },
+  kicker: { fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: ENV.accent },
+  muted: { color: ENV.inkSoft, lineHeight: 1.6 },
+  label: { color: ENV.inkSoft, fontSize: 13, fontWeight: 800 },
+  input: { width: "100%", minHeight: 42, border: `1px solid ${ENV.plateBorder}`, borderRadius: 8, padding: "8px 10px", fontSize: 14, color: ENV.ink, background: ENV.cellBg },
+  link: { color: ENV.accent, fontWeight: 800, textDecoration: "none" },
+  primaryButton: { minHeight: 42, border: 0, borderRadius: 999, padding: "0 18px", background: "#0f766e", color: "#ffffff", fontWeight: 800 },
+  primaryButtonBusyBg: "#9a6730",
+  errorPanel: { border: "1px solid rgba(207, 138, 74, 0.55)", background: "rgba(201, 111, 82, 0.14)", color: "#f19c8e", borderRadius: 10, padding: 12, fontWeight: 700 },
+  meterTrack: "rgba(255, 255, 255, 0.12)",
+  meterGood: "#6fbf8f",
+  meterWarn: "#e2b34c",
+  badges: {
+    ready: { background: "rgba(111, 191, 143, 0.16)", color: "#6fbf8f" },
+    review: { background: "rgba(226, 179, 76, 0.16)", color: "#e2b34c" },
+    blocked: { background: "rgba(207, 138, 74, 0.18)", color: "#f19c8e" },
+    neutral: { background: "rgba(255, 255, 255, 0.08)", color: ENV.inkSoft },
+  },
+} as const;
+const theme = surface.theme;
+
 const shellStyle = {
   minHeight: "100vh",
   background: "#f6f8fb",
@@ -56,34 +100,13 @@ const shellStyle = {
 } as const;
 
 const containerStyle = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  padding: 24,
-  display: "grid",
-  gap: 18,
+  ...surface.container,
+  margin: "24px auto",
 } as const;
 
-const panelStyle = {
-  background: "#ffffff",
-  border: "1px solid #d7deea",
-  borderRadius: 8,
-} as const;
-
-const mutedText = {
-  color: "#5d687a",
-  lineHeight: 1.5,
-} as const;
-
-const inputStyle = {
-  width: "100%",
-  minHeight: 42,
-  border: "1px solid #cbd5e1",
-  borderRadius: 6,
-  padding: "8px 10px",
-  fontSize: 14,
-  color: "#162033",
-  background: "#ffffff",
-} as const;
+const panelStyle = surface.panel;
+const mutedText = surface.muted;
+const inputStyle = surface.input;
 
 function FieldLabel(props: { children: string }) {
   return (
@@ -91,9 +114,7 @@ function FieldLabel(props: { children: string }) {
       style={{
         display: "block",
         marginBottom: 6,
-        color: "#334155",
-        fontSize: 13,
-        fontWeight: 800,
+        ...surface.label,
       }}
     >
       {props.children}
@@ -105,13 +126,7 @@ function StatusBadge(props: {
   tone: "ready" | "review" | "blocked" | "neutral";
   text: string;
 }) {
-  const tones = {
-    ready: { background: "#e7f5ed", color: "#047857" },
-    review: { background: "#fff7ed", color: "#9a3412" },
-    blocked: { background: "#fff1f0", color: "#b42318" },
-    neutral: { background: "#eef2f7", color: "#475569" },
-  } as const;
-  const tone = tones[props.tone];
+  const tone = surface.badges[props.tone];
 
   return (
     <span
@@ -336,17 +351,10 @@ export default function BorrowerEnvironmentalIntakePage() {
             }}
           >
             <div style={{ display: "grid", gap: 8, maxWidth: 760 }}>
-              <span
-                style={{
-                  color: "#456077",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                }}
-              >
+              <span style={surface.kicker}>
                 Borrower Environmental Intake
               </span>
-              <h1 style={{ margin: 0, fontSize: 34, lineHeight: 1.1 }}>
+              <h1 style={{ margin: 0, fontSize: 34, lineHeight: 1.1, color: theme.ink }}>
                 Environmental Intake
               </h1>
               <p style={{ ...mutedText, margin: 0 }}>
@@ -491,7 +499,7 @@ export default function BorrowerEnvironmentalIntakePage() {
                 gap: 8,
                 marginTop: 26,
                 fontSize: 14,
-                color: "#334155",
+                color: theme.inkSoft,
               }}
             >
               <input
@@ -509,13 +517,10 @@ export default function BorrowerEnvironmentalIntakePage() {
             disabled={submitting}
             style={{
               justifySelf: "start",
-              minHeight: 42,
-              border: 0,
-              borderRadius: 6,
-              padding: "0 16px",
-              background: submitting ? "#94a3b8" : "#1d4ed8",
-              color: "#ffffff",
-              fontWeight: 800,
+              ...surface.primaryButton,
+              background: submitting
+                ? surface.primaryButtonBusyBg
+                : surface.primaryButton.background,
               cursor: submitting ? "default" : "pointer",
             }}
           >
@@ -525,16 +530,7 @@ export default function BorrowerEnvironmentalIntakePage() {
           </button>
 
           {error ? (
-            <div
-              style={{
-                border: "1px solid #fecaca",
-                background: "#fff1f0",
-                color: "#991b1b",
-                borderRadius: 8,
-                padding: 12,
-                fontWeight: 700,
-              }}
-            >
+            <div style={surface.errorPanel}>
               {error}
             </div>
           ) : null}
@@ -548,12 +544,12 @@ export default function BorrowerEnvironmentalIntakePage() {
           }}
         >
           <div style={{ ...panelStyle, padding: 18, display: "grid", gap: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 22 }}>Intake Readiness</h2>
+            <h2 style={{ margin: 0, fontSize: 22, color: theme.ink }}>Intake Readiness</h2>
             <div
               style={{
                 height: 12,
                 borderRadius: 999,
-                background: "#e2e8f0",
+                background: surface.meterTrack,
                 overflow: "hidden",
               }}
             >
@@ -563,29 +559,29 @@ export default function BorrowerEnvironmentalIntakePage() {
                   width: `${result.readiness.readinessPercent}%`,
                   background:
                     result.readiness.readinessPercent >= 80
-                      ? "#059669"
-                      : "#ca8a04",
+                      ? surface.meterGood
+                      : surface.meterWarn,
                 }}
               />
             </div>
-            <strong style={{ fontSize: 28 }}>
+            <strong style={{ fontSize: 28, color: theme.ink }}>
               {result.readiness.readinessPercent}%
             </strong>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Assessment Route</h3>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Assessment Route</h3>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <StatusBadge tone="review" text={result.assessmentRoute} />
                 <StatusBadge tone="neutral" text={result.pathwayPosture} />
               </div>
             </div>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Missing Items</h3>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Missing Items</h3>
               {result.readiness.missingItems.length === 0 ? (
                 <p style={{ ...mutedText, margin: 0 }}>
                   Core intake fields are ready for review.
                 </p>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                   {result.readiness.missingItems.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -593,8 +589,8 @@ export default function BorrowerEnvironmentalIntakePage() {
               )}
             </div>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Review Signals</h3>
-              <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Review Signals</h3>
+              <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                 {result.readiness.reviewSignals.slice(0, 8).map((signal) => (
                   <li key={signal}>{signal}</li>
                 ))}
@@ -611,13 +607,13 @@ export default function BorrowerEnvironmentalIntakePage() {
                 gap: 8,
               }}
             >
-              <h2 style={{ margin: 0, fontSize: 20 }}>Trigger Signals</h2>
+              <h2 style={{ margin: 0, fontSize: 20, color: theme.ink }}>Trigger Signals</h2>
               {result.triggerSignals.length === 0 ? (
                 <p style={{ ...mutedText, margin: 0 }}>
                   No trigger signals disclosed.
                 </p>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                   {result.triggerSignals.map((signal) => (
                     <li key={signal}>{signal}</li>
                   ))}
@@ -632,13 +628,13 @@ export default function BorrowerEnvironmentalIntakePage() {
                 gap: 8,
               }}
             >
-              <h2 style={{ margin: 0, fontSize: 20 }}>Exemption Candidates</h2>
+              <h2 style={{ margin: 0, fontSize: 20, color: theme.ink }}>Exemption Candidates</h2>
               {result.exemptionCandidates.length === 0 ? (
                 <p style={{ ...mutedText, margin: 0 }}>
                   No exemption candidates identified for the disclosed context.
                 </p>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                   {result.exemptionCandidates.map((candidate) => (
                     <li key={candidate}>{candidate}</li>
                   ))}
@@ -653,13 +649,13 @@ export default function BorrowerEnvironmentalIntakePage() {
                 gap: 8,
               }}
             >
-              <h2 style={{ margin: 0, fontSize: 20 }}>Blocked Claims</h2>
+              <h2 style={{ margin: 0, fontSize: 20, color: theme.ink }}>Blocked Claims</h2>
               <div
                 style={{
                   display: "flex",
                   gap: 8,
                   flexWrap: "wrap",
-                  color: "#64748b",
+                  color: theme.inkSoft,
                   fontSize: 12,
                   fontWeight: 800,
                 }}
@@ -668,10 +664,9 @@ export default function BorrowerEnvironmentalIntakePage() {
                   <span
                     key={claim}
                     style={{
-                      border: "1px solid #d7deea",
+                      ...surface.cell,
                       borderRadius: 999,
                       padding: "4px 8px",
-                      background: "#f8fafc",
                     }}
                   >
                     No {claim}
@@ -683,7 +678,7 @@ export default function BorrowerEnvironmentalIntakePage() {
         </section>
 
         <section style={{ ...panelStyle, padding: 18, display: "grid", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 22 }}>Governance Evidence</h2>
+          <h2 style={{ margin: 0, fontSize: 22, color: theme.ink }}>Governance Evidence</h2>
           <div
             style={{
               display: "grid",
@@ -724,11 +719,7 @@ export default function BorrowerEnvironmentalIntakePage() {
               <Link
                 key={route}
                 href={route}
-                style={{
-                  color: "#1d4ed8",
-                  fontWeight: 800,
-                  textDecoration: "none",
-                }}
+                style={surface.link}
               >
                 {route}
               </Link>
@@ -737,8 +728,8 @@ export default function BorrowerEnvironmentalIntakePage() {
         </section>
 
         <section style={{ ...panelStyle, padding: 18 }}>
-          <h2 style={{ marginTop: 0, fontSize: 22 }}>Disclosures</h2>
-          <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+          <h2 style={{ marginTop: 0, fontSize: 22, color: theme.ink }}>Disclosures</h2>
+          <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
             {result.disclosures.slice(0, 14).map((disclosure) => (
               <li key={disclosure}>{disclosure}</li>
             ))}

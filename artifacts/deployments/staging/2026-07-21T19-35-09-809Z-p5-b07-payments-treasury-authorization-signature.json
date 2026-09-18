@@ -1,0 +1,7 @@
+{
+  "algorithm": "HMAC-SHA256",
+  "keyId": "gcp-secret-manager://REPORT_SIGNING_SECRET/latest",
+  "reportSha256": "ffa518c27e926e6364d61b1eaf4d6d1d7fbaf59b12f9b741343fc645032ff357",
+  "signature": "CmpL1UMq6CLHH8HM7NbGee8X5F4ewFLag2wdni-GpqE",
+  "signedAtUtc": "2026-07-21T19:35:09.809Z"
+}

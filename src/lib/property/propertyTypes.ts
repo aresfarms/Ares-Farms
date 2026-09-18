@@ -32,7 +32,7 @@ export type PropertyType =
   | "hospitality"
   | "business"
   | "other";
-export type PropertySourceId = "usda" | "hud" | "treasury" | "gsa-realestate";
+export type PropertySourceId = "usda" | "hud" | "treasury" | "gsa-realestate" | "vedp";
 
 export const USDA_SOURCE_LABEL =
   "USDA RD resale data — historical snapshot, listings 2014–2018.";
@@ -45,6 +45,7 @@ export const SOURCE_CITATION: Record<PropertySourceId, string> = {
   hud: "Source: U.S. HUD — FHA (HUD Home Store)",
   treasury: "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
   "gsa-realestate": "Source: GSA — Federal surplus real property (realestatesales.gov)",
+  vedp: "Source: VEDP — Virginia Economic Development Partnership (vedp.org)",
 };
 
 /**
@@ -57,6 +58,7 @@ export const SOURCE_PORTAL: Record<PropertySourceId, { url: string; label: strin
   hud: { url: "https://www.hudhomestore.gov/", label: "View on HUD Home Store ↗" },
   treasury: { url: "https://www.treasury.gov/auctions/treasury/rp/realprop.shtml", label: "View on Treasury auctions ↗" },
   "gsa-realestate": { url: "https://realestatesales.gov/our-listing/", label: "View on GSA realestatesales.gov ↗" },
+  vedp: { url: "https://www.vedp.org/site-selection", label: "View on VEDP Site Selection ↗" },
 };
 
 export function computeIsCurrent(listingDate: string | null, asOfNow: Date = new Date()): boolean {

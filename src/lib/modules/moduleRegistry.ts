@@ -2,6 +2,7 @@ import {
   ModuleFeatureFlags,
   createModuleFeatureFlags,
 } from "@/lib/modules/featureFlagGovernance";
+import { SIGNATURE_EXECUTION_EVENT_TYPES } from "@/lib/signature-execution/eventContracts";
 
 /**
  * Module Manifest Registry
@@ -146,6 +147,30 @@ function applyModuleConformance(
       "STATE-REGISTRY-001",
       "CUSTOMER-TYPE-ELIGIBILITY-001",
       "DATA-FUSION-001"
+    );
+  }
+
+  if (
+    manifest.id === "billing" ||
+    manifest.id.includes("treasury") ||
+    manifest.dataDependencies.some((dependency) =>
+      [
+        "engagement-scope-acceptances",
+        "borrower-protection-fee-controls",
+        "service-delivery-evidence-records",
+        "treasury-revenue-events",
+        "governed-payment-records",
+        "governed-refund-records",
+        "treasury-reconciliation-records",
+      ].includes(dependency)
+    )
+  ) {
+    requirements.push(
+      "CANON-ECON-001",
+      "CANON-TREASURY-001",
+      "TREASURY-ENGINE-001",
+      "OPS-TREASURY-001",
+      "REG-TREASURY-001"
     );
   }
 
@@ -633,12 +658,22 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     route: "/billing",
     audience: ["internal"],
     permissions: ["billing:read", "payments:review"],
-    dataDependencies: ["billing-events", "payment-connector-executions"],
+    dataDependencies: [
+      "billing-events",
+      "payment-connector-executions",
+      "engagement-scope-acceptances",
+      "borrower-protection-fee-controls",
+      "service-delivery-evidence-records",
+      "treasury-revenue-events",
+      "governed-payment-records",
+      "governed-refund-records",
+      "treasury-reconciliation-records",
+    ],
     publicSurfaceAllowed: false,
     productionBlocked: true,
     claimsProfile: "live-action-blocked",
     replayRequired: true,
-    description: "Billing, entitlement, and payment connector controls without payment capture.",
+    description: "Billing and payment governance with advance scope acceptance, fee-control, actual-work evidence, module attribution, payment/refund lineage, and treasury reconciliation; production capture remains separately gated.",
     adjacentModules: ["promotion", "module-readiness"],
     eventsPublished: ["payment.capture.blocked"],
     eventsConsumed: ["partner.workflow.opened"],
@@ -5506,6 +5541,40 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     eventsPublished: ["public.surface.viewed"],
     eventsConsumed: ["revenue.opportunity.reviewed"],
     featureFlags: translationFlags,
+  },
+  {
+    id: "lender-submission",
+    title: "Governed Lender Submission",
+    route: "/lender-submissions",
+    audience: ["borrower", "lender", "internal"],
+    permissions: ["lender-submission:read", "lender-submission:review", "lender-submission:sandbox-dispatch"],
+    dataDependencies: ["application-documents", "lender-submission-cases", "submission-package-versions", "customer-submission-consents", "recipient-verifications", "delivery-outbox", "audit-ledger"],
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    claimsProfile: "live-action-blocked",
+    replayRequired: true,
+    description: "Builds immutable lender packages, captures exact-version customer consent, verifies recipients, and exercises delivery only through the deterministic sandbox adapter. Advisory only: this is not an approval, guarantee, or official determination, and no legal reliance, no regulatory reliance, or public verification is authorized. Furlong is not a lender, does not lend or commit funds, and does not decide credit, eligibility, or approval. AI does not decide; human review is required. Borrowers pay nothing. Your information belongs to you and may be accounted for, exported, deleted, or reviewed by a human. No silent submission and no information sale.",
+    adjacentModules: ["lender-workflow", "lender-evidence", "documents", "reviews", "audit-replay", "promotion"],
+    eventsPublished: ["lender.submission.package.frozen", "lender.submission.dispatch.statused"],
+    eventsConsumed: ["document.metadata.received", "review.transition.approved", "promotion.gate.blocked"],
+    featureFlags: internalFlags,
+  },
+  {
+    id: "signature-execution",
+    title: "Governed Signature Execution",
+    route: "/signature-executions",
+    audience: ["borrower", "internal"],
+    permissions: ["signature-execution:read", "signature-execution:review", "signature-execution:offline-test"],
+    dataDependencies: ["signature-execution-cases", "execution-document-versions", "signature-placement-plans", "signer-authority-records", "signature-electronic-consents", "signature-intent-records", "signature-execution-authorizations", "signature-command-outbox", "signature-evidence-bundles", "executed-pdf-versions", "signature-validation-reports", "signature-replay-refs"],
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    claimsProfile: "live-action-blocked",
+    replayRequired: true,
+    description: "Produces one governed executed PDF through certified placement and offline validation while live signing and delivery remain blocked. Advisory only: this is not an approval, guarantee, or official determination, and no legal reliance, no regulatory reliance, or public verification is authorized. Furlong is not a lender, does not lend or commit funds, and does not decide credit, eligibility, or approval. AI does not decide; human review is required. Borrowers pay nothing. Your information belongs to you and may be accounted for, exported, deleted, or reviewed by a human. No silent submission and no information sale.",
+    adjacentModules: ["documents", "reviews", "audit-replay", "governance", "promotion", "lender-submission"],
+    eventsPublished: [...SIGNATURE_EXECUTION_EVENT_TYPES],
+    eventsConsumed: ["document.metadata.received", "review.transition.approved", "promotion.gate.blocked"],
+    featureFlags: internalFlags,
   },
 ];
 

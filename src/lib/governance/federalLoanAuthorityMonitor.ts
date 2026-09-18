@@ -1,0 +1,488 @@
+import { createHash, randomUUID } from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+
+import { removeSuppressedHtmlElements, stripHtmlMarkup } from "@/lib/security/htmlText";
+import { runtimeStatePath } from "@/lib/property/runtimeStatePath";
+import {
+  buildFederalAuthoritySemanticFingerprint,
+  classifyFederalAuthorityChange,
+  type FederalAuthorityChangeMateriality,
+} from "@/lib/governance/federalLoanAuthorityChangeTriage";
+
+export const FEDERAL_LOAN_AUTHORITY_MONITOR_RULE =
+  "FEDERAL-LOAN-AUTHORITY-CONTINUOUS-MONITOR-001" as const;
+
+export type FederalLoanAgency = "SBA" | "FSA" | "USDA_RD" | "ECFR" | "FEDERAL_REGISTER";
+export type FederalAuthorityKind =
+  | "PROGRAM_CATALOG"
+  | "PROGRAM_TERMS"
+  | "FORM"
+  | "HANDBOOK"
+  | "NOTICE"
+  | "RATE"
+  | "REGULATION"
+  | "OTHER_AUTHORITY";
+
+export interface FederalLoanAuthoritySeed {
+  agency: FederalLoanAgency;
+  url: string;
+  kind: FederalAuthorityKind;
+  discoverLinks: boolean;
+  required: boolean;
+}
+
+export interface FederalLoanAuthorityDocument {
+  documentId: string;
+  agency: FederalLoanAgency;
+  kind: FederalAuthorityKind;
+  url: string;
+  contentType: string;
+  contentHash: string;
+  etag: string | null;
+  lastModified: string | null;
+  title: string | null;
+  normalizedText: string | null;
+  fetchedAt: string;
+  firstObservedAt: string;
+  changedAt: string | null;
+  previousContentHash: string | null;
+  status: "CURRENT" | "CHANGED_REVIEW_REQUIRED" | "FETCH_FAILED" | "TIMED_OUT";
+  error: string | null;
+  semanticHash?: string;
+  semanticMateriality?: Exclude<FederalAuthorityChangeMateriality, "COSMETIC">;
+  triageReasonCodes?: string[];
+}
+
+export interface FederalLoanAuthorityChangeReceipt {
+  receiptId: string;
+  documentId: string;
+  agency: FederalLoanAgency;
+  url: string;
+  detectedAt: string;
+  previousContentHash: string;
+  nextContentHash: string;
+  status: "REVIEW_REQUIRED";
+  reason: string;
+  disposition?: "AUTO_CLEARED" | "REVIEW_REQUIRED";
+  materiality?: FederalAuthorityChangeMateriality;
+  previousSemanticHash?: string | null;
+  nextSemanticHash?: string;
+  reasonCodes?: string[];
+}
+
+export interface FederalLoanAuthorityMonitorState {
+  schemaVersion: "federal-loan-authority-monitor-v1";
+  lastRunAt: string | null;
+  documents: FederalLoanAuthorityDocument[];
+  changes: FederalLoanAuthorityChangeReceipt[];
+  runReceipts: Array<{
+    runId: string;
+    startedAt: string;
+    completedAt: string;
+    fetched: number;
+    changed: number;
+    failed: number;
+    timedOut?: number;
+    discovered: number;
+    attempted?: number;
+    deferred?: number;
+    durationMs?: number;
+    snapshotSha256: string;
+  }>;
+}
+
+export interface FederalLoanAuthorityReviewBinding {
+  reviewedAt: string;
+  officialSourceRefs: readonly string[];
+  reviewedContentHashes: Readonly<Record<string, string>>;
+}
+
+const STATE_FILE = runtimeStatePath("federal-loan-authority", "monitor-state.json");
+const MAX_DISCOVERED_PER_AGENCY = 60;
+const MAX_DISCOVERED_TOTAL = 240;
+const DEFAULT_FETCH_TIMEOUT_MS = 12_000;
+const DEFAULT_RUN_TIMEOUT_MS = 240_000;
+const DEFAULT_CONCURRENCY = 6;
+const MAX_BODY_BYTES = 20 * 1024 * 1024;
+
+export const FEDERAL_LOAN_AUTHORITY_SEEDS: readonly FederalLoanAuthoritySeed[] = Object.freeze([
+  { agency: "SBA", kind: "PROGRAM_CATALOG", discoverLinks: true, required: true, url: "https://www.sba.gov/funding-programs/loans" },
+  { agency: "SBA", kind: "PROGRAM_TERMS", discoverLinks: true, required: true, url: "https://www.sba.gov/partners/lenders/7a-loan-program/terms-conditions-eligibility" },
+  { agency: "SBA", kind: "FORM", discoverLinks: true, required: true, url: "https://www.sba.gov/document/sba-form-1919-borrower-information-form" },
+  { agency: "SBA", kind: "OTHER_AUTHORITY", discoverLinks: true, required: true, url: "https://www.sba.gov/partners/lenders/7a-loan-program/operate-7a-lender" },
+  { agency: "FSA", kind: "PROGRAM_CATALOG", discoverLinks: true, required: true, url: "https://www.fsa.usda.gov/about-fsa/structure-organization/farm-loan-programs" },
+  { agency: "FSA", kind: "HANDBOOK", discoverLinks: true, required: true, url: "https://www.fsa.usda.gov/news-events/laws-regulations/fsa-handbooks" },
+  { agency: "FSA", kind: "FORM", discoverLinks: true, required: true, url: "https://www.fsa.usda.gov/resources/programs/farm-loan-programs" },
+  { agency: "USDA_RD", kind: "PROGRAM_CATALOG", discoverLinks: true, required: true, url: "https://www.rd.usda.gov/programs-services/all-programs" },
+  { agency: "USDA_RD", kind: "PROGRAM_CATALOG", discoverLinks: true, required: true, url: "https://www.rd.usda.gov/programs-services/business-programs" },
+  { agency: "USDA_RD", kind: "PROGRAM_TERMS", discoverLinks: true, required: true, url: "https://www.rd.usda.gov/onerdguarantee" },
+  { agency: "USDA_RD", kind: "OTHER_AUTHORITY", discoverLinks: true, required: true, url: "https://www.rd.usda.gov/programs-services/services" },
+  { agency: "ECFR", kind: "REGULATION", discoverLinks: true, required: true, url: "https://www.ecfr.gov/current/title-13/chapter-I/part-120" },
+  { agency: "ECFR", kind: "REGULATION", discoverLinks: true, required: true, url: "https://www.ecfr.gov/current/title-7" },
+  { agency: "FEDERAL_REGISTER", kind: "NOTICE", discoverLinks: true, required: false, url: "https://www.federalregister.gov/agencies/small-business-administration" },
+  { agency: "FEDERAL_REGISTER", kind: "NOTICE", discoverLinks: true, required: false, url: "https://www.federalregister.gov/agencies/farm-service-agency" },
+  { agency: "FEDERAL_REGISTER", kind: "NOTICE", discoverLinks: true, required: false, url: "https://www.federalregister.gov/agencies/rural-business-cooperative-service" },
+]);
+
+const ALLOWED_HOSTS = new Set([
+  "www.sba.gov",
+  "sba.gov",
+  "www.fsa.usda.gov",
+  "fsa.usda.gov",
+  "www.rd.usda.gov",
+  "rd.usda.gov",
+  "www.ecfr.gov",
+  "ecfr.gov",
+  "www.federalregister.gov",
+  "federalregister.gov",
+]);
+
+const RELEVANT_LINK = /(?:loan|guarantee|guaranty|credit|borrow|lender|eligib|require|form|sop|handbook|notice|regulation|rate|fee|servic|program|farm-ownership|operating-loan|business-industry|community-facilities|rural-energy|water-waste|telecom|electric)/i;
+const EXCLUDED_LINK = /(?:facebook|twitter|linkedin|youtube|instagram|mailto:|javascript:|\/news\/|\/events\/|\/contact-us(?:$|\?))/i;
+
+function sha(value: string | Buffer): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function documentId(url: string): string {
+  return `federal-authority-${sha(url).slice(0, 24)}`;
+}
+
+function stable(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, child]) => `${JSON.stringify(key)}:${stable(child)}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function readState(): FederalLoanAuthorityMonitorState {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(STATE_FILE, "utf8")) as FederalLoanAuthorityMonitorState;
+    if (parsed.schemaVersion === "federal-loan-authority-monitor-v1") return parsed;
+  } catch {
+    // First run or corrupt state; fail closed through an empty state.
+  }
+  return { schemaVersion: "federal-loan-authority-monitor-v1", lastRunAt: null, documents: [], changes: [], runReceipts: [] };
+}
+
+function writeState(state: FederalLoanAuthorityMonitorState): void {
+  fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
+  const tmp = `${STATE_FILE}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
+  fs.renameSync(tmp, STATE_FILE);
+}
+
+function cleanMonitorText(html: string): string {
+  return stripHtmlMarkup(html).replace(/&nbsp;|&#160;/gi, " ").replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim();
+}
+
+function normalizeHtml(html: string): string {
+  return removeSuppressedHtmlElements(html)
+    .replace(/<!--([\s\S]*?)-->/g, " ")
+    .replace(/\s(?:nonce|integrity|data-drupal-selector|data-once|csrf-token)=(?:"[^"]*"|'[^']*')/gi, "")
+    .replace(/>\s+</g, "><")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function titleFromHtml(html: string): string | null {
+  const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return match ? match[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : null;
+}
+
+function inferAgency(url: URL): FederalLoanAgency | null {
+  const hostMatches = (domain: string) =>
+    url.hostname === domain || url.hostname.endsWith(`.${domain}`);
+  if (hostMatches("sba.gov")) return "SBA";
+  if (hostMatches("fsa.usda.gov")) return "FSA";
+  if (hostMatches("rd.usda.gov")) return "USDA_RD";
+  if (hostMatches("ecfr.gov")) return "ECFR";
+  if (hostMatches("federalregister.gov")) return "FEDERAL_REGISTER";
+  return null;
+}
+
+function inferKind(url: URL): FederalAuthorityKind {
+  const p = url.pathname.toLowerCase();
+  if (/form|document/.test(p)) return "FORM";
+  if (/handbook|sop/.test(p)) return "HANDBOOK";
+  if (/notice|federalregister/.test(p)) return "NOTICE";
+  if (/rate|fee/.test(p)) return "RATE";
+  if (/ecfr|regulation|rules/.test(p)) return "REGULATION";
+  if (/all-programs|programs-services|funding-programs\/loans/.test(p)) return "PROGRAM_CATALOG";
+  if (/terms|eligib|require/.test(p)) return "PROGRAM_TERMS";
+  return "OTHER_AUTHORITY";
+}
+
+function canonicalUrl(base: string, href: string): string | null {
+  try {
+    const url = new URL(href, base);
+    url.hash = "";
+    for (const key of [...url.searchParams.keys()]) {
+      if (/^(utm_|fbclid|gclid|_gl)/i.test(key)) url.searchParams.delete(key);
+    }
+    if (!ALLOWED_HOSTS.has(url.hostname.toLowerCase())) return null;
+    if (!/^https:$/.test(url.protocol)) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function discoverLinks(html: string, base: string): string[] {
+  const urls = new Set<string>();
+  for (const match of html.matchAll(/href\s*=\s*(?:"([^"]+)"|'([^']+)')/gi)) {
+    const href = match[1] ?? match[2] ?? "";
+    if (!href || EXCLUDED_LINK.test(href)) continue;
+    const url = canonicalUrl(base, href);
+    if (!url || !RELEVANT_LINK.test(url)) continue;
+    urls.add(url);
+  }
+  return [...urls].sort();
+}
+
+async function fetchBounded(url: string, previous: FederalLoanAuthorityDocument | undefined, fetchImpl: typeof fetch, timeoutMs: number): Promise<{
+  status: number;
+  contentType: string;
+  body: Buffer;
+  etag: string | null;
+  lastModified: string | null;
+}> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error(`Official source timed out after ${timeoutMs}ms.`)), timeoutMs);
+  try {
+    const headers: Record<string, string> = { "user-agent": "FurlongOfficialAuthorityMonitor/1.0 (+governance; official-sources-only)" };
+    if (previous?.etag) headers["if-none-match"] = previous.etag;
+    if (previous?.lastModified) headers["if-modified-since"] = previous.lastModified;
+    const response = await fetchImpl(url, { headers, redirect: "follow", signal: controller.signal });
+    if (response.status === 304 && previous) {
+      return { status: 304, contentType: previous.contentType, body: Buffer.alloc(0), etag: previous.etag, lastModified: previous.lastModified };
+    }
+    if (!response.ok) throw new Error(`Official source returned HTTP ${response.status}.`);
+    const declared = Number(response.headers.get("content-length") ?? "0");
+    if (declared > MAX_BODY_BYTES) throw new Error("Official source exceeds the monitor body-size limit.");
+    const body = Buffer.from(await response.arrayBuffer());
+    if (body.length > MAX_BODY_BYTES) throw new Error("Official source exceeds the monitor body-size limit.");
+    return {
+      status: response.status,
+      contentType: response.headers.get("content-type") ?? "application/octet-stream",
+      body,
+      etag: response.headers.get("etag"),
+      lastModified: response.headers.get("last-modified"),
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function refreshFederalLoanAuthorities(input: {
+  now?: string;
+  fetchImpl?: typeof fetch;
+  seeds?: readonly FederalLoanAuthoritySeed[];
+  persist?: boolean;
+  previousState?: FederalLoanAuthorityMonitorState;
+  fetchTimeoutMs?: number;
+  runTimeoutMs?: number;
+  concurrency?: number;
+} = {}): Promise<{
+  rule: typeof FEDERAL_LOAN_AUTHORITY_MONITOR_RULE;
+  runId: string;
+  fetched: number;
+  changed: number;
+  failed: number;
+  timedOut: number;
+  discovered: number;
+  attempted: number;
+  deferred: number;
+  durationMs: number;
+  snapshotSha256: string;
+  changes: readonly FederalLoanAuthorityChangeReceipt[];
+  state: FederalLoanAuthorityMonitorState;
+}> {
+  const now = input.now ?? new Date().toISOString();
+  const runId = `federal-loan-authority-${randomUUID()}`;
+  const previous = input.previousState ?? readState();
+  const previousByUrl = new Map(previous.documents.map((doc) => [doc.url, doc]));
+  const queue = [...(input.seeds ?? FEDERAL_LOAN_AUTHORITY_SEEDS)];
+  const queued = new Set(queue.map((seed) => seed.url));
+  const discoveredCount = new Map<FederalLoanAgency, number>();
+  const nextByUrl = new Map(previous.documents.map((doc) => [doc.url, doc]));
+  const changes: FederalLoanAuthorityChangeReceipt[] = [];
+  const runStartedMs = Date.now();
+  const runTimeoutMs = Math.max(1_000, input.runTimeoutMs ?? DEFAULT_RUN_TIMEOUT_MS);
+  const fetchTimeoutMs = Math.max(100, input.fetchTimeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS);
+  const concurrency = Math.min(12, Math.max(1, input.concurrency ?? DEFAULT_CONCURRENCY));
+  const runDeadlineMs = runStartedMs + runTimeoutMs;
+  let cursor = 0;
+  let fetched = 0;
+  let failed = 0;
+  let timedOut = 0;
+  let discovered = 0;
+  let attempted = 0;
+
+  const failureDocument = (seed: FederalLoanAuthoritySeed, prior: FederalLoanAuthorityDocument | undefined, error: unknown, status: "FETCH_FAILED" | "TIMED_OUT"): FederalLoanAuthorityDocument => ({
+    documentId: prior?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
+    contentType: prior?.contentType ?? "unknown", contentHash: prior?.contentHash ?? "",
+    etag: prior?.etag ?? null, lastModified: prior?.lastModified ?? null, title: prior?.title ?? null,
+    normalizedText: prior?.normalizedText ?? null, fetchedAt: now, firstObservedAt: prior?.firstObservedAt ?? now,
+    changedAt: prior?.changedAt ?? null, previousContentHash: prior?.previousContentHash ?? null,
+    status, error: error instanceof Error ? error.message : String(error),
+  });
+
+  while (cursor < queue.length && Date.now() < runDeadlineMs) {
+    const batch = queue.slice(cursor, cursor + concurrency);
+    cursor += batch.length;
+    const discoveredFromBatch: FederalLoanAuthoritySeed[] = [];
+    await Promise.all(batch.map(async (seed) => {
+      const prior = previousByUrl.get(seed.url);
+      attempted += 1;
+      const remainingMs = runDeadlineMs - Date.now();
+      if (remainingMs <= 0) {
+        timedOut += 1;
+        nextByUrl.set(seed.url, failureDocument(seed, prior, new Error("Authority-monitor run deadline reached before this source could start."), "TIMED_OUT"));
+        return;
+      }
+      try {
+        const response = await fetchBounded(seed.url, prior, input.fetchImpl ?? fetch, Math.min(fetchTimeoutMs, remainingMs));
+        fetched += 1;
+        if (response.status === 304 && prior) {
+          const semantic = buildFederalAuthoritySemanticFingerprint(prior.normalizedText ?? "");
+          nextByUrl.set(seed.url, {
+            ...prior,
+            fetchedAt: now,
+            status: prior.status === "CHANGED_REVIEW_REQUIRED" ? "CHANGED_REVIEW_REQUIRED" : "CURRENT",
+            error: null,
+            semanticHash: semantic.semanticHash,
+            semanticMateriality: semantic.materiality,
+            triageReasonCodes: prior.triageReasonCodes ?? semantic.reasonCodes,
+          });
+          return;
+        }
+        const html = /(?:text\/html|application\/xhtml\+xml)/i.test(response.contentType) ? response.body.toString("utf8") : null;
+        const normalized = html ? normalizeHtml(html) : response.body;
+        const normalizedText = html ? cleanMonitorText(html).slice(0, 2_000_000) : null;
+        const semantic = buildFederalAuthoritySemanticFingerprint(normalizedText ?? "");
+        const contentHash = sha(normalized);
+        const changed = Boolean(prior && prior.contentHash !== contentHash);
+        const triage = changed
+          ? classifyFederalAuthorityChange({ previousText: prior?.normalizedText, nextText: normalizedText })
+          : null;
+        const reviewRequiredChange = Boolean(changed && triage?.disposition === "REVIEW_REQUIRED");
+        const doc: FederalLoanAuthorityDocument = {
+          documentId: prior?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
+          contentType: response.contentType, contentHash, etag: response.etag, lastModified: response.lastModified,
+          title: html ? titleFromHtml(html) : prior?.title ?? null,
+          normalizedText,
+          fetchedAt: now, firstObservedAt: prior?.firstObservedAt ?? now,
+          changedAt: reviewRequiredChange ? now : prior?.changedAt ?? null,
+          previousContentHash: changed ? prior!.contentHash : prior?.previousContentHash ?? null,
+          status: reviewRequiredChange || (!changed && prior?.status === "CHANGED_REVIEW_REQUIRED") ? "CHANGED_REVIEW_REQUIRED" : "CURRENT",
+          error: null,
+          semanticHash: semantic.semanticHash,
+          semanticMateriality: semantic.materiality,
+          triageReasonCodes: triage?.reasonCodes ?? semantic.reasonCodes,
+        };
+        nextByUrl.set(seed.url, doc);
+        if (changed && triage) changes.push({
+          receiptId: randomUUID(), documentId: doc.documentId, agency: doc.agency, url: doc.url,
+          detectedAt: now, previousContentHash: prior!.contentHash, nextContentHash: contentHash,
+          status: "REVIEW_REQUIRED", disposition: triage.disposition, materiality: triage.materiality,
+          previousSemanticHash: triage.previousSemanticHash, nextSemanticHash: triage.nextSemanticHash,
+          reasonCodes: triage.reasonCodes,
+          reason: triage.disposition === "AUTO_CLEARED"
+            ? "Raw official-source content changed without a lending-authority change; the change was isolated and auto-cleared."
+            : "Official lending authority changed or lacks a sufficient prior semantic baseline; dependent guidance remains review-stale.",
+        });
+        if (seed.discoverLinks && html && discovered < MAX_DISCOVERED_TOTAL) {
+          for (const url of discoverLinks(html, seed.url)) {
+            if (queued.has(url) || discovered + discoveredFromBatch.length >= MAX_DISCOVERED_TOTAL) continue;
+            const parsed = new URL(url);
+            const agency = inferAgency(parsed);
+            if (!agency) continue;
+            const count = discoveredCount.get(agency) ?? 0;
+            if (count >= MAX_DISCOVERED_PER_AGENCY) continue;
+            queued.add(url);
+            discoveredCount.set(agency, count + 1);
+            discoveredFromBatch.push({ agency, url, kind: inferKind(parsed), discoverLinks: false, required: false });
+          }
+        }
+      } catch (error) {
+        const isTimeout = error instanceof Error && (error.name === "AbortError" || /timed out|abort/i.test(error.message));
+        if (isTimeout) timedOut += 1; else failed += 1;
+        nextByUrl.set(seed.url, failureDocument(seed, prior, error, isTimeout ? "TIMED_OUT" : "FETCH_FAILED"));
+      }
+    }));
+    if (discoveredFromBatch.length) {
+      queue.push(...discoveredFromBatch);
+      discovered += discoveredFromBatch.length;
+    }
+  }
+
+  const deferredSeeds = queue.slice(cursor);
+  for (const seed of deferredSeeds) {
+    const prior = previousByUrl.get(seed.url);
+    nextByUrl.set(seed.url, failureDocument(seed, prior, new Error("Authority-monitor whole-run deadline reached; source deferred to the next scheduled run."), "TIMED_OUT"));
+  }
+  timedOut += deferredSeeds.length;
+  const deferred = deferredSeeds.length;
+
+  // Backfill semantic fingerprints for every retained text authority, including
+  // documents outside this run's bounded fetch queue. This is a metadata-only
+  // migration: it does not clear or downgrade any existing review hold.
+  const documents = [...nextByUrl.values()]
+    .map((doc) => {
+      if (doc.semanticHash || !doc.normalizedText) return doc;
+      const semantic = buildFederalAuthoritySemanticFingerprint(doc.normalizedText);
+      return {
+        ...doc,
+        semanticHash: semantic.semanticHash,
+        semanticClauses: semantic.clauses,
+      };
+    })
+    .sort((a, b) => a.url.localeCompare(b.url));
+  const snapshotSha256 = sha(stable(documents.map((doc) => ({ url: doc.url, contentHash: doc.contentHash, semanticHash: doc.semanticHash ?? null, status: doc.status }))));
+  const completedAt = new Date().toISOString();
+  const durationMs = Date.now() - runStartedMs;
+  const state: FederalLoanAuthorityMonitorState = {
+    schemaVersion: "federal-loan-authority-monitor-v1",
+    lastRunAt: completedAt,
+    documents,
+    changes: [...previous.changes, ...changes],
+    runReceipts: [...previous.runReceipts, { runId, startedAt: now, completedAt, fetched, changed: changes.filter((change) => change.disposition !== "AUTO_CLEARED").length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256 }].slice(-365),
+  };
+  if (input.persist !== false) writeState(state);
+  return { rule: FEDERAL_LOAN_AUTHORITY_MONITOR_RULE, runId, fetched, changed: changes.filter((change) => change.disposition !== "AUTO_CLEARED").length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256, changes, state };
+}
+
+export function inspectFederalLoanAuthorityBinding(binding: FederalLoanAuthorityReviewBinding, providedState?: FederalLoanAuthorityMonitorState): {
+  current: boolean;
+  blockers: string[];
+  snapshotSha256: string;
+} {
+  const state = providedState ?? readState();
+  const byUrl = new Map(state.documents.map((doc) => [doc.url, doc]));
+  const blockers: string[] = [];
+  const reviewedAt = Date.parse(binding.reviewedAt);
+  if (!Number.isFinite(reviewedAt)) blockers.push("AUTHORITY_REVIEW_DATE_INVALID");
+  for (const ref of binding.officialSourceRefs) {
+    const doc = byUrl.get(ref);
+    if (!doc) { blockers.push(`AUTHORITY_SOURCE_NOT_MONITORED:${ref}`); continue; }
+    if (doc.status === "FETCH_FAILED") blockers.push(`AUTHORITY_SOURCE_FETCH_FAILED:${ref}`);
+    if (doc.status === "TIMED_OUT") blockers.push(`AUTHORITY_SOURCE_TIMED_OUT:${ref}`);
+    if (!doc.contentHash) blockers.push(`AUTHORITY_SOURCE_HAS_NO_BASELINE:${ref}`);
+    if (doc.changedAt && Date.parse(doc.changedAt) > reviewedAt) blockers.push(`AUTHORITY_CHANGED_AFTER_REVIEW:${ref}`);
+    const boundHash = binding.reviewedContentHashes[ref];
+    if (!boundHash) blockers.push(`AUTHORITY_HASH_BINDING_REQUIRED:${ref}`);
+    else if (boundHash !== doc.contentHash) blockers.push(`AUTHORITY_HASH_MISMATCH:${ref}`);
+  }
+  if (binding.officialSourceRefs.length === 0) blockers.push("OFFICIAL_PROGRAM_SOURCE_REQUIRED");
+  return { current: blockers.length === 0, blockers, snapshotSha256: sha(stable(binding)) };
+}
+
+export function readFederalLoanAuthorityMonitorState(): FederalLoanAuthorityMonitorState {
+  return readState();
+}

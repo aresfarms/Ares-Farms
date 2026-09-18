@@ -129,6 +129,22 @@ export default function ProductionFinalAuthorityPage() {
   );
   const authorityItems = arrayFromRecord(review, "authorityItems");
   const blockingReasons = arrayFromRecord(review, "blockingReasons");
+  const authorityPacket = isRecord(data.authority.json?.authorityPacket)
+    ? data.authority.json.authorityPacket
+    : null;
+  const authorityHistory = Array.isArray(data.authority.json?.authorityHistory)
+    ? data.authority.json.authorityHistory
+    : [];
+  const releaseBoardEvidence = isRecord(
+    data.authority.json?.releaseBoardEvidence
+  )
+    ? data.authority.json.releaseBoardEvidence
+    : null;
+  const supportCommunicationsEvidence = isRecord(
+    data.authority.json?.supportCommunicationsEvidence
+  )
+    ? data.authority.json.supportCommunicationsEvidence
+    : null;
   const contentClaims = useMemo(() => {
     return evaluateContentClaims({
       text: [
@@ -215,7 +231,7 @@ export default function ProductionFinalAuthorityPage() {
 
         setActionMessage(
           `Production final authority packet recorded: ${shortId(
-            authorityPacket.authorityPacketId
+            authorityPacket.evidenceId
           )}. No final authority approval, go-live approval, production launch authorization, hold release, support activation, customer communication, regulatory communication, public status page, borrower notice send, official report publication, public verification, legal advice, official reliance, production cutover authority, deployment, public API exposure, portal launch, payment capture, or live external action was approved.`
         );
         await loadAll({ clearActionMessage: false });
@@ -242,6 +258,25 @@ export default function ProductionFinalAuthorityPage() {
           refreshing={refreshing}
           onRefresh={() => void loadAll()}
         />
+
+        <section
+          style={{ ...panelStyle, padding: 16, display: "grid", gap: 10 }}
+        >
+          <h2 style={{ margin: 0, fontSize: 18 }}>Evidence Chain</h2>
+          <div style={{ display: "grid", gap: 6, color: "#475569" }}>
+            <div>
+              Release board: {shortId(releaseBoardEvidence?.evidenceId) || "not recorded"}
+            </div>
+            <div>
+              Support communications: {shortId(supportCommunicationsEvidence?.evidenceId) || "not recorded"}
+            </div>
+            <div>
+              Final authority: {shortId(authorityPacket?.evidenceId) || "not recorded"}
+            </div>
+            <div>Persisted final-authority packets: {authorityHistory.length}</div>
+            <div>Evidence continuity does not grant launch authority.</div>
+          </div>
+        </section>
 
         <SummaryGrid
           items={[

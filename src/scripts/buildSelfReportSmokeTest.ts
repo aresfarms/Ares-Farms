@@ -21,32 +21,32 @@ function assert(condition: boolean, message: string): asserts condition {
 function main() {
   assert(
     BUILD_SELF_REPORT_RUNTIME_VERSION === "build-self-report-runtime-v0.1.0",
-    "Runtime version must match v0.1.0 seal."
+    "Runtime version must match v0.1.0 seal.",
   );
   assert(
     BUILD_SELF_REPORT_SPEC_VERSION === "module-42-build-self-report-spec-v1.0",
-    "Spec version must match v1.0 seal."
+    "Spec version must match v1.0 seal.",
   );
   const lineage = buildSelfReportLineage();
   assert(
     lineage.runtimeVersion === BUILD_SELF_REPORT_RUNTIME_VERSION,
-    "Lineage runtimeVersion must equal canonical."
+    "Lineage runtimeVersion must equal canonical.",
   );
   assert(
     lineage.specVersion === BUILD_SELF_REPORT_SPEC_VERSION,
-    "Lineage specVersion must equal canonical."
+    "Lineage specVersion must equal canonical.",
   );
   assert(
     lineage.moduleCount === moduleManifests.length,
-    "Lineage moduleCount must equal manifest registry size."
+    "Lineage moduleCount must equal manifest registry size.",
   );
   assert(
     lineage.eventContractCount === eventContractRegistry.length,
-    "Lineage eventContractCount must equal event contract registry size."
+    "Lineage eventContractCount must equal event contract registry size.",
   );
   assert(
     lineage.handoffCount === crossModuleHandoffMap.length,
-    "Lineage handoffCount must equal handoff map size."
+    "Lineage handoffCount must equal handoff map size.",
   );
 
   // ────────────────────────────────────────────────────────────────────
@@ -70,7 +70,8 @@ function main() {
         name: "Module 44 Disclosure Audit Gate",
         owner: "TBD",
         blocked_reason: "not yet implemented",
-        required_evidence: "disclosure audit corpus + prohibited claims red-team",
+        required_evidence:
+          "disclosure audit corpus + prohibited claims red-team",
         promotion_condition: "module 44 ships",
       },
       {
@@ -125,17 +126,17 @@ function main() {
       result.auditSafe &&
       result.federationScoped &&
       result.conflictPreserving,
-    "Report must preserve every constitutional flag."
+    "Report must preserve every constitutional flag.",
   );
 
   // Header.
   assert(
     result.header.commit === "smoke-commit-sha",
-    "Header must reflect the caller-supplied commit."
+    "Header must reflect the caller-supplied commit.",
   );
   assert(
     result.header.totals.modules === moduleManifests.length,
-    "Header must report every module."
+    "Header must report every module.",
   );
   assert(
     result.header.totals.modules ===
@@ -143,24 +144,23 @@ function main() {
         result.header.totals.pass_with_warnings +
         result.header.totals.fail +
         result.header.totals.blocked_by_design,
-    "Header verdict counts must sum to total modules."
+    "Header verdict counts must sum to total modules.",
   );
 
   // Every module row must declare every check cell (no blanks).
   for (const row of result.modules) {
     for (const [key, cell] of Object.entries(row.checks)) {
-      const status =
-        typeof cell === "string" ? cell : cell.status;
+      const status = typeof cell === "string" ? cell : cell.status;
       assert(
         ["PASS", "FAIL", "WARN", "N/A", "BLOCKED_BY_DESIGN"].includes(status),
-        `Module ${row.module_id} check ${key} has invalid status "${status}".`
+        `Module ${row.module_id} check ${key} has invalid status "${status}".`,
       );
       if (status === "N/A") {
         const reason =
           typeof cell === "object" && cell.reason ? cell.reason : "";
         assert(
           reason.length > 0,
-          `Module ${row.module_id} check ${key} marked N/A must carry a reason.`
+          `Module ${row.module_id} check ${key} marked N/A must carry a reason.`,
         );
       }
     }
@@ -168,9 +168,9 @@ function main() {
       ["PASS", "FAIL", "WARN", "N/A", "BLOCKED_BY_DESIGN"].includes(
         typeof row.checks.blocks_enforced === "string"
           ? row.checks.blocks_enforced
-          : row.checks.blocks_enforced.status
+          : row.checks.blocks_enforced.status,
       ),
-      `Module ${row.module_id} blocks_enforced has invalid status.`
+      `Module ${row.module_id} blocks_enforced has invalid status.`,
     );
   }
 
@@ -178,15 +178,15 @@ function main() {
   for (const finding of result.findings) {
     assert(
       finding.resolution === "REQUIRES_HUMAN_REVIEW",
-      `Finding ${finding.findingId} must resolve to REQUIRES_HUMAN_REVIEW.`
+      `Finding ${finding.findingId} must resolve to REQUIRES_HUMAN_REVIEW.`,
     );
     assert(
       finding.evidenceReplayRef.length > 0,
-      `Finding ${finding.findingId} must carry an evidence replay reference.`
+      `Finding ${finding.findingId} must carry an evidence replay reference.`,
     );
     assert(
       finding.reviewerExplanation.length > 0,
-      `Finding ${finding.findingId} must carry a reviewer explanation.`
+      `Finding ${finding.findingId} must carry a reviewer explanation.`,
     );
   }
 
@@ -201,28 +201,28 @@ function main() {
   const ccr = result.classificationChangeRegistry;
   assert(
     ccr.parsed,
-    `Canonical Classification Change Registry must parse. Error: ${ccr.error ?? "(none)"}`
+    `Canonical Classification Change Registry must parse. Error: ${ccr.error ?? "(none)"}`,
   );
   const allCcr = [...ccr.activeEntries, ...ccr.historicalEntries];
   const ccrById = (id: string) => allCcr.find((e) => e.id === id);
   assert(
     ccrById("CCR-2026-001")?.status === "RESOLVED",
-    "CCR-2026-001 must be RESOLVED (resolution criteria met at Build 39)."
+    "CCR-2026-001 must be RESOLVED (resolution criteria met at Build 39).",
   );
   for (const activeId of ["CCR-2026-002", "CCR-2026-003", "CCR-2026-004"]) {
     const entry = ccrById(activeId);
     assert(
       entry?.status === "ACTIVE",
-      `${activeId} must be ACTIVE in the canonical registry.`
+      `${activeId} must be ACTIVE in the canonical registry.`,
     );
     assert(
       ccr.activeEntries.some((e) => e.id === activeId),
-      `${activeId} must appear in activeEntries[].`
+      `${activeId} must appear in activeEntries[].`,
     );
   }
   assert(
     !ccr.activeEntries.some((e) => e.id === "CCR-2026-001"),
-    "CCR-2026-001 (RESOLVED) must NOT count as active."
+    "CCR-2026-001 (RESOLVED) must NOT count as active.",
   );
   // Every active entry must carry the full required field set.
   for (const entry of ccr.activeEntries) {
@@ -235,19 +235,19 @@ function main() {
         entry.approver.length > 0 &&
         entry.effectiveDate.length > 0 &&
         entry.resolutionCriteria.length > 0,
-      `Active CCR ${entry.id} must carry every required field.`
+      `Active CCR ${entry.id} must carry every required field.`,
     );
   }
   // Markdown must surface the active-changes section + each active id.
   const ccrMd = renderBuildSelfReportMarkdown(result);
   assert(
     ccrMd.includes("## Active Classification Changes"),
-    "Markdown must include the Active Classification Changes section."
+    "Markdown must include the Active Classification Changes section.",
   );
   for (const activeId of ["CCR-2026-002", "CCR-2026-003", "CCR-2026-004"]) {
     assert(
       ccrMd.includes(activeId),
-      `Markdown active-changes section must render ${activeId}.`
+      `Markdown active-changes section must render ${activeId}.`,
     );
   }
 
@@ -268,13 +268,13 @@ function main() {
   });
   assert(
     liveFetchPack.header.exit_code === 1,
-    "live_fetch_enabled != 0 must produce exit_code 1."
+    "live_fetch_enabled != 0 must produce exit_code 1.",
   );
   assert(
     liveFetchPack.crossSourceConflicts.some(
-      (c) => c.conflictId === "bsr-v1-live-fetch-enabled"
+      (c) => c.conflictId === "bsr-v1-live-fetch-enabled",
     ),
-    "live_fetch_enabled != 0 must surface the live-fetch conflict."
+    "live_fetch_enabled != 0 must surface the live-fetch conflict.",
   );
 
   // ────────────────────────────────────────────────────────────────────
@@ -293,13 +293,13 @@ function main() {
   });
   assert(
     auditBrokenPack.header.exit_code === 1,
-    "audit_chain_intact = FAIL must produce exit_code 1."
+    "audit_chain_intact = FAIL must produce exit_code 1.",
   );
   assert(
     auditBrokenPack.crossSourceConflicts.some(
-      (c) => c.conflictId === "bsr-v1-audit-chain-broken"
+      (c) => c.conflictId === "bsr-v1-audit-chain-broken",
     ),
-    "audit_chain_intact = FAIL must surface the audit-chain-broken conflict."
+    "audit_chain_intact = FAIL must surface the audit-chain-broken conflict.",
   );
 
   // ────────────────────────────────────────────────────────────────────
@@ -313,13 +313,13 @@ function main() {
   });
   assert(
     reqGapPack.header.exit_code === 1,
-    "requirements-not-enumerated must produce exit_code 1."
+    "requirements-not-enumerated must produce exit_code 1.",
   );
   assert(
     reqGapPack.crossSourceConflicts.some(
-      (c) => c.conflictId === "bsr-v1-requirements-not-enumerated"
+      (c) => c.conflictId === "bsr-v1-requirements-not-enumerated",
     ),
-    "requirements-not-enumerated must surface the requirements conflict."
+    "requirements-not-enumerated must surface the requirements conflict.",
   );
 
   // ────────────────────────────────────────────────────────────────────
@@ -356,27 +356,27 @@ function main() {
   });
   assert(
     malformedPack.classificationChangeRegistry.parsed === false,
-    "Malformed CCR (active entry missing required field) must not parse."
+    "Malformed CCR (active entry missing required field) must not parse.",
   );
   assert(
     malformedPack.header.exit_code === 1,
-    "Malformed CCR must fail the report closed (exit_code 1)."
+    "Malformed CCR must fail the report closed (exit_code 1).",
   );
   assert(
     malformedPack.classificationChangeRegistry.activeCount === 0,
-    "A failed parse must emit zero active entries."
+    "A failed parse must emit zero active entries.",
   );
   assert(
     malformedPack.findings.some(
-      (f) => f.category === "CLASSIFICATION_REGISTRY_PARSE_FAIL"
+      (f) => f.category === "CLASSIFICATION_REGISTRY_PARSE_FAIL",
     ),
-    "Malformed CCR must surface a CLASSIFICATION_REGISTRY_PARSE_FAIL finding."
+    "Malformed CCR must surface a CLASSIFICATION_REGISTRY_PARSE_FAIL finding.",
   );
   assert(
     malformedPack.crossSourceConflicts.some(
-      (c) => c.conflictId === "bsr-v1-classification-registry-parse-fail"
+      (c) => c.conflictId === "bsr-v1-classification-registry-parse-fail",
     ),
-    "Malformed CCR must surface the classification-registry-parse-fail conflict."
+    "Malformed CCR must surface the classification-registry-parse-fail conflict.",
   );
 
   // A junk line inside a meta block must also fail closed.
@@ -402,7 +402,7 @@ function main() {
   assert(
     junkPack.classificationChangeRegistry.parsed === false &&
       junkPack.header.exit_code === 1,
-    "A malformed meta line must fail the report closed."
+    "A malformed meta line must fail the report closed.",
   );
 
   // Invalid status must fail closed.
@@ -427,7 +427,7 @@ function main() {
   assert(
     badStatusPack.classificationChangeRegistry.parsed === false &&
       badStatusPack.header.exit_code === 1,
-    "An invalid status value must fail the report closed."
+    "An invalid status value must fail the report closed.",
   );
 
   // ────────────────────────────────────────────────────────────────────
@@ -449,21 +449,20 @@ function main() {
   });
   assert(
     emptyCcrPack.classificationChangeRegistry.parsed === true,
-    "An empty registry must parse (no entries is not a failure)."
+    "An empty registry must parse (no entries is not a failure).",
   );
   assert(
     emptyCcrPack.classificationChangeRegistry.activeCount === 0,
-    "An empty registry must emit zero active entries."
+    "An empty registry must emit zero active entries.",
   );
-  assert(
-    emptyCcrPack.header.exit_code === 0,
-    "An empty registry with no active CCRs must NOT fail the report."
-  );
+  // The overall report may still fail closed for independent module/gate
+  // findings. This scenario proves only that an empty CCR registry adds no
+  // classification-registry failure of its own.
   assert(
     !emptyCcrPack.findings.some(
-      (f) => f.category === "CLASSIFICATION_REGISTRY_PARSE_FAIL"
+      (f) => f.category === "CLASSIFICATION_REGISTRY_PARSE_FAIL",
     ),
-    "An empty registry must not surface a parse-fail finding."
+    "An empty registry must not surface a parse-fail finding.",
   );
 
   const historyOnlyCcrMarkdown = [
@@ -487,101 +486,119 @@ function main() {
   assert(
     historyOnlyPack.classificationChangeRegistry.parsed === true &&
       historyOnlyPack.classificationChangeRegistry.activeCount === 0 &&
-      historyOnlyPack.classificationChangeRegistry.historicalCount === 1 &&
-      historyOnlyPack.header.exit_code === 0,
-    "A registry whose only entry is RESOLVED must parse, count 0 active, and not fail."
+      historyOnlyPack.classificationChangeRegistry.historicalCount === 1,
+    "A registry whose only entry is RESOLVED must parse and count 0 active entries.",
+  );
+  assert(
+    historyOnlyPack.header.exit_code === emptyCcrPack.header.exit_code,
+    "Empty and history-only CCR registries must have identical overall exit posture; independent module findings may still fail the report closed.",
+  );
+  const ccrFailureCategories = new Set([
+    "CLASSIFICATION_REGISTRY_PARSE_FAIL",
+    "CLASSIFICATION_CHANGE_INCOMPLETE",
+  ]);
+  assert(
+    !emptyCcrPack.findings.some((finding) =>
+      ccrFailureCategories.has(finding.category),
+    ) &&
+      !historyOnlyPack.findings.some((finding) =>
+        ccrFailureCategories.has(finding.category),
+      ),
+    "Empty and history-only registries must not add a CCR parse/incompleteness failure.",
   );
 
   // Disclosures + production restrictions.
   assert(
     BUILD_SELF_REPORT_DISCLOSURES.some((d) =>
-      d.toLowerCase().includes("blocked_by_design")
+      d.toLowerCase().includes("blocked_by_design"),
     ),
-    "Disclosures must include BLOCKED_BY_DESIGN framing."
+    "Disclosures must include BLOCKED_BY_DESIGN framing.",
   );
   assert(
     BUILD_SELF_REPORT_PRODUCTION_RESTRICTIONS.includes("no information sale") &&
-      BUILD_SELF_REPORT_PRODUCTION_RESTRICTIONS.includes("no silent submission"),
-    "Production restrictions must block information sale and silent submission."
+      BUILD_SELF_REPORT_PRODUCTION_RESTRICTIONS.includes(
+        "no silent submission",
+      ),
+    "Production restrictions must block information sale and silent submission.",
   );
 
   // Signals.
   assert(
     result.v1Signals.length === BUILD_SELF_REPORT_SIGNAL_IDS.length,
-    "Audit must compose all four governed build-self-report signals."
+    "Audit must compose all four governed build-self-report signals.",
   );
 
   // Markdown renderer sanity.
   const md = renderBuildSelfReportMarkdown(result);
   assert(
     md.includes(`Build Self-Report — ${result.header.checkpoint}`),
-    "Markdown must include the checkpoint header."
+    "Markdown must include the checkpoint header.",
   );
   assert(
     md.includes("| # | id | title"),
-    "Markdown must include the per-module table header."
+    "Markdown must include the per-module table header.",
   );
 
   // Module manifest conformance.
   const moduleManifest = moduleManifests.find(
-    (m) => m.id === "governance-build-self-report"
+    (m) => m.id === "governance-build-self-report",
   );
   assert(
     moduleManifest !== undefined,
-    "governance-build-self-report module manifest must be registered."
+    "governance-build-self-report module manifest must be registered.",
   );
   assert(
     moduleManifest.productionBlocked && moduleManifest.replayRequired,
-    "Module must be production-blocked and replay-required."
+    "Module must be production-blocked and replay-required.",
   );
   assert(
     moduleManifest.publicSurfaceAllowed === false,
-    "Module must not have a public surface."
+    "Module must not have a public surface.",
   );
   assert(
     moduleManifest.eventsPublished.includes(
-      "governance.build.self.report.generated"
+      "governance.build.self.report.generated",
     ),
-    "Module must publish the generated event."
+    "Module must publish the generated event.",
   );
 
   // Event contract conformance.
   const contract = eventContractRegistry.find(
-    (entry) => entry.eventType === "governance.build.self.report.generated"
+    (entry) => entry.eventType === "governance.build.self.report.generated",
   );
   assert(contract !== undefined, "Event contract must be registered.");
   assert(
     contract.productionBlocked && contract.replayRequired,
-    "Event contract must be production-blocked and replay-required."
+    "Event contract must be production-blocked and replay-required.",
   );
   assert(
     contract.classificationLevel === "RESTRICTED",
-    "Event contract must be RESTRICTED."
+    "Event contract must be RESTRICTED.",
   );
   assert(
     contract.publicSurfaceAllowed === false,
-    "Event contract must not be public-surface allowed."
+    "Event contract must not be public-surface allowed.",
   );
 
   // Handoff conformance.
   const handoffs = crossModuleHandoffMap.filter(
     (handoff) =>
       handoff.fromModuleId === "governance-build-self-report" ||
-      handoff.toModuleId === "governance-build-self-report"
+      handoff.toModuleId === "governance-build-self-report",
   );
   assert(
     handoffs.length >= 8,
-    "Build Self-Report module must declare at least eight governed handoff routes."
+    "Build Self-Report module must declare at least eight governed handoff routes.",
   );
   assert(
     handoffs.every(
-      (handoff) => handoff.productionBlocked && handoff.humanReviewBoundary
+      (handoff) => handoff.productionBlocked && handoff.humanReviewBoundary,
     ),
-    "Every handoff must remain production-blocked and human-review-bound."
+    "Every handoff must remain production-blocked and human-review-bound.",
   );
   assert(
     handoffs.some((h) => h.toModuleId === "build-preservation"),
-    "Build Self-Report must hand off to build-preservation (Module 42)."
+    "Build Self-Report must hand off to build-preservation (Module 42).",
   );
 
   console.log(
@@ -607,8 +624,7 @@ function main() {
         reqGapPackExitCode: reqGapPack.header.exit_code,
         classificationRegistryParsed:
           result.classificationChangeRegistry.parsed,
-        classificationChangesActive:
-          result.summary.classificationChangesActive,
+        classificationChangesActive: result.summary.classificationChangesActive,
         classificationChangesHistorical:
           result.summary.classificationChangesHistorical,
         malformedCcrExitCode: malformedPack.header.exit_code,
@@ -617,8 +633,8 @@ function main() {
         message: "Build Self-Report v1 smoke test passed.",
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 }
 

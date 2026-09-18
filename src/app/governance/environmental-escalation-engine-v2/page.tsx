@@ -9,6 +9,7 @@ import {
   EnvironmentalEscalationQueueEntry,
   composeEnvironmentalEscalationEngineV2,
 } from "@/lib/environmental/escalationEngineV2Runtime";
+import { readJsonResponse } from "@/lib/http/readJsonResponse";
 
 type ApiResponse = {
   ok: boolean;
@@ -146,7 +147,7 @@ export default function EnvironmentalEscalationEngineV2Page() {
         bankerSpokeIsolated: spokeIsolation,
         auditAnchorRef: "audit-anchor://review/eng-001",
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       riskOverlay: {
         siteContaminationHistory: "NONE",
         waterWetlandProximity: "NONE",
@@ -179,7 +180,7 @@ export default function EnvironmentalEscalationEngineV2Page() {
           body: JSON.stringify(localInput),
         }
       );
-      const data: ApiResponse = await response.json();
+      const data = await readJsonResponse<ApiResponse>(response);
       setServerResult(data);
       if (!data.ok) {
         setError(data.error ?? "Unknown error from API");

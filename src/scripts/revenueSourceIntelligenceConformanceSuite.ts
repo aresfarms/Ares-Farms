@@ -299,10 +299,10 @@ function verifyDataFusion(): void {
 }
 
 function verifyCustomerRevenueModule(): void {
-  const module = customerRevenueModule({});
-  const serialized = JSON.stringify(module);
+  const revenueModule = customerRevenueModule({});
+  const serialized = JSON.stringify(revenueModule);
 
-  assert(module.ok, "Customer revenue module should pass advisory runtime.");
+  assert(revenueModule.ok, "Customer revenue module should pass advisory runtime.");
   assert(
     serialized.includes("/customer-revenue") &&
       serialized.includes("/portal/revenue-opportunities") &&

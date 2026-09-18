@@ -100,6 +100,20 @@ function main() {
     "Module 45 must have its own binding (amend registry)."
   );
 
+  for (const moduleId of ["lender-submission", "signature-execution"]) {
+    const binding = HUMAN_AUTHORITY_BINDINGS.find(
+      (entry) => entry.module_id === moduleId
+    );
+    assert(binding !== undefined, `${moduleId} must have a human-authority binding.`);
+    assert(
+      binding.intent === "intentionally_held" &&
+        binding.clearing_rule.mode === "dual" &&
+        binding.clearing_rule.no_self_clear &&
+        !binding.clearing_rule.ai_permitted,
+      `${moduleId} must remain held behind dual human review with no self-clear or AI authority.`
+    );
+  }
+
   // ────────────────────────────────────────────────────────────────────
   // Scenario A: no filled roles. Coverage holds, no-AI holds, but
   // every alpha_required module with a binding reports FAIL because

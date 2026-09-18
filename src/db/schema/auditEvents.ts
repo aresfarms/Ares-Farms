@@ -32,7 +32,7 @@ import {
 export const auditEvents = pgTable("audit_events", {
   id: uuid("id").primaryKey(),
 
-  userId: uuid("user_id"),
+  userId: uuid("user_id").notNull(),
 
   eventType: text("event_type"),
   entityType: text("entity_type"),
@@ -43,7 +43,7 @@ export const auditEvents = pgTable("audit_events", {
   riskScore: integer("risk_score"),
 
   input: jsonb("input"),
-  output: jsonb("output"),
+  output: jsonb("output").notNull(),
   trace: jsonb("trace"),
 
   payload: jsonb("payload"),

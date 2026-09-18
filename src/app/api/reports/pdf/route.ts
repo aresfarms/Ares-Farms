@@ -4,7 +4,7 @@ import { evaluateAccess } from "@/lib/auth/accessControl";
 import { evaluateApplicationRecordAccess } from "@/lib/auth/recordAccess";
 import { evaluateContentClaims } from "@/lib/governance/contentClaimsPolicy";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
-import { persistReportRecord } from "@/lib/reports/reportRecordStore";
+import { canonicalReportAuthority } from "@/lib/platform/authorities/report";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
@@ -59,7 +59,7 @@ function routeActorRole(body: ReportRequest): unknown {
 }
 
 function reportRecordResponse(
-  record: Awaited<ReturnType<typeof persistReportRecord>>
+  record: Awaited<ReturnType<typeof canonicalReportAuthority.persist>>
 ) {
   return {
     id: record.id,
@@ -477,7 +477,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const reportRecord = await persistReportRecord({
+    const reportRecord = await canonicalReportAuthority.persist({
       traceId,
       reportId: traceId,
       reportType: body.reportType ?? "STANDARD",

@@ -403,8 +403,8 @@ function buildLegacyRevenueOpportunityBridge(
     bridge.push({
       revenueOpportunityId: opportunity.revenue_opportunity_id,
       productCategory: opportunity.product_or_service_category,
-      estimatedRevenueRange: opportunity.estimated_revenue_range,
-      estimatedCostRange: opportunity.estimated_cost_range,
+      estimatedRevenueRange: opportunity.estimated_revenue_range ?? "",
+      estimatedCostRange: opportunity.estimated_cost_range ?? "",
       projectionBasis: opportunity.projection_basis,
       sourceRefs: [...opportunity.source_refs],
     });

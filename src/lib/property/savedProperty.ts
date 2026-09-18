@@ -23,13 +23,16 @@ export interface SavedProperty {
   priceLabel: string;
   exactAddress: string | null;
   zip: string | null;
-  sourceId: "usda" | "hud" | "treasury" | "gsa-realestate";
+  sourceId: "usda" | "hud" | "treasury" | "gsa-realestate" | "vedp" | "furlong-report";
   sourceCitation: string;
   isCurrent: boolean;
   vintageStamp: string;
   listingUrl: string;
   /** Illustrative finance-pathway tags (e.g. USDA / FHA) — for the handoff. */
   pathways: string[];
+  /** For "furlong-report" records: the analysis URL that reopens the report
+      (property context only — never the visitor's answers). */
+  resumeHref?: string | null;
 }
 
 const KEY = "furlong.saved.v1";

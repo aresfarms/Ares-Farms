@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import { evaluateApplicationRecordAccess } from "@/lib/auth/recordAccess";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
@@ -600,7 +602,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const params = req.nextUrl.searchParams;
-    const role = params.get("role") ?? "user";
+    const role = effectiveRole(req);
     const tenantId = params.get("tenantId");
     const partnerType = params.get("partnerType");
     const partnerId = params.get("partnerId");

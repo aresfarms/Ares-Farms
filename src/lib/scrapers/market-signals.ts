@@ -1,4 +1,4 @@
 export {
   marketSignalsAlias,
   marketplaceIngestion,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";

@@ -5,7 +5,7 @@ import { FINANCING_PATHWAY_ENGINE_V2_RUNTIME_VERSION } from "@/lib/financing/pat
 import { eventContractRegistry } from "@/lib/modules/eventContractRegistry";
 import { crossModuleHandoffMap } from "@/lib/modules/handoffMap";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
-import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/opportunity/discoveryV2Runtime";
+import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/platform/authorities/opportunity";
 import { READINESS_ASSESSMENT_V2_RUNTIME_VERSION } from "@/lib/readiness/readinessAssessmentV2Runtime";
 import { REVENUE_INTELLIGENCE_V2_RUNTIME_VERSION } from "@/lib/revenue-intelligence/revenueIntelligenceV2Runtime";
 import {

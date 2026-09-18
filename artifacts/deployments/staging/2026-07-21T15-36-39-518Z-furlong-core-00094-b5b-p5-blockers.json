@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "p5-production-blocker-ledger-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00094-b5b",
+  "productionAuthorized": false,
+  "blockers": [
+    {
+      "id": "P5-B01",
+      "title": "Named tester acceptance",
+      "owner": "Caitlin Hudson / Stuart Fraass",
+      "passCondition": "Both named testers record PASS or documented findings",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B02",
+      "title": "Production data classification and PII authorization",
+      "owner": "Data Rights Officer",
+      "passCondition": "Approved PII inventory, retention and redaction evidence",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B03",
+      "title": "Financing activation authority",
+      "owner": "Credit/Eligibility Authority",
+      "passCondition": "Qualified human approval and lender workflow controls",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B04",
+      "title": "Live source legal and licensing approval",
+      "owner": "Source Legal Authority",
+      "passCondition": "Source-by-source license, ToS, retention and display approval",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B05",
+      "title": "External connector activation",
+      "owner": "Qualified Governance Reviewer",
+      "passCondition": "Certified adapters, monitoring, rollback and kill-switch proof",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B06",
+      "title": "Payments and billing activation",
+      "owner": "Chief Governance Authority",
+      "passCondition": "Payment processor, refund, dispute and reconciliation gates",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B07",
+      "title": "Official reports and notices",
+      "owner": "Regulatory Liaison Authority",
+      "passCondition": "Official-use templates, delivery receipts and adverse-action review",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B08",
+      "title": "Security and incident readiness",
+      "owner": "Security/Operations Authority",
+      "passCondition": "Production threat model, incident drill and alert evidence",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B09",
+      "title": "Production database and backup recovery",
+      "owner": "Platform Operations Authority",
+      "passCondition": "Restore drill, PITR evidence and production migration approval",
+      "status": "OPEN"
+    },
+    {
+      "id": "P5-B10",
+      "title": "Release board, DNS and final launch hold",
+      "owner": "Production Release Board",
+      "passCondition": "Quorum approval, DNS plan, rollback and final hold release",
+      "status": "OPEN"
+    }
+  ],
+  "generatedAtUtc": "2026-07-21T15:36:39.518Z"
+}

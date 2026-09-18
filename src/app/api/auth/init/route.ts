@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 
 import {
@@ -5,7 +7,10 @@ import {
   normalizeIdentityEmail,
   toPublicUserIdentity,
 } from "@/lib/auth/identity";
-import { sanitizeSelfServiceAuthRole } from "@/lib/auth/authActivationPolicy";
+import {
+  evaluateCredentialAuthPolicy,
+  sanitizeSelfServiceAuthRole,
+} from "@/lib/auth/authActivationPolicy";
 import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
@@ -49,9 +54,7 @@ type AuthInitRequestBody = {
 };
 
 function createAuthInitTraceId(): string {
-  return `auth-init-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `auth-init-${randomUUID()}`;
 }
 
 export async function POST(req: Request) {
@@ -98,6 +101,23 @@ export async function POST(req: Request) {
           },
         },
         { status: 400 }
+      );
+    }
+
+    const authorization = req.headers.get("authorization")?.trim() ?? "";
+    const credential = authorization.replace(/^Bearer\s+/i, "");
+    const credentialPolicy = evaluateCredentialAuthPolicy({
+      email,
+      password: credential,
+    });
+    if (!credentialPolicy.allowed) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Identity initialization is not authorized.",
+          governance: { traceId, mode: credentialPolicy.mode },
+        },
+        { status: 403 },
       );
     }
 

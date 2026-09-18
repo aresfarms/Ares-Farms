@@ -19,7 +19,7 @@ import {
   evaluateAdvancedIntelligence,
 } from "@/lib/intelligence/advancedIntelligenceRuntime";
 import { LENDER_WORKFLOW_V2_RUNTIME_VERSION } from "@/lib/lender/workflowV2Runtime";
-import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/opportunity/discoveryV2Runtime";
+import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/platform/authorities/opportunity";
 import {
   REVENUE_INTELLIGENCE_V2_RUNTIME_VERSION,
   RevenueIntelligenceV2Result,

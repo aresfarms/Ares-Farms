@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { institutionalLifecycleCycleAuthority as authority } from "@/lib/platform/institutionalLifecycleCycleAuthority";
+const archive={schemaVersion:"institutional-appeal-remand-archive-reopening-archive-projection-v1",projectionPolicyId:"projection-1",canonicalObjectId:"case-1",decision:"ALLOW",resultingState:"ARCHIVED",replayRef:"replay-1"} as const;
+const policy=authority.createPolicy({policyId:"cycle-policy",governanceVersion:"g1",maximumGeneration:3,requireHumanApprovalAfterInitialCycle:true,requiredEvidenceRefs:["evidence-cycle"],auditRefs:["audit-policy"],replayRef:"replay-1",versionRefs:["v1"]});
+const first=authority.evaluate({archive,policy,cycleId:"cycle-1",evidenceRefs:["evidence-cycle"],openedAt:"2026-07-22T20:00:00Z",auditRefs:["audit-1"],replayRef:"replay-1"});
+const review=authority.evaluate({archive,policy,cycleId:"cycle-2",previousCycle:first,evidenceRefs:["evidence-cycle"],openedAt:"2026-07-22T21:00:00Z",auditRefs:["audit-2"],replayRef:"replay-1"});
+const second=authority.evaluate({archive,policy,cycleId:"cycle-2",previousCycle:first,approvalRefs:["approval-1"],evidenceRefs:["evidence-cycle"],openedAt:"2026-07-22T21:00:00Z",auditRefs:["audit-2"],replayRef:"replay-1"});
+const badArchive={...archive,canonicalObjectId:"case-2"};const blocked=authority.evaluate({archive:badArchive,policy,cycleId:"cycle-3",previousCycle:second,approvalRefs:["approval-2"],evidenceRefs:["evidence-cycle"],openedAt:"2026-07-22T22:00:00Z",auditRefs:["audit-3"],replayRef:"replay-1"});
+assert.equal(first.decision,"ALLOW");assert.equal(first.generation,1);assert.equal(review.decision,"REVIEW_REQUIRED");assert.equal(second.decision,"ALLOW");assert.equal(second.generation,2);assert.equal(second.parentCycleId,"cycle-1");assert.equal(blocked.decision,"BLOCK");
+console.log(JSON.stringify({ok:true,schemaVersion:first.schemaVersion,first:first.decision,review:review.decision,second:second.decision,blocked:blocked.decision,generation:second.generation,message:"Institutional lifecycle cycle authority conformance passed."},null,2));

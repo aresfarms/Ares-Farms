@@ -180,7 +180,7 @@ export default function EnvironmentalRiskAssessmentV2Page() {
         bankerSpokeIsolated: true,
         auditAnchorRef: "audit-anchor://review/eng-001",
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       riskOverlay: {
         siteContaminationHistory: siteContamination as any,
         waterWetlandProximity: waterWetland as any,

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "p5-seeded-workflow-acceptance-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00094-b5b",
+  "targetImageDigest": "sha256:10e00056b431a7a0d437698ca58f89d836f7242f88a2a89f5c45b63e93755ca6",
+  "seedRunId": "staging-p4-furlong-core-00094-b5b",
+  "applicationId": "staging-p4-furlong-core-00094-b5b-application",
+  "outcome": "PASS",
+  "automatedAcceptanceOnly": true,
+  "namedTesterAcceptance": "PENDING",
+  "productionAuthorized": false,
+  "checks": [
+    {
+      "name": "target revision ready",
+      "pass": true,
+      "actual": "True",
+      "evidence": "furlong-core-00094-b5b"
+    },
+    {
+      "name": "target image digest exact",
+      "pass": true,
+      "actual": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:10e00056b431a7a0d437698ca58f89d836f7242f88a2a89f5c45b63e93755ca6",
+      "evidence": "sha256:10e00056b431a7a0d437698ca58f89d836f7242f88a2a89f5c45b63e93755ca6"
+    },
+    {
+      "name": "P4 seed bound to target revision",
+      "pass": true,
+      "actual": "furlong-core-00094-b5b",
+      "evidence": "2026-07-21T15-27-01-911Z-f220007-seed.json"
+    },
+    {
+      "name": "P4 seed outcome PASS",
+      "pass": true,
+      "actual": "PASS",
+      "evidence": "2026-07-21T15-27-01-911Z-f220007-seed.json"
+    },
+    {
+      "name": "seeded workflow breadth",
+      "pass": true,
+      "actual": "14",
+      "evidence": "14 governed workflow steps required"
+    },
+    {
+      "name": "seed prohibited-action guardrails",
+      "pass": true,
+      "actual": "{\"officialReportGenerated\":false,\"liveExternalCallPerformed\":false,\"rawDocumentContentAccepted\":false,\"paymentCaptured\":false,\"finalDecisionIssued\":false,\"borrowerNoticeSent\":false,\"publicVerificationEnabled\":false}",
+      "evidence": "2026-07-21T15-27-01-911Z-f220007-seed.json"
+    },
+    {
+      "name": "migration execution succeeded",
+      "pass": true,
+      "actual": "furlong-db-migrate-hwggk",
+      "evidence": "Cloud Run job history"
+    },
+    {
+      "name": "runtime privilege verification succeeded",
+      "pass": true,
+      "actual": "furlong-runtime-verify-k5bwk",
+      "evidence": "Cloud Run job history"
+    },
+    {
+      "name": "anonymous edge remains IAP-blocked",
+      "pass": true,
+      "actual": "HTTP 302",
+      "evidence": "https://accounts.google.com/o/oauth2/v2/auth?client_id=369001918367-t5qrahnqdaasaifvk6akpqkpjk9vli58.apps.googleusercontent.com&response_type=code&scope=openid+email&redirect_uri=https://iap.googleapis.com/v1/oauth/clientIds/369001918367-t5qrahnqdaasaifvk6akpqkpjk9vli58.apps.googleusercontent.com:handleRedirect&code_challenge=SWpEGKmYiZzTsZ1VxOJGfudMXg2reZFCOx8enLWdDIE&code_challenge_method=S256&cred_ref=true&state=AcVHNzoEieBsFnxJX9hF4fLxZ5AK680gTn20OaN-_gG-cCTA5p4A6-s6LhKy9y1bLW5rpPPjEt_CMFCckjoov-77KQSHKaXcsHLe91oDFpIcWG8CodBhnapHNATMxWvBxOJ3ekC-Ko1TIZMtv6bouGPisLk3GsOyTk5aLIJgYCOhKwJP187CZ-i2WRtRf9zIhHmsewz3THnspSKb4eX8nn6msuzmkTA_elZItnO2OBMJwvwTNEcsovPeNpjqktwcEXQd38FB_vNTvyorOjTC3yErb5QEWWaBamUsPNGNhRBwwYWCFP0_NQTjeFRAdWywAgYHWTaG3ro3ggg-4DMWYXXfXep8UpDMN1ZNZ5YFnY7kBKnV1CshTCzFXFn9uqD3x2R9jrjBEoARco7YIooGRy9hAPP1KJzyxAVgCxjovgwpEV-J0Nxkj2vg8vKkHB6ZTOEj3jC4-c93q6wKH2ffZ9oUPsumHXQHOWDFa_dwLSPSa9ZR4VBdyH_bbDf-gGJxAdt92zorJVXpxU3JZsvQubEYxi_RpijbqcVXvTBkSknDzSr6F862sCjTKZ-n_e7sEaHrLGm_sV0rQqHJbqMOY_XmqVTB10A2Rc82G2k7eK0AwPmoKtINlPV34VCWHQbFPaoz263PuYxvMzOQooqqYeP9FZ4GZd9MdkmeXBgqBm-FeAUitYCeYo60wSVKsKkXLNyvG0VQ_HZNOw5l_jO6w-GJxIRXk5RqFjjGIchIZs1N3CxwQH-UNwGXypJrbyNK4iGFgZW_489GcPnk0fmAaKTEEUAbAZN5xOW0_FI5y9L4wVrCjpaokdik8MS_rrbZUMMyCVhnK_Kaa0GiCDmEp1_IDB84q-DGyV1sfWcMGshAhKwFoc1WaAXdF_CO2krOCgM334Uhkoa666Qy-Yk3N3q9Yz6oCVTWTV1yF3sGobtzBpSdSOY6pVovS6YdXwst3JLYD3Y-mLGAKBVQFyYWIMRJjtQfO8CyuZ1QtsFRzaEsZFQzGc-TtWU98wZ--jHtIs_idtlqGJ_-IESPjOFiRlOz3ZBIkaQT7j_4kwyDCTIbZxxgxXuYVXmxD0jmy4M95s2R8UafFspCDbK1LFIp4THLpgnz5D7iXdBCjny2uVlCWb2-ycvK1h7T12uPONuhfA2k-QZgcZUKmDk-Q0_6XmZmrFy4D4_LhYENyifdQ33uJAit7rftakjIkCgJKuOikhwyrYUFZrvZbngr79eotn0h255dYJhUsQ"
+    },
+    {
+      "name": "internal workflow remains IAP-blocked",
+      "pass": true,
+      "actual": "HTTP 302",
+      "evidence": "https://accounts.google.com/o/oauth2/v2/auth?client_id=369001918367-t5qrahnqdaasaifvk6akpqkpjk9vli58.apps.googleusercontent.com&response_type=code&scope=openid+email&redirect_uri=https://iap.googleapis.com/v1/oauth/clientIds/369001918367-t5qrahnqdaasaifvk6akpqkpjk9vli58.apps.googleusercontent.com:handleRedirect&code_challenge=r2OeW4kdz32Y5cGBXX8COMIqnSgHySYH55bcPG1LCsw&code_challenge_method=S256&cred_ref=true&state=AcVHNzoEv-YM3WzAmehGYOK1Bu1l_XWnsQXBSLlvBJwIbIL5EaIT3xVIPrEAsne71r0Jp2T9Es65mC2mNMCcJqePxA76a__STEiGwHUyuW4eNWI7b6z7cPnkSUaNtvCq60jij0CLj9ObljZ9SCChCxcd9O3FtXqsvWO0fF17Y7tQb6NfIHCdipw-w40P2w8KyRDl6iNvo15wAmdvKtjboGSXXozGPXTOIaFF4VQZW1m-1KvQr00TQ28UgX9EJ4ALXs2K6D_Om2SSQ-JYs6TsgOjt_Wxe48i87EJtwQCBjkPK5INpK4ZQQzrnXAC9U0i14dGSmMxhu_XOXIj3-FvgtERAb_mPnALmQSJj9MDgnvg463z5ogL1mV_V2RK7qCRd5bz2DHCUJI1sMFKO-zVPOCqbHARb_4EVGiADyh3pNfZui7bd9Irs15L369H6U7is-ebz2-dNT0WatCuP9_VnlaXj-qXt1cyIdTLlMkvlq2cnT2L1kqwdgTPa1EnlLKR3-NzXZbK9rbwhWBCq0S4xB6eXxY9lMBO-i4pbuc9E-CsOCmc3-lkav9qpzM-L-ptT2BFvMvvongwK-vUeWkMFPFOHyRjhuDvee3PGeSr2aZcEvBhz_5ic4fghpps2cOIuxK0WkWuFMY4tlHOB90Mv3bEsPqimGVTAWj_RbrEWw_9ydC7ut-xLgW2TFSXhEYAiiOln_bhUzXBGykOKaMStn1e7BQ2SRjxHU5yi4X8OGFjaVOAYpHIAsmLUKk4CrZTyQVdgyNxJKsmYfTbUWyE7AlzQdQMWaGrQqbbKwFSK99Ozs_vu22xTAtBtOP4T8EqqtWU62qutTYaZEv01CD_6tUHIouAYDPkUjgy8eeKLoSfVWFzw7JkkEq7LjB1NvQiD0y_kFpgOOnzbYnGvR-liyGo2MTqGqLC-thUWLheDAUMa3C48ozVzs9kncQkxWNiBG1gmbGVStJzkRKPYKgg08o9KIsGmYLWNPyc51BDfA99_-vrSFgJwq4vfKO5pGBMpWMAt4RQwp4ZrHiuF5T2kMXr2PM_V1LOOuucQXkD1IQqaEwtwQS0vMFcLUEG8z4KcdNmTlXbK_RCrfrxjhhKmi8ipehh7gXhDXT-dyngVbm1LtAHpxLX3v7nMCtsyiBxYj0pacfZ4iqrch9hEupHaOdHgB-sj7Bw0wGsml8fzgq5MuK6YiJYHJXLZmHuP6kFxDJmvm50u057JUl3Ak6gM3gKtMRkgQixrKZxsLCjRKI9fc3X9vjyvtISW43QUnaU82upl08zRbnuNOgMYuKZRA04HfOKby1Lhnejskro"
+    },
+    {
+      "name": "public API contains no seeded application identifier",
+      "pass": true,
+      "actual": "HTTP 302; leaked=false",
+      "evidence": "/api/public/surfaces"
+    },
+    {
+      "name": "homepage contains no seeded application identifier",
+      "pass": true,
+      "actual": "leaked=false",
+      "evidence": "/"
+    },
+    {
+      "name": "all governed seed route families observed in Cloud Logging",
+      "pass": true,
+      "actual": "11 route families",
+      "evidence": "api-perimeter staging-seed-authority logs"
+    }
+  ],
+  "blockerSummary": {
+    "total": 10,
+    "open": 10
+  },
+  "generatedAtUtc": "2026-07-21T15:36:39.518Z"
+}

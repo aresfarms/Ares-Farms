@@ -5,13 +5,13 @@
  * the official realestatesales.gov page (public domain). PENDING Module 22/23.
  *
  * Written by src/scripts/ingestGsaRealEstate.ts. Re-run `npm run ingest:gsa-realestate`.
- * Ingested at: 2026-06-10T23:40:10.092Z
+ * Ingested at: 2026-07-17T16:15:54.771Z
  */
 
 import type { CanonicalProperty } from "./propertyTypes";
 
 export const GSA_RE_INGEST_PROVENANCE = {
-  "fetchedAt": "2026-06-10T23:40:10.092Z",
+  "fetchedAt": "2026-07-17T16:15:54.771Z",
   "feedUrl": "https://realestatesales.gov/our-listing/",
   "listed": 12,
   "current": 12,
@@ -20,6 +20,171 @@ export const GSA_RE_INGEST_PROVENANCE = {
 } as const;
 
 export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
+  {
+    "canonical_property_id": "gsa-re-68",
+    "source_records": [
+      {
+        "sourceId": "gsa-realestate",
+        "listingId": "68",
+        "listingDate": null,
+        "auctionDate": null,
+        "state": "CO",
+        "county": "Unknown",
+        "town": "Denver",
+        "propertyType": "commercial",
+        "rawPropertyStyle": "Commercial",
+        "exactAddress": "dding Five Points Historic Garage Collection - Welton St. 2101 Welton St. Denver",
+        "zip": "80205",
+        "price": 120000,
+        "bedrooms": null,
+        "yearBuilt": null,
+        "squareFeet": null,
+        "acreageText": null,
+        "program": null,
+        "description": "Commercial · Online Auction · GSA listing #68",
+        "photoFile": null,
+        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=68",
+        "isCurrent": true,
+        "latitude": null,
+        "longitude": null
+      }
+    ],
+    "parcel_refs": [],
+    "geospatial_refs": [],
+    "provenance_chain": [
+      {
+        "source_id": "gsa-realestate",
+        "source_url": "https://realestatesales.gov/our-listing/",
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "a853bf89fa51dd3734b5880cd208e7db50144b1babce9a76a4462f8aaec4e26d"
+      }
+    ],
+    "listing_status": "AUCTION",
+    "listing_history": [
+      "GSA realestatesales.gov 2026-07-17"
+    ],
+    "confidence_score": 80,
+    "source_id": "gsa-realestate",
+    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
+    "source_url": "https://realestatesales.gov/our-listing/",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "a853bf89fa51dd3734b5880cd208e7db50144b1babce9a76a4462f8aaec4e26d",
+    "classification_level": "PUBLIC",
+    "replay_ref": "gsa-re-68",
+    "connector_id": "gsa-realestate-connector",
+    "jurisdiction_scope": "federal",
+    "scraper_version": "gsa-realestate-ingest-v0.1.0"
+  },
+  {
+    "canonical_property_id": "gsa-re-67",
+    "source_records": [
+      {
+        "sourceId": "gsa-realestate",
+        "listingId": "67",
+        "listingDate": null,
+        "auctionDate": null,
+        "state": "CO",
+        "county": "Unknown",
+        "town": "Denver",
+        "propertyType": "commercial",
+        "rawPropertyStyle": "Commercial",
+        "exactAddress": "ve Points Historic Garage Collection - California St. 2106 California St. Denver",
+        "zip": "80205",
+        "price": 120000,
+        "bedrooms": null,
+        "yearBuilt": null,
+        "squareFeet": null,
+        "acreageText": null,
+        "program": null,
+        "description": "Commercial · Online Auction · GSA listing #67",
+        "photoFile": null,
+        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=67",
+        "isCurrent": true,
+        "latitude": null,
+        "longitude": null
+      }
+    ],
+    "parcel_refs": [],
+    "geospatial_refs": [],
+    "provenance_chain": [
+      {
+        "source_id": "gsa-realestate",
+        "source_url": "https://realestatesales.gov/our-listing/",
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "759fe5b23d2d06109c8ed9cbcbf65d5ab959eea30429f10622883673f5e77731"
+      }
+    ],
+    "listing_status": "AUCTION",
+    "listing_history": [
+      "GSA realestatesales.gov 2026-07-17"
+    ],
+    "confidence_score": 80,
+    "source_id": "gsa-realestate",
+    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
+    "source_url": "https://realestatesales.gov/our-listing/",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "759fe5b23d2d06109c8ed9cbcbf65d5ab959eea30429f10622883673f5e77731",
+    "classification_level": "PUBLIC",
+    "replay_ref": "gsa-re-67",
+    "connector_id": "gsa-realestate-connector",
+    "jurisdiction_scope": "federal",
+    "scraper_version": "gsa-realestate-ingest-v0.1.0"
+  },
+  {
+    "canonical_property_id": "gsa-re-66",
+    "source_records": [
+      {
+        "sourceId": "gsa-realestate",
+        "listingId": "66",
+        "listingDate": null,
+        "auctionDate": null,
+        "state": "DE",
+        "county": "Unknown",
+        "town": "Townsend",
+        "propertyType": "other",
+        "rawPropertyStyle": "GSA real property",
+        "exactAddress": "ow Bidding Reedy Island Rear Range Light 1171 Taylor&#x27;s Bridge Road Townsend",
+        "zip": "19734",
+        "price": 5000,
+        "bedrooms": null,
+        "yearBuilt": null,
+        "squareFeet": null,
+        "acreageText": null,
+        "program": null,
+        "description": "Online Auction · GSA listing #66",
+        "photoFile": null,
+        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=66",
+        "isCurrent": true,
+        "latitude": null,
+        "longitude": null
+      }
+    ],
+    "parcel_refs": [],
+    "geospatial_refs": [],
+    "provenance_chain": [
+      {
+        "source_id": "gsa-realestate",
+        "source_url": "https://realestatesales.gov/our-listing/",
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "01342c9ad22cda076458072c3e14c3038c6f6ba8563634ec578100d8ad8ab235"
+      }
+    ],
+    "listing_status": "AUCTION",
+    "listing_history": [
+      "GSA realestatesales.gov 2026-07-17"
+    ],
+    "confidence_score": 80,
+    "source_id": "gsa-realestate",
+    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
+    "source_url": "https://realestatesales.gov/our-listing/",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "01342c9ad22cda076458072c3e14c3038c6f6ba8563634ec578100d8ad8ab235",
+    "classification_level": "PUBLIC",
+    "replay_ref": "gsa-re-66",
+    "connector_id": "gsa-realestate-connector",
+    "jurisdiction_scope": "federal",
+    "scraper_version": "gsa-realestate-ingest-v0.1.0"
+  },
   {
     "canonical_property_id": "gsa-re-63",
     "source_records": [
@@ -35,7 +200,7 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "rawPropertyStyle": "Land/Lots",
         "exactAddress": "000 Now Bidding Hobart NIKE Site 520 W 700 North Hobart",
         "zip": "46342",
-        "price": 15000,
+        "price": 140000,
         "bedrooms": null,
         "yearBuilt": null,
         "squareFeet": null,
@@ -55,20 +220,20 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "152e261ec27d3cdf266f8674728f615b755d906261b60c8b3939cabd0abac1f0"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "f82ce8f23f26138bc83a0a45aa5dbaf818e60762ce01374ff9522d0bc6e3fe59"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "152e261ec27d3cdf266f8674728f615b755d906261b60c8b3939cabd0abac1f0",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "f82ce8f23f26138bc83a0a45aa5dbaf818e60762ce01374ff9522d0bc6e3fe59",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-63",
     "connector_id": "gsa-realestate-connector",
@@ -90,7 +255,7 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "rawPropertyStyle": "Commercial",
         "exactAddress": "000 Now Bidding 1863 Monroe 1863 Monroe Ave NW Grand Rapids",
         "zip": "49505",
-        "price": 1500000,
+        "price": 2325000,
         "bedrooms": null,
         "yearBuilt": null,
         "squareFeet": null,
@@ -110,20 +275,20 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "6cef6fd1dd23b3b4cc5a1a8f30425d9ee19785c9a212901d9b4514e1dfa25502"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "ef8e2e33097e5641b6a93f337f3c1c14be1b70ed071c7a78705bab5ebc16b40c"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "6cef6fd1dd23b3b4cc5a1a8f30425d9ee19785c9a212901d9b4514e1dfa25502",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "ef8e2e33097e5641b6a93f337f3c1c14be1b70ed071c7a78705bab5ebc16b40c",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-46",
     "connector_id": "gsa-realestate-connector",
@@ -165,132 +330,22 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
+        "fetched_at": "2026-07-17T16:15:54.771Z",
         "content_hash": "eaa9523443710c2ee9c44371f5e22a27b742739e86d059aec5316fffa70f9c54"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
     "content_hash": "eaa9523443710c2ee9c44371f5e22a27b742739e86d059aec5316fffa70f9c54",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-54",
-    "connector_id": "gsa-realestate-connector",
-    "jurisdiction_scope": "federal",
-    "scraper_version": "gsa-realestate-ingest-v0.1.0"
-  },
-  {
-    "canonical_property_id": "gsa-re-62",
-    "source_records": [
-      {
-        "sourceId": "gsa-realestate",
-        "listingId": "62",
-        "listingDate": null,
-        "auctionDate": null,
-        "state": "TX",
-        "county": "Unknown",
-        "town": "Port Lavaca",
-        "propertyType": "home",
-        "rawPropertyStyle": "Residential",
-        "exactAddress": "121 Brookhollow Dr - USCG Port Lavaca Housing 1121 Brookhollow Drive Port Lavaca",
-        "zip": "77979",
-        "price": 35000,
-        "bedrooms": null,
-        "yearBuilt": null,
-        "squareFeet": null,
-        "acreageText": null,
-        "program": null,
-        "description": "Residential · Online Auction · GSA listing #62",
-        "photoFile": null,
-        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=62",
-        "isCurrent": true,
-        "latitude": null,
-        "longitude": null
-      }
-    ],
-    "parcel_refs": [],
-    "geospatial_refs": [],
-    "provenance_chain": [
-      {
-        "source_id": "gsa-realestate",
-        "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "d4547dc6fe8276f030e64533fdc6c6471ebd684ab3b2750240d5e30acffe953a"
-      }
-    ],
-    "listing_status": "AUCTION",
-    "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
-    ],
-    "confidence_score": 80,
-    "source_id": "gsa-realestate",
-    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
-    "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "d4547dc6fe8276f030e64533fdc6c6471ebd684ab3b2750240d5e30acffe953a",
-    "classification_level": "PUBLIC",
-    "replay_ref": "gsa-re-62",
-    "connector_id": "gsa-realestate-connector",
-    "jurisdiction_scope": "federal",
-    "scraper_version": "gsa-realestate-ingest-v0.1.0"
-  },
-  {
-    "canonical_property_id": "gsa-re-55",
-    "source_records": [
-      {
-        "sourceId": "gsa-realestate",
-        "listingId": "55",
-        "listingDate": null,
-        "auctionDate": null,
-        "state": "TX",
-        "county": "Unknown",
-        "town": "Port Lavaca",
-        "propertyType": "home",
-        "rawPropertyStyle": "Residential",
-        "exactAddress": "dding 1711 Jackson St - USCG Port Lavaca Housing 1711 Jackson Street Port Lavaca",
-        "zip": "77979",
-        "price": 30000,
-        "bedrooms": null,
-        "yearBuilt": null,
-        "squareFeet": null,
-        "acreageText": null,
-        "program": null,
-        "description": "Residential · Online Auction · GSA listing #55",
-        "photoFile": null,
-        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=55",
-        "isCurrent": true,
-        "latitude": null,
-        "longitude": null
-      }
-    ],
-    "parcel_refs": [],
-    "geospatial_refs": [],
-    "provenance_chain": [
-      {
-        "source_id": "gsa-realestate",
-        "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "20af916bbf5724b9dbeb613b16d47915c55c5af7cc843ee780e4cf84d89d329a"
-      }
-    ],
-    "listing_status": "AUCTION",
-    "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
-    ],
-    "confidence_score": 80,
-    "source_id": "gsa-realestate",
-    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
-    "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "20af916bbf5724b9dbeb613b16d47915c55c5af7cc843ee780e4cf84d89d329a",
-    "classification_level": "PUBLIC",
-    "replay_ref": "gsa-re-55",
     "connector_id": "gsa-realestate-connector",
     "jurisdiction_scope": "federal",
     "scraper_version": "gsa-realestate-ingest-v0.1.0"
@@ -308,9 +363,9 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "town": "Port Lavaca",
         "propertyType": "home",
         "rawPropertyStyle": "Residential",
-        "exactAddress": "dding 2107 Jackson St - USCG Port Lavaca Housing 2107 Jackson Street Port Lavaca",
+        "exactAddress": "Today 2107 Jackson St - USCG Port Lavaca Housing 2107 Jackson Street Port Lavaca",
         "zip": "77979",
-        "price": 30000,
+        "price": 115000,
         "bedrooms": null,
         "yearBuilt": null,
         "squareFeet": null,
@@ -330,77 +385,22 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "50e63461ccde33c308744e7a4d636e2f3a706e9c93a85a1ef5b08e5e99e69dab"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "472d4c33ee9cec32962c1186ea4b5109ee64af18fbb29759d6d4498a92e60653"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "50e63461ccde33c308744e7a4d636e2f3a706e9c93a85a1ef5b08e5e99e69dab",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "472d4c33ee9cec32962c1186ea4b5109ee64af18fbb29759d6d4498a92e60653",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-59",
-    "connector_id": "gsa-realestate-connector",
-    "jurisdiction_scope": "federal",
-    "scraper_version": "gsa-realestate-ingest-v0.1.0"
-  },
-  {
-    "canonical_property_id": "gsa-re-60",
-    "source_records": [
-      {
-        "sourceId": "gsa-realestate",
-        "listingId": "60",
-        "listingDate": null,
-        "auctionDate": null,
-        "state": "TX",
-        "county": "Unknown",
-        "town": "Port Lavaca",
-        "propertyType": "home",
-        "rawPropertyStyle": "Residential",
-        "exactAddress": "idding 817 Westwood Dr - USCG Port Lavaca Housing 817 Westwood Drive Port Lavaca",
-        "zip": "77979",
-        "price": 30000,
-        "bedrooms": null,
-        "yearBuilt": null,
-        "squareFeet": null,
-        "acreageText": null,
-        "program": null,
-        "description": "Residential · Online Auction · GSA listing #60",
-        "photoFile": null,
-        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=60",
-        "isCurrent": true,
-        "latitude": null,
-        "longitude": null
-      }
-    ],
-    "parcel_refs": [],
-    "geospatial_refs": [],
-    "provenance_chain": [
-      {
-        "source_id": "gsa-realestate",
-        "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "ab52d945c555a95fc874c47f54340d23317e6fba00741cdc10936b372f5c6be5"
-      }
-    ],
-    "listing_status": "AUCTION",
-    "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
-    ],
-    "confidence_score": 80,
-    "source_id": "gsa-realestate",
-    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
-    "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "ab52d945c555a95fc874c47f54340d23317e6fba00741cdc10936b372f5c6be5",
-    "classification_level": "PUBLIC",
-    "replay_ref": "gsa-re-60",
     "connector_id": "gsa-realestate-connector",
     "jurisdiction_scope": "federal",
     "scraper_version": "gsa-realestate-ingest-v0.1.0"
@@ -418,9 +418,9 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "town": "Port Lavaca",
         "propertyType": "home",
         "rawPropertyStyle": "Residential",
-        "exactAddress": "dding 1712 Jackson St - USCG Port Lavaca Housing 1712 Jackson Street Port Lavaca",
+        "exactAddress": "Today 1712 Jackson St - USCG Port Lavaca Housing 1712 Jackson Street Port Lavaca",
         "zip": "77979",
-        "price": 30000,
+        "price": 115000,
         "bedrooms": null,
         "yearBuilt": null,
         "squareFeet": null,
@@ -440,77 +440,22 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "ca5cc3db62c070a00e0225246b4c3de69beee0aaa81f735d1433370c9536f007"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "1a443bf28405db827733e05572e3db0751adfe92ea67bac23d363157d1ee2554"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "ca5cc3db62c070a00e0225246b4c3de69beee0aaa81f735d1433370c9536f007",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "1a443bf28405db827733e05572e3db0751adfe92ea67bac23d363157d1ee2554",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-56",
-    "connector_id": "gsa-realestate-connector",
-    "jurisdiction_scope": "federal",
-    "scraper_version": "gsa-realestate-ingest-v0.1.0"
-  },
-  {
-    "canonical_property_id": "gsa-re-61",
-    "source_records": [
-      {
-        "sourceId": "gsa-realestate",
-        "listingId": "61",
-        "listingDate": null,
-        "auctionDate": null,
-        "state": "TX",
-        "county": "Unknown",
-        "town": "Port Lavaca",
-        "propertyType": "home",
-        "rawPropertyStyle": "Residential",
-        "exactAddress": "ding 1002 Westwood Dr - USCG Port Lavaca Housing 1002 Westwood Drive Port Lavaca",
-        "zip": "77979",
-        "price": 35000,
-        "bedrooms": null,
-        "yearBuilt": null,
-        "squareFeet": null,
-        "acreageText": null,
-        "program": null,
-        "description": "Residential · Online Auction · GSA listing #61",
-        "photoFile": null,
-        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=61",
-        "isCurrent": true,
-        "latitude": null,
-        "longitude": null
-      }
-    ],
-    "parcel_refs": [],
-    "geospatial_refs": [],
-    "provenance_chain": [
-      {
-        "source_id": "gsa-realestate",
-        "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "d571c123272f89c37a62be74737b9b9d67d56d6a39e2c1dc3ee3d0a1bf2a1b30"
-      }
-    ],
-    "listing_status": "AUCTION",
-    "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
-    ],
-    "confidence_score": 80,
-    "source_id": "gsa-realestate",
-    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
-    "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "d571c123272f89c37a62be74737b9b9d67d56d6a39e2c1dc3ee3d0a1bf2a1b30",
-    "classification_level": "PUBLIC",
-    "replay_ref": "gsa-re-61",
     "connector_id": "gsa-realestate-connector",
     "jurisdiction_scope": "federal",
     "scraper_version": "gsa-realestate-ingest-v0.1.0"
@@ -530,7 +475,7 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "rawPropertyStyle": "Residential",
         "exactAddress": "dding 2105 Jackson St - USCG Port Lavaca Housing 2105 Jackson Street Port Lavaca",
         "zip": "77979",
-        "price": 30000,
+        "price": 125000,
         "bedrooms": null,
         "yearBuilt": null,
         "squareFeet": null,
@@ -550,22 +495,77 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "9aeac15d3647750261d0d9190fbc8aea765490a2d2a5b775f6e5a3c12a16027f"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "48c39101e4f77b10e7c2b5d2d1290986b22a0338c2cc1fa88bb7363f3e776759"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "9aeac15d3647750261d0d9190fbc8aea765490a2d2a5b775f6e5a3c12a16027f",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "48c39101e4f77b10e7c2b5d2d1290986b22a0338c2cc1fa88bb7363f3e776759",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-57",
+    "connector_id": "gsa-realestate-connector",
+    "jurisdiction_scope": "federal",
+    "scraper_version": "gsa-realestate-ingest-v0.1.0"
+  },
+  {
+    "canonical_property_id": "gsa-re-62",
+    "source_records": [
+      {
+        "sourceId": "gsa-realestate",
+        "listingId": "62",
+        "listingDate": null,
+        "auctionDate": null,
+        "state": "TX",
+        "county": "Unknown",
+        "town": "Port Lavaca",
+        "propertyType": "home",
+        "rawPropertyStyle": "Residential",
+        "exactAddress": "121 Brookhollow Dr - USCG Port Lavaca Housing 1121 Brookhollow Drive Port Lavaca",
+        "zip": "77979",
+        "price": 145000,
+        "bedrooms": null,
+        "yearBuilt": null,
+        "squareFeet": null,
+        "acreageText": null,
+        "program": null,
+        "description": "Residential · Online Auction · GSA listing #62",
+        "photoFile": null,
+        "listingUrl": "https://realestatesales.gov/asset-details/?property_id=62",
+        "isCurrent": true,
+        "latitude": null,
+        "longitude": null
+      }
+    ],
+    "parcel_refs": [],
+    "geospatial_refs": [],
+    "provenance_chain": [
+      {
+        "source_id": "gsa-realestate",
+        "source_url": "https://realestatesales.gov/our-listing/",
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "3378bfd9503b7c6647759377c1ef293cc7e2233e44c63347ba97f09c3dd85bc3"
+      }
+    ],
+    "listing_status": "AUCTION",
+    "listing_history": [
+      "GSA realestatesales.gov 2026-07-17"
+    ],
+    "confidence_score": 80,
+    "source_id": "gsa-realestate",
+    "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
+    "source_url": "https://realestatesales.gov/our-listing/",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "3378bfd9503b7c6647759377c1ef293cc7e2233e44c63347ba97f09c3dd85bc3",
+    "classification_level": "PUBLIC",
+    "replay_ref": "gsa-re-62",
     "connector_id": "gsa-realestate-connector",
     "jurisdiction_scope": "federal",
     "scraper_version": "gsa-realestate-ingest-v0.1.0"
@@ -585,7 +585,7 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "rawPropertyStyle": "Land/Lots",
         "exactAddress": "Now Bidding 1.24 Acres of the Bear River Bird Refuge 3425 South 1700 West Perry",
         "zip": "84302",
-        "price": 10000,
+        "price": 12000,
         "bedrooms": null,
         "yearBuilt": null,
         "squareFeet": null,
@@ -605,20 +605,20 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "5377f0bc52840c9f8d36a5a1053a00aabc3e0191517ac04cd88d52bc3f50e69c"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "bbcb71f0a7f943a59d30f43db6f30c584d7a3375af692088378e77efb73f00de"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "5377f0bc52840c9f8d36a5a1053a00aabc3e0191517ac04cd88d52bc3f50e69c",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "bbcb71f0a7f943a59d30f43db6f30c584d7a3375af692088378e77efb73f00de",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-64",
     "connector_id": "gsa-realestate-connector",
@@ -638,7 +638,7 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
         "town": "Montpelier",
         "propertyType": "commercial",
         "rawPropertyStyle": "Commercial",
-        "exactAddress": "000 Coming Soon 87 State Street 87 State Street Montpelier",
+        "exactAddress": "000 Now Bidding 87 State Street 87 State Street Montpelier",
         "zip": "05602",
         "price": 500000,
         "bedrooms": null,
@@ -660,20 +660,20 @@ export const GSA_RE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "gsa-realestate",
         "source_url": "https://realestatesales.gov/our-listing/",
-        "fetched_at": "2026-06-10T23:40:10.092Z",
-        "content_hash": "4044df5ea2e34f695140f7b09f555b139f04d7d7a758608e0b2ec653c642396e"
+        "fetched_at": "2026-07-17T16:15:54.771Z",
+        "content_hash": "e237e767b3740450844d5bf2f60d3da7fbc9df13505f93098cc4f5fc693722b4"
       }
     ],
     "listing_status": "AUCTION",
     "listing_history": [
-      "GSA realestatesales.gov 2026-06-10"
+      "GSA realestatesales.gov 2026-07-17"
     ],
     "confidence_score": 80,
     "source_id": "gsa-realestate",
     "source_name": "GSA — Federal surplus real property (realestatesales.gov)",
     "source_url": "https://realestatesales.gov/our-listing/",
-    "fetched_at": "2026-06-10T23:40:10.092Z",
-    "content_hash": "4044df5ea2e34f695140f7b09f555b139f04d7d7a758608e0b2ec653c642396e",
+    "fetched_at": "2026-07-17T16:15:54.771Z",
+    "content_hash": "e237e767b3740450844d5bf2f60d3da7fbc9df13505f93098cc4f5fc693722b4",
     "classification_level": "PUBLIC",
     "replay_ref": "gsa-re-53",
     "connector_id": "gsa-realestate-connector",

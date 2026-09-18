@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "p5-financing-authority-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00098-lw9",
+  "targetImage": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:bab379c20d37a7df380b76f09fbae1843f659332dd718df10eebaf275d79bba1",
+  "blockerId": "P5-B03",
+  "blockerStatus": "EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",
+  "outcome": "PASS",
+  "productionAuthorized": false,
+  "productionFinancingPermitted": false,
+  "authorityVersion": "p5-b03-financing-authority-v1",
+  "authority": {
+    "blockerId": "P5-B03",
+    "ownerRole": "CREDIT_ELIGIBILITY_AUTHORITY",
+    "ownerPresent": true,
+    "qualifiedHumanApprovalRequired": true,
+    "qualifiedHumanApprovalGranted": false,
+    "lenderParticipationApproved": false,
+    "productionFinancingPermitted": false,
+    "autonomousUnderwritingPermitted": false,
+    "autonomousCreditDecisionPermitted": false,
+    "lenderCommitmentPermitted": false,
+    "borrowerNoticeSendPermitted": false,
+    "paymentAuthorizationPermitted": false
+  },
+  "requiredControls": [
+    "named participating lender or agency",
+    "executed participation agreement",
+    "license or agency authority reference",
+    "jurisdiction and product scope",
+    "authorized human decision role",
+    "underwriting policy ownership",
+    "fair-lending and ECOA review",
+    "adverse-action ownership",
+    "notice template and delivery ownership",
+    "appeal and reconsideration procedure",
+    "data-use and retention terms",
+    "security and incident obligations",
+    "audit and replay access",
+    "effective date and expiration",
+    "revocation and suspension procedure"
+  ],
+  "boundaryMatrix": [
+    {
+      "action": "collect intake and documents",
+      "furlong": "COORDINATION_ONLY",
+      "lender": "AUTHORIZED_AFTER_AGREEMENT"
+    },
+    {
+      "action": "suggest financing pathways",
+      "furlong": "ADVISORY_ONLY",
+      "lender": "REVIEW_REQUIRED"
+    },
+    {
+      "action": "determine eligibility",
+      "furlong": "PROHIBITED",
+      "lender": "QUALIFIED_HUMAN_ONLY"
+    },
+    {
+      "action": "underwrite credit",
+      "furlong": "PROHIBITED",
+      "lender": "QUALIFIED_HUMAN_ONLY"
+    },
+    {
+      "action": "approve or deny",
+      "furlong": "PROHIBITED",
+      "lender": "QUALIFIED_HUMAN_ONLY"
+    },
+    {
+      "action": "issue commitment",
+      "furlong": "PROHIBITED",
+      "lender": "AUTHORIZED_LENDER_ONLY"
+    },
+    {
+      "action": "issue adverse-action notice",
+      "furlong": "PROHIBITED",
+      "lender": "AUTHORIZED_LENDER_ONLY"
+    },
+    {
+      "action": "send borrower notice",
+      "furlong": "BLOCKED_PENDING_CONTROLLED_DELIVERY",
+      "lender": "AUTHORIZED_LENDER_ONLY"
+    }
+  ],
+  "checks": [
+    {
+      "name": "live revision ready",
+      "pass": true,
+      "evidence": "furlong-core-00098-lw9"
+    },
+    {
+      "name": "image digest pinned",
+      "pass": true,
+      "evidence": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:bab379c20d37a7df380b76f09fbae1843f659332dd718df10eebaf275d79bba1"
+    },
+    {
+      "name": "financing authority smoke",
+      "pass": true,
+      "evidence": "npm run smoke:production-financing-authority"
+    },
+    {
+      "name": "lender workflow v2",
+      "pass": true,
+      "evidence": "npm run smoke:lender-workflow-v2"
+    },
+    {
+      "name": "lender workflow v1",
+      "pass": true,
+      "evidence": "npm run smoke:lender-workflow"
+    },
+    {
+      "name": "credit authority registered",
+      "pass": true,
+      "evidence": "CREDIT_ELIGIBILITY_AUTHORITY"
+    },
+    {
+      "name": "activation controls complete",
+      "pass": true,
+      "evidence": "15"
+    },
+    {
+      "name": "Furlong cannot determine eligibility",
+      "pass": true,
+      "evidence": "boundary matrix"
+    },
+    {
+      "name": "Furlong cannot underwrite",
+      "pass": true,
+      "evidence": "boundary matrix"
+    },
+    {
+      "name": "Furlong cannot approve or deny",
+      "pass": true,
+      "evidence": "boundary matrix"
+    },
+    {
+      "name": "human approval preserved",
+      "pass": true,
+      "evidence": "{\"blockerId\":\"P5-B03\",\"ownerRole\":\"CREDIT_ELIGIBILITY_AUTHORITY\",\"ownerPresent\":true,\"qualifiedHumanApprovalRequired\":true,\"qualifiedHumanApprovalGranted\":false,\"lenderParticipationApproved\":false,\"productionFinancingPermitted\":false,\"autonomousUnderwritingPermitted\":false,\"autonomousCreditDecisionPermitted\":false,\"lenderCommitmentPermitted\":false,\"borrowerNoticeSendPermitted\":false,\"paymentAuthorizationPermitted\":false}"
+    },
+    {
+      "name": "lender participation blocked",
+      "pass": true,
+      "evidence": "lenderParticipationApproved=false"
+    },
+    {
+      "name": "production financing blocked",
+      "pass": true,
+      "evidence": "productionFinancingPermitted=false"
+    },
+    {
+      "name": "autonomous credit blocked",
+      "pass": true,
+      "evidence": "autonomousCreditDecisionPermitted=false"
+    },
+    {
+      "name": "notices and payments blocked",
+      "pass": true,
+      "evidence": "notice/payment=false"
+    }
+  ],
+  "generatedAtUtc": "2026-07-21T18:13:41.554Z"
+}

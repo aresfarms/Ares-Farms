@@ -1,0 +1,16 @@
+export { canonicalPropertyAuthority } from "./property";
+export { canonicalPlaceAuthority } from "./place";
+export { canonicalLandRegisterAuthority } from "./landRegister";
+export { canonicalEvidenceAuthority } from "./evidence";
+export { canonicalSourceAuthority } from "./source";
+export { canonicalProgramAuthority } from "./program";
+export { canonicalProviderAuthority } from "./provider";
+export { canonicalReportAuthority } from "./report";
+export { canonicalOpportunityAuthority } from "./opportunity";
+export { canonicalOrganizationAuthority } from "./organization";
+export { canonicalPersonAuthority } from "./person";
+export { canonicalAssetAuthority } from "./asset";
+export { canonicalTransactionAuthority } from "./transaction";
+export { canonicalCaseAuthority } from "./case";
+export { canonicalOperationAuthority } from "./operation";
+export { canonicalEventAuthority } from "./event";

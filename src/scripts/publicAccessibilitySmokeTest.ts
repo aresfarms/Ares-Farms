@@ -113,7 +113,9 @@ type CriterionResult = {
 };
 
 function runAcceptanceCriteria(): CriterionResult[] {
-  const homepage = readSrc("src/app/page.tsx");
+  // Homepage lives in the (public) route group (relocated during the compass-rose
+  // redesign); the prior "src/app/page.tsx" path no longer exists.
+  const homepage = readSrc("src/app/(public)/page.tsx");
 
   return [
     {
@@ -194,16 +196,17 @@ async function runBrowserAudit(): Promise<{
   // Dynamic import so the script doesn't fail when Playwright isn't installed
   // @axe-core/playwright uses AxeBuilder class API (not injectAxe/getViolations)
   let chromium: import("@playwright/test").BrowserType | null = null;
-  let AxeBuilder: (new (params: { page: unknown }) => {
-    withTags(tags: string[]): unknown;
-    analyze(): Promise<{ violations: Array<{ id: string; impact?: string | null; description: string; nodes: unknown[] }> }>;
-  }) | null = null;
+  // @axe-core/playwright is an optional dev dependency imported dynamically
+  // below; its constructor is typed `any` here so the smoke test compiles under
+  // strict mode without the package's types being present at build time.
+
+  let AxeBuilder: any = null;
 
   try {
     const pw  = await import("@playwright/test");
     chromium  = pw.chromium;
     const axe = await import("@axe-core/playwright");
-    AxeBuilder = axe.AxeBuilder as typeof AxeBuilder;
+    AxeBuilder = axe.AxeBuilder as unknown as typeof AxeBuilder;
   } catch (err) {
     throw new Error(`Playwright or @axe-core/playwright not importable: ${String(err)}`);
   }

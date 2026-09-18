@@ -40,12 +40,14 @@ export async function POST(
       const saved = Array.isArray(body.saved) ? body.saved : [];
       // Contact is OPTIONAL and only kept with explicit consent — never required.
       const contact =
-        body.consentContact === true && typeof body.contact === "string" ? body.contact : null;
-      const { token: minted, tokenId } = mintToken({ saved, contact });
+        body.consentContact === true && typeof body.contact === "string"
+          ? body.contact
+          : null;
+      const { token: minted, tokenId } = await mintToken({ saved, contact });
       return NextResponse.json({ token: minted, tokenId, rights: DATA_RIGHTS });
     }
     case "return": {
-      const rec = getByToken(token);
+      const rec = await getByToken(token);
       if (!rec) return NextResponse.json({ found: false }, { status: 404 });
       return NextResponse.json({
         found: true,
@@ -56,20 +58,23 @@ export async function POST(
       });
     }
     case "export": {
-      const rec = exportToken(token);
+      const rec = await exportToken(token);
       if (!rec) return NextResponse.json({ found: false }, { status: 404 });
       return NextResponse.json(rec);
     }
     case "delete": {
-      const purged = deleteToken(token);
+      const purged = await deleteToken(token);
       return NextResponse.json({ purged });
     }
     case "hold":
     case "human-review": {
-      const ok = requestRight(token, action);
+      const ok = await requestRight(token, action);
       return NextResponse.json({ ok });
     }
     default:
-      return NextResponse.json({ error: `unknown action "${action}"` }, { status: 400 });
+      return NextResponse.json(
+        { error: `unknown action "${action}"` },
+        { status: 400 },
+      );
   }
 }

@@ -1,0 +1,77 @@
+name: Weekly Ag Data Refresh
+
+# Keeps The Furlong Compass + the farm/ranch advanced analysis current on its
+# own: re-runs the weekly agricultural ingests and opens a PR with the updated
+# snapshots. Data refreshes automatically; DEPLOY stays deliberate — a human
+# reviews and merges, then runs the normal deploy chain. Respects the
+# replay-safety / deliberate-change posture.
+#
+# Cadence: Thursday 12:00 UTC (~8am ET) — after the U.S. Drought Monitor's
+# weekly Thursday release and the week's USDA NASS + AMS updates.
+#
+# REQUIRED repository secrets (Settings → Secrets and variables → Actions):
+#   NASS_API_KEY  — USDA NASS QuickStats (crop conditions + prices)
+#   MARS_API_KEY  — USDA AMS Market News (local grain bids)
+# (U.S. Drought Monitor needs no key.)
+
+on:
+  schedule:
+    - cron: "0 12 * * 4"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Refresh weekly agricultural data
+        env:
+          NASS_API_KEY: ${{ secrets.NASS_API_KEY }}
+          MARS_API_KEY: ${{ secrets.MARS_API_KEY }}
+        run: npm run refresh:weekly-ag
+
+      - name: Typecheck the regenerated snapshots
+        run: npx tsc --noEmit
+
+      - name: Open a PR if the data changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- src/lib/property/stateDroughtGenerated.ts \
+               src/lib/property/stateCropConditionsGenerated.ts \
+               src/lib/property/commodityPricesGenerated.ts \
+               src/lib/property/stateGrainBidsGenerated.ts \
+               src/lib/property/inputCostsGenerated.ts; then
+            echo "No agricultural-data changes this week — nothing to PR."
+            exit 0
+          fi
+          STAMP="$(date -u +%Y-%m-%d)"
+          BRANCH="auto/weekly-ag-refresh-${STAMP}"
+          git config user.name  "furlong-ag-refresh[bot]"
+          git config user.email "furlong-ag-refresh@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add src/lib/property/stateDroughtGenerated.ts \
+                  src/lib/property/stateCropConditionsGenerated.ts \
+                  src/lib/property/commodityPricesGenerated.ts \
+                  src/lib/property/stateGrainBidsGenerated.ts \
+                  src/lib/property/inputCostsGenerated.ts
+          git commit -m "Weekly ag data refresh — ${STAMP} (drought, crop conditions, grain bids, prices)"
+          git push --set-upstream origin "$BRANCH"
+          gh pr create \
+            --title "Weekly ag data refresh — ${STAMP}" \
+            --body "Automated refresh of the regional agricultural data behind The Furlong Compass and the farm/ranch advanced analysis: U.S. Drought Monitor, USDA NASS crop conditions + prices, and USDA AMS local grain bids. Review the numbers, merge, then deploy on the normal chain." \
+            --base "$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)" \
+            --head "$BRANCH"

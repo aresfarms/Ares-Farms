@@ -5,6 +5,11 @@ import {
   evaluateProductionPostActivationVerificationGate,
 } from "@/lib/governance/productionPostActivationVerificationGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -170,34 +175,28 @@ async function handleProductionPostActivationVerification(
     const result = evaluateProductionPostActivationVerificationGate({
       verificationScope,
     });
+    const scope = verificationScope ?? "platform";
     const verificationPacket =
-      req.method === "POST"
-        ? {
-            verificationPacketId: `production-post-activation-verification-${Date.now()}`,
-            verificationScope: verificationScope ?? "platform",
-            reviewStatus:
-              "PRODUCTION_POST_ACTIVATION_VERIFICATION_PACKET_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            postActivationVerificationApprovalGranted: false,
-            postActivationVerificationStarted: false,
-            postActivationVerificationCompleted: false,
-            postActivationVerificationPassed: false,
-            productionHealthCertified: false,
-            activationCeremonyApprovalGranted: false,
-            activationCeremonyExecuted: false,
-            productionActivationExecuted: false,
-            finalAuthorityApprovalGranted: false,
-            goLiveApproved: false,
-            productionLaunchAuthorized: false,
-            deploymentExecuted: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_POST_ACTIVATION_VERIFICATION_PACKET",
+            scope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_POST_ACTIVATION_VERIFICATION_PACKET"
+          );
+    const verificationHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_POST_ACTIVATION_VERIFICATION_PACKET"
+    );
+    const activationCeremonyEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_ACTIVATION_CEREMONY_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionPostActivationVerificationReviews.length,
@@ -207,6 +206,8 @@ async function handleProductionPostActivationVerification(
         disclosures: result.disclosures,
         verificationPosture: result.verificationPosture,
         verificationPacket,
+        verificationHistory,
+        activationCeremonyEvidence,
         productionBlocked: true,
         postActivationVerificationApprovalGranted: false,
         postActivationVerificationStarted: false,
@@ -341,6 +342,8 @@ async function handleProductionPostActivationVerification(
       disclosures: classifiedOutput.disclosures,
       verificationPosture: classifiedOutput.verificationPosture,
       verificationPacket: classifiedOutput.verificationPacket,
+      verificationHistory: classifiedOutput.verificationHistory,
+      activationCeremonyEvidence: classifiedOutput.activationCeremonyEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       postActivationVerificationApprovalGranted:
         classifiedOutput.postActivationVerificationApprovalGranted,

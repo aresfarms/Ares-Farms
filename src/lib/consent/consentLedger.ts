@@ -25,6 +25,7 @@
  * counsel signs off (GLBA / data-rights / inter-module data-sharing agreements).
  */
 
+import { createHash } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -69,6 +70,11 @@ function assertPiiFree(field: string, value: string | undefined): void {
     }
   }
 }
+/** Tokens HASHED AT REST (control F): ledger stores sha256(token), never raw. */
+function tokenDigest(token: string): string {
+  return "sha256:" + createHash("sha256").update(token).digest("hex");
+}
+
 function assertOpaqueToken(token: string): void {
   if (!/^[A-Za-z0-9_-]{8,}$/.test(token)) {
     throw new Error("Refused: token must be an opaque identifier (8+ url-safe chars), never identifying text.");
@@ -110,7 +116,7 @@ export function recordConsent(input: {
   const e: ConsentEvent = {
     ts: new Date().toISOString(),
     type: "CONSENT",
-    token: input.token,
+    token: tokenDigest(input.token),
     action: input.action,
     dataScope: input.dataScope,
     toModule: input.toModule,
@@ -123,7 +129,7 @@ export function recordConsent(input: {
 /** The customer's STOP — halts all future sharing/processing immediately. */
 export function recordStop(token: string): ConsentEvent {
   assertOpaqueToken(token);
-  const e: ConsentEvent = { ts: new Date().toISOString(), type: "STOP", token };
+  const e: ConsentEvent = { ts: new Date().toISOString(), type: "STOP", token: tokenDigest(token) };
   append(e);
   return e;
 }
@@ -132,7 +138,8 @@ export function recordStop(token: string): ConsentEvent {
  *  CONSENT event with no later STOP and no deletion? Checked before EVERY
  *  share/compile/export; absence of consent = refusal (ask, never assume). */
 export function hasActiveConsent(token: string, action: ConsentAction, toModule: string): boolean {
-  const events = readAll().filter((e) => e.token === token);
+  const digest = tokenDigest(token);
+  const events = readAll().filter((e) => e.token === digest);
   if (events.some((e) => e.type === "TOKEN_DELETED")) return false;
   // Append-only log ORDER is authoritative (timestamps can collide within a
   // millisecond): active = a matching CONSENT appears after the last STOP.
@@ -147,7 +154,8 @@ export function hasActiveConsent(token: string, action: ConsentAction, toModule:
 }
 
 export function isTokenDeleted(token: string): boolean {
-  return readAll().some((e) => e.token === token && e.type === "TOKEN_DELETED");
+  const digest = tokenDigest(token);
+  return readAll().some((e) => e.token === digest && e.type === "TOKEN_DELETED");
 }
 
 /** The HONEST retention disclosure (requirement #5) — shown verbatim. */
@@ -170,17 +178,19 @@ export function retentionDisclosure(moduleNames: string[]): string {
  */
 export function deleteToken(token: string): { deleted: true; disclosure: string } {
   assertOpaqueToken(token);
+  const digest = tokenDigest(token);
   const engaged = [...new Set(readAll()
-    .filter((e) => e.token === token && e.type === "CONSENT" && e.toModule)
+    .filter((e) => e.token === digest && e.type === "CONSENT" && e.toModule)
     .map((e) => e.toModule!))];
-  append({ ts: new Date().toISOString(), type: "TOKEN_DELETED", token });
+  append({ ts: new Date().toISOString(), type: "TOKEN_DELETED", token: tokenDigest(token) });
   return { deleted: true, disclosure: retentionDisclosure(engaged) };
 }
 
 /** Token-keyed consent history (PII-free by construction) — what the customer
  *  sees: where they are, what they've agreed to, step by step. */
 export function consentHistory(token: string): ConsentEvent[] {
-  return readAll().filter((e) => e.token === token);
+  const digest = tokenDigest(token);
+  return readAll().filter((e) => e.token === digest);
 }
 
 // ── PII-free status channel (requirement #7) ─────────────────────────────────
@@ -206,7 +216,7 @@ export function postStatus(input: { token: string; fromModule: string; status: s
   if (!hasActiveConsent(input.token, "engage-module", input.fromModule)) {
     throw new Error(`Refused: no active engage-module consent for ${input.fromModule} — status cannot flow without the customer's yes.`);
   }
-  const p: StatusPost = { ts: new Date().toISOString(), ...input };
+  const p: StatusPost = { ts: new Date().toISOString(), ...input, token: tokenDigest(input.token) };
   fs.mkdirSync(path.dirname(STATUS_PATH), { recursive: true });
   fs.appendFileSync(STATUS_PATH, JSON.stringify(p) + "\n", "utf8");
   return p;
@@ -215,7 +225,7 @@ export function postStatus(input: { token: string; fromModule: string; status: s
 export function statusHistory(token: string): StatusPost[] {
   try {
     return fs.readFileSync(STATUS_PATH, "utf8").split("\n").filter(Boolean)
-      .map((l) => JSON.parse(l) as StatusPost).filter((p) => p.token === token);
+      .map((l) => JSON.parse(l) as StatusPost).filter((p) => p.token === tokenDigest(token));
   } catch {
     return [];
   }

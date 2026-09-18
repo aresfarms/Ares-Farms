@@ -25,7 +25,7 @@ import {
   OpportunityDiscoveryV2GrantCard,
   OpportunityDiscoveryV2Result,
   composeOpportunityDiscoveryV2,
-} from "@/lib/opportunity/discoveryV2Runtime";
+} from "@/lib/platform/authorities/opportunity";
 import { REVENUE_INTELLIGENCE_V2_RUNTIME_VERSION } from "@/lib/revenue-intelligence/revenueIntelligenceV2Runtime";
 
 /**

@@ -10,7 +10,7 @@ import {
   OpportunityDiscoveryV2Input,
   OpportunityDiscoveryV2Result,
   composeOpportunityDiscoveryV2,
-} from "@/lib/opportunity/discoveryV2Runtime";
+} from "@/lib/platform/authorities/opportunity";
 
 type ApiResponse = {
   ok: boolean;

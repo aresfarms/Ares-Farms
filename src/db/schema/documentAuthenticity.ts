@@ -1,0 +1,28 @@
+import { boolean, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+export const documentAuthenticityEvidence = pgTable("document_authenticity_evidence", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  artifactRef: text("artifact_ref").notNull(),
+  artifactSha256: text("artifact_sha256").notNull(),
+  sourceType: text("source_type").notNull(),
+  sourceInstitution: text("source_institution"),
+  sourceReference: text("source_reference"),
+  customerIdentityVerificationRef: text("customer_identity_verification_ref").notNull(),
+  accountOwnershipVerificationRef: text("account_ownership_verification_ref"),
+  forensicRunId: text("forensic_run_id"),
+  fraudProviderResultRef: text("fraud_provider_result_ref"),
+  institutionCorroborationRef: text("institution_corroboration_ref"),
+  corroborationFieldsChecked: jsonb("corroboration_fields_checked").notNull().default([]),
+  forensicSignals: jsonb("forensic_signals").notNull().default([]),
+  materialDiscrepancies: jsonb("material_discrepancies").notNull().default([]),
+  humanReviewRef: text("human_review_ref"),
+  authenticityClassification: text("authenticity_classification").notNull(),
+  eligibleForExternalPackage: boolean("eligible_for_external_package").notNull().default(false),
+  evidenceSha256: text("evidence_sha256").notNull(),
+  verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
+  governanceVersion: text("governance_version").notNull(),
+  replayRef: text("replay_ref").notNull(),
+  traceId: text("trace_id").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

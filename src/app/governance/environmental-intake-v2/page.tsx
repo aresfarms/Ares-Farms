@@ -171,7 +171,7 @@ export default function EnvironmentalIntakeV2Page() {
         .filter(Boolean),
       intendedUses: ["environmental compliance", "energy efficiency"],
       scope: { sovereignFederationAllowed: sovereignAllowed },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       onboardingState: {
         stage: "BEGINNER",
         location: { country: "US", state: stateValue, county: "Frederick" },

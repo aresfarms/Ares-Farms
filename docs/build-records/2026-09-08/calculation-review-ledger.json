@@ -1,0 +1,81 @@
+{
+  "version": "calculation-review-ledger-v1.0.0",
+  "asOf": "2026-09-08",
+  "allPlatformCalculationsCertified": false,
+  "scope": "Focused corrections within the combined platform calculation / soils / current price / BPO request",
+  "domains": [
+    {
+      "domain": "Debt payment, inverse loan and remaining balance",
+      "status": "targeted-behavior-tested",
+      "tests": [
+        "verify:calculation-integrity"
+      ],
+      "evidence": "24 independent amortization cases plus period-by-period balances; 0% rates, losses, invalid and missing inputs",
+      "limitations": "A published benchmark or illustrative payment schedule is not a lender's binding term sheet."
+    },
+    {
+      "domain": "Agricultural enterprise and crop suitability",
+      "status": "unsupported-claims-blocked",
+      "tests": [
+        "verify:farm-use-integrity"
+      ],
+      "evidence": "Seippes actual parcel outline returns seven soil map units; no automatic alfalfa or crop ranking.",
+      "limitations": "No clipped soil acreage, current field tests, verified buyer demand or complete alternative budgets yet."
+    },
+    {
+      "domain": "Current asking-price evidence",
+      "status": "targeted-behavior-tested-source-coverage-incomplete",
+      "tests": [
+        "verify:property-value-indication",
+        "verify:property-entry-parity"
+      ],
+      "evidence": "7-day, exact-full-address, approved-source and explicit asking-price gates; stale snapshots remain historical.",
+      "limitations": "No general retail asking-price connector configured. Official HUD geospatial feed has no asking-price field. Contract ingestion remains separate."
+    },
+    {
+      "domain": "Market-value / BPO screen",
+      "status": "evidence-gates-tested-workflow-incomplete",
+      "tests": [
+        "verify:property-value-indication"
+      ],
+      "evidence": "Assessment and farm state averages cannot produce a market-value range; >=3 distinct recent reviewed adjusted sales or sourced NOI/cap inputs.",
+      "limitations": "MD candidates are not adjusted comps; authenticated comparable review/intake and NY/DE batch ingestion remain unimplemented."
+    },
+    {
+      "domain": "Operating model and user form",
+      "status": "targeted-behavior-tested",
+      "tests": [
+        "verify:property-operating-model",
+        "verify:calculation-integrity"
+      ],
+      "evidence": "Blank form inputs remain null. Incomplete expenses withhold NOI, DSCR and cap scenario; explicit zero and losses preserved.",
+      "limitations": "Manual assumptions are not automatically verified operating history. Variable-cost sensitivities and real underwriting remain separate."
+    },
+    {
+      "domain": "FSA program-fit and ownership projections",
+      "status": "targeted-behavior-tested-not-full-program-certification",
+      "tests": [
+        "verify:financing-program-fit"
+      ],
+      "evidence": "Loan ceilings apply to proposed loan not purchase price; blended funding remains pending; expired FY2026 limit requires refresh; farm does not use residential HPI/FHA equity. Structured price/loan/NOI/rate-date/payment inputs replace prose parsing. Missing financial evidence cannot produce a named financing leader; 1.25x is an illustrative comparison target. Old Seippes outputs independently replayed exactly.",
+      "limitations": "Program rule library, rates, total debts and specific eligibility still need dated authoritative review."
+    },
+    {
+      "domain": "Exports and document calculations",
+      "status": "targeted-behavior-tested-live-testing-pdf-checked",
+      "tests": [
+        "verify:calculation-integrity",
+        "verify:property-value-indication"
+      ],
+      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending. Local and live testing PDF checks completed. Fresh 13-page cloud PDF generated 2026-09-08T03:12:11Z: no default selected FSA program, no old 9,922/4,639/2.14 figures, pending gross revenue/expenses/NOI/debt service/DSCR, dated rate basis and monthly payment frequency. U8/U9/U10/U13 remain OPEN. Complete text checked; pages 5, 7, 9 and 10 visually inspected. Evidence and hash in calculation-financing-release.json.",
+      "limitations": "Every export path and complete live customer journey not certified. Legacy loan-lane headings, malformed U2 threshold glyph, truncated answers and narrow environmental-screen overclaims remain review items."
+    },
+    {
+      "domain": "Other platform calculations, treasury, verification and workflows",
+      "status": "audit-required-not-certified",
+      "tests": [],
+      "evidence": "Static calculation candidate inventory generated separately.",
+      "limitations": "No claim that every module, Master Volume control, user onboarding, security incident or source refresh is resolved by this revision."
+    }
+  ]
+}

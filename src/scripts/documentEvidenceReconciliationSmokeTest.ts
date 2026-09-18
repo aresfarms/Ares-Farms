@@ -9,7 +9,7 @@ import {
   DOCUMENT_RECONCILIATION_BANNED_ACCUSATORY_TOKENS,
   composeDocumentEvidenceReconciliation,
   documentEvidenceReconciliationLineage,
-} from "@/lib/evidence/documentEvidenceReconciliationRuntime";
+} from "@/lib/platform/authorities/evidence";
 import { EVIDENCE_RESOLUTION_WORKFLOW_RUNTIME_VERSION } from "@/lib/evidence-resolution/evidenceResolutionWorkflowRuntime";
 import { eventContractRegistry } from "@/lib/modules/eventContractRegistry";
 import { crossModuleHandoffMap } from "@/lib/modules/handoffMap";

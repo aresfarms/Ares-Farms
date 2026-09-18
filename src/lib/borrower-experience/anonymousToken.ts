@@ -5,7 +5,7 @@
  * BY DESIGN:
  *   - minting requires ZERO real-identity PII — no email, no name. The visitor
  *     gets a generated token/passphrase they keep. The token is the only handle.
- *   - we store ONLY the token's SHA-256 hash, never the plaintext — so we
+ *   - we store ONLY a peppered HMAC-SHA-256 token verifier, never the plaintext — so we
  *     genuinely cannot recover it, and cannot identify the visitor.
  *   - optional contact (to return / for matching) is OPTIONAL, minimal, and only
  *     stored if the visitor explicitly provides it — never required to mint.
@@ -23,11 +23,12 @@
  * unit holds whatever public property snapshot the visitor chose to keep.
  */
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomInt } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
 import { appendLedgerEvent } from "@/lib/audit/appendLedger";
+import { writeAuditEvent } from "@/lib/audit/writeAuditEvent";
 
 const STORE_DIR = path.join(process.cwd(), "data", "borrower-experience");
 const STORE_PATH = path.join(STORE_DIR, "tokens.json");
@@ -39,8 +40,9 @@ export type StoredSnapshot = Record<string, unknown>;
 export interface TokenRecord {
   /** Short public handle for logging — derived from the hash, identifies NO person. */
   tokenId: string;
-  /** SHA-256 of the plaintext token. The plaintext is NEVER stored. */
+  /** HMAC-SHA-256 (v2) or legacy SHA-256 (v1). Plaintext is NEVER stored. */
   tokenHash: string;
+  hashVersion?: "v1-sha256" | "v2-hmac-sha256";
   createdAt: string;
   /** The visitor's saved properties (public listing snapshots). */
   saved: StoredSnapshot[];
@@ -52,15 +54,48 @@ export interface TokenRecord {
 
 /** The five data rights, surfaced so the UX can explain them. */
 export const DATA_RIGHTS = [
-  { id: "explain", label: "Explain", note: "See exactly what is stored under your token." },
-  { id: "export", label: "Export", note: "Download everything stored under your token." },
-  { id: "human-review", label: "Human review", note: "Ask a person to review anything under your token." },
-  { id: "hold", label: "Hold", note: "Pause any processing of your token's data." },
-  { id: "delete", label: "Delete", note: "Permanently purge your token's data — truly gone." },
+  {
+    id: "explain",
+    label: "Explain",
+    note: "See exactly what is stored under your token.",
+  },
+  {
+    id: "export",
+    label: "Export",
+    note: "Download everything stored under your token.",
+  },
+  {
+    id: "human-review",
+    label: "Human review",
+    note: "Ask a person to review anything under your token.",
+  },
+  {
+    id: "hold",
+    label: "Hold",
+    note: "Pause any processing of your token's data.",
+  },
+  {
+    id: "delete",
+    label: "Delete",
+    note: "Permanently purge your token's data — truly gone.",
+  },
 ] as const;
 
-function sha(s: string): string {
-  return createHash("sha256").update(s).digest("hex");
+function legacySha(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function tokenPepper(): string {
+  const pepper = process.env.ANONYMOUS_TOKEN_PEPPER?.trim();
+  if (pepper) return pepper;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ANONYMOUS_TOKEN_PEPPER is required in production.");
+  }
+  return "furlong-local-development-pepper-not-for-production";
+}
+
+function protectedHash(value: string): string {
+  return createHmac("sha256", tokenPepper()).update(value).digest("hex");
 }
 
 function readAll(): TokenRecord[] {
@@ -76,8 +111,13 @@ function writeAll(rows: TokenRecord[]): void {
   fs.writeFileSync(STORE_PATH, JSON.stringify(rows, null, 2), "utf8");
 }
 
-function log(tokenId: string, decision: string, reason: string): void {
-  // tokenId only — NEVER a person. actorId is the token; there is no human name.
+async function log(
+  tokenId: string,
+  decision: string,
+  reason: string,
+): Promise<void> {
+  // tokenId only — NEVER a person. The local chain is forensic fallback;
+  // the database writer is the durable canonical audit authority.
   appendLedgerEvent({
     actorId: `anon:${tokenId}`,
     actorName: "anonymous-token",
@@ -86,15 +126,32 @@ function log(tokenId: string, decision: string, reason: string): void {
     decision,
     reason,
   });
+  await writeAuditEvent({
+    userId: `anon:${tokenId}`,
+    anonymousId: tokenId,
+    moduleId: "borrower-experience",
+    traceId: `anonymous-token:${tokenId}`,
+    eventType: `ANONYMOUS_TOKEN_${decision}`,
+    entityType: "anonymous-token",
+    entityId: tokenId,
+    decision,
+    payload: { anonymousId: tokenId, reason },
+    metadata: {
+      moduleId: "borrower-experience",
+      domain: LEDGER_DOMAIN,
+      zeroPii: true,
+    },
+    classification: "RESTRICTED",
+    source: "borrower-experience.anonymous-token",
+  });
 }
 
 /** Generate a human-keepable token: furlong-XXXX-XXXX-XXXX (base32, no PII). */
 function generateToken(): string {
   const alphabet = "ABCDEFGHJKMNPQRSTVWXYZ23456789"; // no ambiguous chars
-  const bytes = randomBytes(12);
   let out = "";
   for (let i = 0; i < 12; i++) {
-    out += alphabet[bytes[i] % alphabet.length];
+    out += alphabet[randomInt(alphabet.length)];
     if (i % 4 === 3 && i < 11) out += "-";
   }
   return `furlong-${out.toLowerCase()}`;
@@ -104,16 +161,20 @@ function generateToken(): string {
  * Mint a new anonymous token. NO PII required. Returns the PLAINTEXT token ONCE
  * (the caller shows it to the visitor; we never store or recover it).
  */
-export function mintToken(input?: { saved?: StoredSnapshot[]; contact?: string | null }): {
+export async function mintToken(input?: {
+  saved?: StoredSnapshot[];
+  contact?: string | null;
+}): Promise<{
   token: string;
   tokenId: string;
-} {
+}> {
   const token = generateToken();
-  const tokenHash = sha(token);
+  const tokenHash = protectedHash(token);
   const tokenId = tokenHash.slice(0, 16);
   const record: TokenRecord = {
     tokenId,
     tokenHash,
+    hashVersion: "v2-hmac-sha256",
     createdAt: new Date().toISOString(),
     saved: input?.saved ?? [],
     contact: input?.contact?.trim() ? input.contact.trim() : null, // optional, consented
@@ -122,53 +183,77 @@ export function mintToken(input?: { saved?: StoredSnapshot[]; contact?: string |
   const rows = readAll();
   rows.push(record);
   writeAll(rows);
-  log(tokenId, "MINT", input?.contact ? "minted with optional contact" : "minted with zero PII");
+  await log(
+    tokenId,
+    "MINT",
+    input?.contact ? "minted with optional contact" : "minted with zero PII",
+  );
   return { token, tokenId };
 }
 
-function findByToken(token: string): { rows: TokenRecord[]; idx: number; tokenId: string } {
-  const tokenHash = sha(token);
+function findByToken(token: string): {
+  rows: TokenRecord[];
+  idx: number;
+  tokenId: string;
+} {
+  const protectedTokenHash = protectedHash(token);
+  const legacyTokenHash = legacySha(token);
   const rows = readAll();
-  const idx = rows.findIndex((r) => r.tokenHash === tokenHash);
-  return { rows, idx, tokenId: tokenHash.slice(0, 16) };
+  const idx = rows.findIndex((r) =>
+    r.hashVersion === "v2-hmac-sha256"
+      ? r.tokenHash === protectedTokenHash
+      : r.tokenHash === legacyTokenHash,
+  );
+  const resolvedHash =
+    idx >= 0 && rows[idx].hashVersion !== "v2-hmac-sha256"
+      ? legacyTokenHash
+      : protectedTokenHash;
+  return { rows, idx, tokenId: resolvedHash.slice(0, 16) };
 }
 
 /** Return-by-token. Null if unknown (lost token = genuinely gone). */
-export function getByToken(token: string): TokenRecord | null {
+export async function getByToken(token: string): Promise<TokenRecord | null> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return null;
-  log(tokenId, "RETURN", "returned by token");
+  await log(tokenId, "RETURN", "returned by token");
   return rows[idx];
 }
 
 /** Persist the visitor's saved set + optional consented contact. */
-export function updateToken(token: string, patch: { saved?: StoredSnapshot[]; contact?: string | null }): TokenRecord | null {
+export async function updateToken(
+  token: string,
+  patch: { saved?: StoredSnapshot[]; contact?: string | null },
+): Promise<TokenRecord | null> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return null;
   if (patch.saved) rows[idx].saved = patch.saved;
-  if (patch.contact !== undefined) rows[idx].contact = patch.contact?.trim() ? patch.contact.trim() : null;
+  if (patch.contact !== undefined)
+    rows[idx].contact = patch.contact?.trim() ? patch.contact.trim() : null;
   writeAll(rows);
-  log(tokenId, "UPDATE", "saved set updated");
+  await log(tokenId, "UPDATE", "saved set updated");
   return rows[idx];
 }
 
 /** Data right: EXPORT — return everything stored under the token. */
-export function exportToken(token: string): TokenRecord | null {
+export async function exportToken(token: string): Promise<TokenRecord | null> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return null;
   rows[idx].rightsLog.push({ ts: new Date().toISOString(), right: "export" });
   writeAll(rows);
-  log(tokenId, "EXPORT", "data-rights export");
+  await log(tokenId, "EXPORT", "data-rights export");
   return rows[idx];
 }
 
 /** Data right: HOLD / HUMAN-REVIEW — recorded request (no processing here). */
-export function requestRight(token: string, right: "hold" | "human-review"): boolean {
+export async function requestRight(
+  token: string,
+  right: "hold" | "human-review",
+): Promise<boolean> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return false;
   rows[idx].rightsLog.push({ ts: new Date().toISOString(), right });
   writeAll(rows);
-  log(tokenId, right.toUpperCase(), `data-rights ${right} requested`);
+  await log(tokenId, right.toUpperCase(), `data-rights ${right} requested`);
   return true;
 }
 
@@ -176,13 +261,22 @@ export function requestRight(token: string, right: "hold" | "human-review"): boo
  * Data right: DELETE — TRUE purge. The record is removed entirely; there is no
  * account or shared table elsewhere holding a copy. Returns true if purged.
  */
-export function deleteToken(token: string): boolean {
+export async function deleteToken(token: string): Promise<boolean> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return false;
   rows.splice(idx, 1);
   writeAll(rows);
-  log(tokenId, "DELETE", "data-rights delete — purged");
+  await log(tokenId, "DELETE", "data-rights delete — purged");
   return true;
+}
+
+
+/** Validate possession of an anonymous token for a governed, read-only review.
+ * Returns only the opaque tokenId; no saved data, contact, or rights log leaves
+ * the borrower-experience authority. The caller must separately audit access. */
+export function resolveAnonymousTokenIdForGovernedReview(token: string): string | null {
+  const { idx, tokenId } = findByToken(token);
+  return idx >= 0 ? tokenId : null;
 }
 
 /** Count of stored tokens — for verification only (no token contents). */

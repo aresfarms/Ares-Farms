@@ -1,0 +1,137 @@
+/**
+ * farmMarginsCurated — what a bushel price actually MEANS for a farmer
+ * (founder direction 2026-07-17: "$4.54 corn" and "costs up 22%" sitting side
+ * by side don't say anything — say the per-truckload gross and the net
+ * estimated profit for corn, soybeans, wheat; and poultry, per pound).
+ *
+ * The honest core (USDA ERS Commodity Costs & Returns): at today's prices the
+ * three crops clear their OPERATING (cash) cost with room, but none covers its
+ * full ECONOMIC cost once land and equipment are charged. So a truthful tool
+ * shows TWO net lines — over cash cost (feels like profit) and over full cost
+ * (tells you whether the whole operation is paying for itself). One number
+ * alone misleads.
+ *
+ * Poultry is different in kind: ~97% of US broilers are raised under contract,
+ * where the grower owns no birds and buys no feed — they're paid a housing fee
+ * per pound, NOT the market price. So there is no "market margin per pound" for
+ * the farmer; the honest figure is the fee against the barn debt it services.
+ *
+ * Curated national-average snapshot (like farmEditorialCurated), maintained by
+ * the team from USDA releases. Illustrative — a specific operation's costs and
+ * local basis differ. Scanned by verify:brief-copy. Deterministic.
+ */
+
+export type CropCommodity = "corn" | "soybeans" | "wheat";
+
+export interface CropCostBasis {
+  label: string;
+  /** USDA ERS operating (cash) cost per bushel, national average. */
+  operatingCostPerBu: number;
+  /** USDA ERS total economic cost per bushel (adds land + capital recovery). */
+  totalCostPerBu: number;
+  /** USDA WASDE season-average price forecast per bushel (fallback price). */
+  nationalPrice: number;
+}
+
+/**
+ * A hopper truck holds 900 bushels per load — flat across all grain (founder,
+ * 2026-07-17). A semi + hopper trailer at ~900 bu runs ~80,000 lb, right at the
+ * legal limit without special permits (which not all states offer). Beans and
+ * wheat weigh more per bushel, but 900 is the working average that covers every
+ * commodity grain. Do NOT "correct" this to weight-derived per-crop bushels.
+ */
+const BUSHELS_PER_LOAD = 900;
+
+export const CROP_COST_BASIS: Record<CropCommodity, CropCostBasis> = {
+  // Costs: ERS 2026 forecast per planted acre ÷ 2025 NASS yield (midpoint of
+  // the planted/harvested range). Prices: WASDE 2026/27 season-average.
+  corn: { label: "Corn", operatingCostPerBu: 2.65, totalCostPerBu: 5.2, nationalPrice: 4.4 },
+  soybeans: { label: "Soybeans", operatingCostPerBu: 4.88, totalCostPerBu: 12.95, nationalPrice: 11.4 },
+  wheat: { label: "Wheat", operatingCostPerBu: 3.2, totalCostPerBu: 8.0, nationalPrice: 6.5 },
+};
+
+export const FARM_MARGINS_PROVENANCE = {
+  costSource: "USDA ERS Commodity Costs & Returns, 2026 forecast (Jun 2026); per-bushel derived with 2025 NASS yields",
+  priceSource: "USDA WASDE 2026/27 season-average forecast; local elevator bid where shown",
+  note: "National averages, illustrative — a specific operation's costs, yields, and local basis differ. Not a projection of your result.",
+} as const;
+
+export interface TruckloadMargin {
+  commodity: CropCommodity;
+  label: string;
+  pricePerBu: number;
+  priceIsLocal: boolean;
+  /** Bushels per hopper-truck load (900). */
+  bushelsPerLoad: number;
+  gross: number;
+  /** Net over operating (cash) cost — the number that feels like profit. */
+  netOverOperating: number;
+  /** Net over full economic cost — the number that includes land + equipment. */
+  netOverTotal: number;
+}
+
+const round10 = (n: number): number => Math.round(n / 10) * 10;
+
+/**
+ * Per-truckload economics for one crop at a given price (local bid preferred,
+ * else the national season-average). Weight-limited load, so heavier soybeans
+ * and wheat carry fewer bushels than corn.
+ */
+export function truckloadMargin(
+  commodity: CropCommodity,
+  localPrice?: number | null
+): TruckloadMargin {
+  const b = CROP_COST_BASIS[commodity];
+  const priceIsLocal = typeof localPrice === "number" && localPrice > 0;
+  const price = priceIsLocal ? (localPrice as number) : b.nationalPrice;
+  const bushelsPerLoad = BUSHELS_PER_LOAD;
+  return {
+    commodity,
+    label: b.label,
+    pricePerBu: price,
+    priceIsLocal,
+    bushelsPerLoad,
+    gross: round10(price * bushelsPerLoad),
+    netOverOperating: round10((price - b.operatingCostPerBu) * bushelsPerLoad),
+    netOverTotal: round10((price - b.totalCostPerBu) * bushelsPerLoad),
+  };
+}
+
+/**
+ * Poultry reality for a contract grower — a fee per pound, not a market margin
+ * (the whole point). Kept as an explainer, never a fabricated profit number.
+ */
+export const POULTRY_GROWER_NOTE = {
+  growerFeeCentsPerLb: { low: 4.3, median: 6.8, high: 9.6 }, // USDA ERS, 2020 median
+  integratorMarketCentsPerLb: 122, // USDA AMS wholesale composite, 2026
+  asOf: "grower fee: USDA ERS 2020; market price: USDA AMS 2026; house costs/flock counts: industry norms, illustrative",
+  /** Paragraphs separated by \n\n — surfaces render each as its own paragraph. */
+  text:
+    "Chickens: the deal, the math, and whether it's worth it. Raising broilers here almost always means " +
+    "CONTRACT growing: the company owns the birds and buys all the feed — you provide the houses, the " +
+    "utilities, and the daily work. You are paid for housing and care, not for the chicken: about 5–9¢ per " +
+    "pound of live weight (6–7¢ is typical), roughly 45¢ a bird. The ~$1.22/lb the chicken sells for is the " +
+    "company's revenue, not yours.\n\n" +
+    "The real math, per house: one modern house holds roughly 25,000–30,000 birds and turns 5–6 flocks a " +
+    "year — call it $55,000–$70,000 a year in grower pay. Out of that come propane and electricity (often " +
+    "$15,000–$20,000 a year), litter handling, repairs, insurance, and your own labor. Houses paid off? A " +
+    "house can clear roughly $30,000–$40,000 a year. Still paying for them? New houses run $300,000–$500,000 " +
+    "EACH, and the loan payment eats most of what's left — many growers net only a few thousand dollars per " +
+    "house per year until the debt retires.\n\n" +
+    "So is it worth it? With paid-off houses and a solid contract, it's a steady income floor that doesn't " +
+    "depend on rain. With new-house debt, you are mostly building equity, not income — while your pay moves " +
+    "under a ranking (\"tournament\") system against other growers, and contracts typically renew flock to " +
+    "flock, not for the life of your loan. The two questions that decide it: what does the contract actually " +
+    "guarantee, and how many years of debt are left on the houses.",
+} as const;
+
+/** A one-line, honest read of a crop's truckload margin. */
+export function truckloadLine(m: TruckloadMargin): string {
+  const usd = (n: number): string => `$${Math.abs(n).toLocaleString("en-US")}`;
+  const cash = m.netOverOperating >= 0 ? `about ${usd(m.netOverOperating)} over your cash costs` : `about ${usd(m.netOverOperating)} short of cash costs`;
+  const full =
+    m.netOverTotal >= 0
+      ? `and still ${usd(m.netOverTotal)} ahead after land and equipment`
+      : `but roughly ${usd(m.netOverTotal)} in the red once land and equipment are counted`;
+  return `${m.label} at $${m.pricePerBu.toFixed(2)} → ${usd(m.gross)} a truckload (${m.bushelsPerLoad} bu): ${cash}, ${full}.`;
+}

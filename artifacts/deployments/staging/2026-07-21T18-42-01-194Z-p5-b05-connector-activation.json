@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "p5-connector-activation-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00100-562",
+  "targetImage": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:a0633dc895e57f030bc7f3016acb8e5126d5844338ede8cc9029871c50f1312c",
+  "blockerId": "P5-B05",
+  "blockerStatus": "EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",
+  "outcome": "PASS",
+  "productionAuthorized": false,
+  "liveExternalExecutionPermitted": false,
+  "inventoryVersion": "p5-b05-connector-activation-v1",
+  "inventory": [
+    {
+      "connectorId": "usda-fsa",
+      "sourceName": "USDA Farm Service Agency",
+      "sourceType": "USDA",
+      "authorityLevel": "official-reference-required",
+      "sourceVersion": "usda-fsa-connector-governance-v0.1.0",
+      "allowedQueryTypes": [
+        "program_reference",
+        "farm_service_context"
+      ],
+      "adapterCertificationRequired": true,
+      "credentialVaultRequired": true,
+      "schemaContractRequired": true,
+      "provenanceRequired": true,
+      "deterministicReplayRequired": true,
+      "monitoringAndAlertingRequired": true,
+      "rollbackPlanRequired": true,
+      "killSwitchRequired": true,
+      "incidentRunbookRequired": true,
+      "dataClassificationRequired": true,
+      "sourceLegalApprovalRequired": true,
+      "qualifiedHumanApprovalRequired": true,
+      "liveExecutionApproved": false,
+      "liveExecutionPermitted": false
+    },
+    {
+      "connectorId": "sba",
+      "sourceName": "Small Business Administration",
+      "sourceType": "SBA",
+      "authorityLevel": "official-reference-required",
+      "sourceVersion": "sba-connector-governance-v0.1.0",
+      "allowedQueryTypes": [
+        "program_reference",
+        "small_business_context"
+      ],
+      "adapterCertificationRequired": true,
+      "credentialVaultRequired": true,
+      "schemaContractRequired": true,
+      "provenanceRequired": true,
+      "deterministicReplayRequired": true,
+      "monitoringAndAlertingRequired": true,
+      "rollbackPlanRequired": true,
+      "killSwitchRequired": true,
+      "incidentRunbookRequired": true,
+      "dataClassificationRequired": true,
+      "sourceLegalApprovalRequired": true,
+      "qualifiedHumanApprovalRequired": true,
+      "liveExecutionApproved": false,
+      "liveExecutionPermitted": false
+    },
+    {
+      "connectorId": "property-records",
+      "sourceName": "Property Records Source",
+      "sourceType": "PROPERTY",
+      "authorityLevel": "jurisdictional-source-required",
+      "sourceVersion": "property-records-connector-governance-v0.1.0",
+      "allowedQueryTypes": [
+        "property_record",
+        "parcel_context"
+      ],
+      "adapterCertificationRequired": true,
+      "credentialVaultRequired": true,
+      "schemaContractRequired": true,
+      "provenanceRequired": true,
+      "deterministicReplayRequired": true,
+      "monitoringAndAlertingRequired": true,
+      "rollbackPlanRequired": true,
+      "killSwitchRequired": true,
+      "incidentRunbookRequired": true,
+      "dataClassificationRequired": true,
+      "sourceLegalApprovalRequired": true,
+      "qualifiedHumanApprovalRequired": true,
+      "liveExecutionApproved": false,
+      "liveExecutionPermitted": false
+    }
+  ],
+  "authorization": {
+    "blockerId": "P5-B05",
+    "ownerRole": "QUALIFIED_GOVERNANCE_REVIEWER",
+    "approvalRequired": true,
+    "approvalGranted": false,
+    "certifiedAdaptersApproved": false,
+    "monitoringApproved": false,
+    "rollbackApproved": false,
+    "killSwitchApproved": false,
+    "liveExternalExecutionPermitted": false,
+    "productionAuthorized": false
+  },
+  "checks": [
+    {
+      "name": "target revision is live",
+      "pass": true,
+      "evidence": "furlong-core-00100-562 expected furlong-core-00100-562"
+    },
+    {
+      "name": "live image is digest pinned",
+      "pass": true,
+      "evidence": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:a0633dc895e57f030bc7f3016acb8e5126d5844338ede8cc9029871c50f1312c"
+    },
+    {
+      "name": "production connector activation smoke",
+      "pass": true,
+      "evidence": "npm run smoke:production-connector-activation"
+    },
+    {
+      "name": "connector certification v1",
+      "pass": true,
+      "evidence": "npm run smoke:connector-certification"
+    },
+    {
+      "name": "connector certification v2",
+      "pass": true,
+      "evidence": "npm run smoke:connector-certification-v2"
+    },
+    {
+      "name": "external connector execution gate",
+      "pass": true,
+      "evidence": "execution route and governed integration smoke are present; live calls remain disabled"
+    },
+    {
+      "name": "all connectors inventoried",
+      "pass": true,
+      "evidence": "3 connectors"
+    },
+    {
+      "name": "certified adapters required",
+      "pass": true,
+      "evidence": "all connectors"
+    },
+    {
+      "name": "monitoring required",
+      "pass": true,
+      "evidence": "all connectors"
+    },
+    {
+      "name": "rollback required",
+      "pass": true,
+      "evidence": "all connectors"
+    },
+    {
+      "name": "kill switch required",
+      "pass": true,
+      "evidence": "all connectors"
+    },
+    {
+      "name": "provenance and replay required",
+      "pass": true,
+      "evidence": "all connectors"
+    },
+    {
+      "name": "source legal approval required",
+      "pass": true,
+      "evidence": "all connectors"
+    },
+    {
+      "name": "human approval preserved",
+      "pass": true,
+      "evidence": "{\"blockerId\":\"P5-B05\",\"ownerRole\":\"QUALIFIED_GOVERNANCE_REVIEWER\",\"approvalRequired\":true,\"approvalGranted\":false,\"certifiedAdaptersApproved\":false,\"monitoringApproved\":false,\"rollbackApproved\":false,\"killSwitchApproved\":false,\"liveExternalExecutionPermitted\":false,\"productionAuthorized\":false}"
+    },
+    {
+      "name": "live execution remains blocked",
+      "pass": true,
+      "evidence": "liveExternalExecutionPermitted=false"
+    }
+  ],
+  "generatedAtUtc": "2026-07-21T18:42:01.194Z"
+}

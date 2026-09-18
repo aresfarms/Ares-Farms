@@ -5,6 +5,11 @@ import {
   evaluateProductionRegulatoryResponseGate,
 } from "@/lib/governance/productionRegulatoryResponseGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -177,38 +182,28 @@ async function handleProductionRegulatoryResponse(
     const result = evaluateProductionRegulatoryResponseGate({
       responseScope,
     });
+    const scope = responseScope ?? "platform";
     const responsePacket =
-      req.method === "POST"
-        ? {
-            responsePacketId: `production-regulatory-response-${Date.now()}`,
-            responseScope: responseScope ?? "platform",
-            reviewStatus: "PRODUCTION_REGULATORY_RESPONSE_PACKET_RECORDED",
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_REGULATORY_RESPONSE_PACKET",
+            scope,
+            actorId,
             reviewNote: body.reviewNote ?? null,
-            regulatoryResponsePackageApproved: false,
-            officialRegulatorResponseIssued: false,
-            correctiveActionPlanApproved: false,
-            correctiveActionCommitted: false,
-            correctiveActionExecuted: false,
-            remediationPlanApproved: false,
-            remediationExecuted: false,
-            examinerFindingClosed: false,
-            externalExaminerDisclosureApproved: false,
-            legalHoldReleased: false,
-            productionRelianceApprovalGranted: false,
-            publicVerificationApprovalGranted: false,
-            officialRelianceAllowed: false,
-            legalAdviceProvided: false,
-            regulatoryExaminationPackageSubmitted: false,
-            examinationArchiveCertified: false,
-            productionHealthCertified: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_REGULATORY_RESPONSE_PACKET"
+          );
+    const responseHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_REGULATORY_RESPONSE_PACKET"
+    );
+    const regulatoryExaminationEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_REGULATORY_EXAMINATION_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionRegulatoryResponseReviews.length,
@@ -218,6 +213,8 @@ async function handleProductionRegulatoryResponse(
         disclosures: result.disclosures,
         responsePosture: result.responsePosture,
         responsePacket,
+        responseHistory,
+        regulatoryExaminationEvidence,
         productionBlocked: true,
         regulatoryResponsePackageApproved: false,
         officialRegulatorResponseIssued: false,
@@ -354,6 +351,8 @@ async function handleProductionRegulatoryResponse(
       disclosures: classifiedOutput.disclosures,
       responsePosture: classifiedOutput.responsePosture,
       responsePacket: classifiedOutput.responsePacket,
+      responseHistory: classifiedOutput.responseHistory,
+      regulatoryExaminationEvidence: classifiedOutput.regulatoryExaminationEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       regulatoryResponsePackageApproved:
         classifiedOutput.regulatoryResponsePackageApproved,

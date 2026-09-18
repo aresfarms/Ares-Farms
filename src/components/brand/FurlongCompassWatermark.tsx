@@ -144,7 +144,7 @@ export function FurlongCompassWatermark({
         className={classes}
         style={{ opacity: effectiveOpacity }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img
           src="/brand/furlong-compass-watermark.png"
           alt=""

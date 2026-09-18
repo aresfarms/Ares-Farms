@@ -15,6 +15,7 @@ import {
   ModuleHeader,
   StatusPill,
   SummaryGrid,
+  formatDateTime,
   isRecord,
   loadJsonSurface,
   moduleContainerStyle,
@@ -129,6 +130,15 @@ export default function ProductionReleaseBoardPage() {
   );
   const releaseBoardItems = arrayFromRecord(review, "releaseBoardItems");
   const blockingReasons = arrayFromRecord(review, "blockingReasons");
+  const releaseBoardEvidence = isRecord(data.releaseBoard.json?.releaseBoard)
+    ? data.releaseBoard.json.releaseBoard
+    : null;
+  const cutoverEvidence = isRecord(data.releaseBoard.json?.cutoverEvidence)
+    ? data.releaseBoard.json.cutoverEvidence
+    : null;
+  const releaseBoardHistory = Array.isArray(data.releaseBoard.json?.releaseBoardHistory)
+    ? data.releaseBoard.json.releaseBoardHistory
+    : [];
   const contentClaims = useMemo(() => {
     return evaluateContentClaims({
       text: [
@@ -213,7 +223,7 @@ export default function ProductionReleaseBoardPage() {
 
         setActionMessage(
           `Production release board packet recorded: ${shortId(
-            releaseBoard.releaseBoardPacketId
+            releaseBoard.evidenceId ?? releaseBoard.releaseBoardPacketId
           )}. No release board approval, production cutover authority, launch hold release, deployment, production secret activation, public DNS cutover, production database migration, public production API exposure, production portal launch, payment capture, borrower notice send, official report publication, public verification, legal advice, or official reliance was approved.`
         );
         await loadAll({ clearActionMessage: false });
@@ -416,6 +426,34 @@ export default function ProductionReleaseBoardPage() {
             ) : (
               <EmptyState>No production release board review returned.</EmptyState>
             )}
+          </div>
+
+          <div style={{ ...panelStyle, padding: 16, display: "grid", gap: 12 }}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>Release Evidence Chain</h2>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div>
+                <strong>Production cutover hold</strong>
+                <p style={{ margin: "4px 0 0", color: "#64748b" }}>
+                  {cutoverEvidence
+                    ? `${shortId(cutoverEvidence.evidenceId)} · ${formatDateTime(cutoverEvidence.recordedAtUtc)}`
+                    : "No persisted cutover-hold evidence is attached for this scope."}
+                </p>
+              </div>
+              <div>
+                <strong>Release board packet</strong>
+                <p style={{ margin: "4px 0 0", color: "#64748b" }}>
+                  {releaseBoardEvidence
+                    ? `${shortId(releaseBoardEvidence.evidenceId)} · ${formatDateTime(releaseBoardEvidence.recordedAtUtc)}`
+                    : "No persisted release-board packet has been recorded."}
+                </p>
+              </div>
+              <div>
+                <strong>Packet history</strong>
+                <p style={{ margin: "4px 0 0", color: "#64748b" }}>
+                  {releaseBoardHistory.length} persisted release-board record(s). Evidence continuity does not grant approval or cutover authority.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div style={{ ...panelStyle, padding: 16, display: "grid", gap: 14 }}>

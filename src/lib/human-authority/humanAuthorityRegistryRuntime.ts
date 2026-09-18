@@ -480,6 +480,46 @@ export const HUMAN_AUTHORITY_BINDINGS: ReadonlyArray<HumanAuthorityBinding> = [
     status: "defined",
   },
   {
+    binding_id: "auth-lender-submission-sandbox-dispatch",
+    module_id: "lender-submission",
+    module_number: null,
+    clearable_action:
+      "clear an exact-version package for sandbox dispatch after customer consent and recipient verification",
+    intent: "intentionally_held",
+    required_roles: ["GOVERNANCE_OPERATOR", "QUALIFIED_GOVERNANCE_REVIEWER"],
+    credential: CREDENTIALED_REVIEWER,
+    clearing_rule: RULE_DUAL,
+    evidence_required: [
+      "exact-version-package-review",
+      "customer-submission-consent",
+      "recipient-verification-record",
+    ],
+    audit_event: "authority.cleared",
+    status: "defined",
+  },
+  {
+    binding_id: "auth-signature-execution-release",
+    module_id: "signature-execution",
+    module_number: null,
+    clearable_action:
+      "authorize release of a validated executed PDF after signer-originated consent and intent",
+    intent: "intentionally_held",
+    required_roles: [
+      "DOCUMENT_VERIFICATION_REVIEWER",
+      "QUALIFIED_GOVERNANCE_REVIEWER",
+    ],
+    credential: CREDENTIALED_REVIEWER,
+    clearing_rule: RULE_DUAL,
+    evidence_required: [
+      "exact-source-hash",
+      "signer-authority-record",
+      "signature-consent-and-intent-record",
+      "executed-pdf-validation-report",
+    ],
+    audit_event: "authority.cleared",
+    status: "defined",
+  },
+  {
     binding_id: "auth-production-final-authority",
     module_id: "production-final-authority",
     module_number: 36,

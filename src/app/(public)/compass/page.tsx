@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Disclosures } from "@/components/public/Disclosures";
+import { chartSurface } from "@/lib/property/chartThemes";
 
 /**
  * /compass — What We Do (Compass to Capital). Build 56, consolidation Stage 2.
@@ -10,6 +11,9 @@ import { Disclosures } from "@/components/public/Disclosures";
  * Maze" copy + the precise "Furlong does not / helps you understand" lists +
  * the shared <Disclosures> (single source of truth). Each page does one job and
  * links to the others rather than restating them.
+ *
+ * Chart Table cohesion rollout (founder 2026-07-17): the page sits on the
+ * navigator stage via chartSurface("buyer") — shared tokens, copy unchanged.
  *
  * Carries the Customer-Journey §1 tokens (tagline "Compass to Capital",
  * founder-mission, the promise negations + affirmations) so the surface registry
@@ -25,16 +29,18 @@ export const metadata: Metadata = {
     "helps you get organized so the right information reaches the right people. We help; we don't decide.",
 };
 
+const surface = chartSurface("buyer");
+const theme = surface.theme;
+
 const container = {
+  ...surface.container,
   maxWidth: 760,
-  margin:   "0 auto",
-  padding:  "48px 24px 80px",
-  display:  "grid",
-  gap:      28,
+  padding: "48px 28px 64px",
+  gap: 28,
 } as const;
 
-const muted = { margin: 0, fontSize: 16, color: "#3b475a", lineHeight: 1.7 } as const;
-const small = { margin: 0, fontSize: 14, color: "#5d687a", lineHeight: 1.65 } as const;
+const muted = { margin: 0, fontSize: 16, color: theme.inkSoft, lineHeight: 1.7 } as const;
+const small = { margin: 0, fontSize: 14, color: theme.inkSoft, lineHeight: 1.65 } as const;
 
 export default function CompassPage() {
   return (
@@ -42,11 +48,11 @@ export default function CompassPage() {
       <div style={container}>
 
         {/* ── Hero ──────────────────────────────────────────────────────── */}
-        <header style={{ display: "grid", gap: 16, paddingBottom: 24, borderBottom: "1px solid #d7deea" }}>
-          <h1 style={{ margin: 0, fontSize: "clamp(28px, 4.5vw, 44px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, color: "#162033" }}>
+        <header style={{ display: "grid", gap: 16, paddingBottom: 24, borderBottom: `1px solid ${theme.plateBorder}` }}>
+          <h1 style={{ margin: 0, fontSize: "clamp(28px, 4.5vw, 44px)", fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.12, color: theme.ink }}>
             Compass to Capital: Navigating the Maze
           </h1>
-          <p style={{ ...muted, fontSize: 18, color: "#5d687a" }}>
+          <p style={{ ...muted, fontSize: 18 }}>
             Getting funding for a farm, a building, or a small business shouldn't feel like wandering
             through a maze in the dark. But it usually does — the bank needs one set of papers, the
             state agency demands another, a grant office wants a third, and none of them talk to each
@@ -59,21 +65,21 @@ export default function CompassPage() {
 
         {/* ── How the Beacon guides you ─────────────────────────────────── */}
         <section style={{ display: "grid", gap: 14 }} aria-label="How the Beacon guides you">
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: theme.ink }}>
             💡 How the Beacon guides you
           </h2>
           <p style={muted}>Clarity before you commit time, money, or personal data:</p>
           <ul style={{ margin: 0, paddingLeft: 24, display: "grid", gap: 12 }}>
-            <li style={muted}><strong>🚀 Your available pathways</strong> — the actual loans, grants, and agricultural programs that fit your goals.</li>
-            <li style={muted}><strong>📉 Your readiness gaps</strong> — exactly what's complete and what's missing before you apply anywhere.</li>
-            <li style={muted}><strong>📋 Your documentation needs</strong> — rounding up the records underwriting teams always look for.</li>
-            <li style={muted}><strong>🌿 Your land considerations</strong> — the local environmental, zoning, and safety rules that affect success.</li>
+            <li style={muted}><strong style={{ color: theme.ink }}>🚀 Your available pathways</strong> — the actual loans, grants, and agricultural programs that fit your goals.</li>
+            <li style={muted}><strong style={{ color: theme.ink }}>📉 Your readiness gaps</strong> — exactly what's complete and what's missing before you apply anywhere.</li>
+            <li style={muted}><strong style={{ color: theme.ink }}>📋 Your documentation needs</strong> — rounding up the records underwriting teams always look for.</li>
+            <li style={muted}><strong style={{ color: theme.ink }}>🌿 Your land considerations</strong> — the local environmental, zoning, and safety rules that affect success.</li>
           </ul>
         </section>
 
         {/* ── We light the way — you hold the wheel ─────────────────────── */}
         <section style={{ display: "grid", gap: 12 }} aria-label="We light the way, you hold the wheel">
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: theme.ink }}>
             🛑 We light the way — you hold the wheel.
           </h2>
           <p style={muted}>
@@ -87,7 +93,7 @@ export default function CompassPage() {
 
         {/* ── Free for borrowers ────────────────────────────────────────── */}
         <section style={{ display: "grid", gap: 12 }} aria-label="Free for borrowers">
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: theme.ink }}>
             💵 Free for borrowers, always.
           </h2>
           <p style={muted}>
@@ -102,13 +108,13 @@ export default function CompassPage() {
             ══════════════════════════════════════════════════════════════ */}
         <section
           aria-label="What we help, we don't decide means — specifically"
-          style={{ background: "#f8fafc", border: "1px solid #d7deea", borderRadius: 12, padding: "24px 28px", display: "grid", gap: 20 }}
+          style={{ ...surface.panel, padding: "24px 28px", display: "grid", gap: 20 }}
         >
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#162033" }}>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: theme.ink }}>
             What "we help, we don't decide" means — specifically
           </h2>
           <div style={{ display: "grid", gap: 8 }}>
-            <p style={{ ...small, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#8a2018", fontSize: 12 }}>
+            <p style={{ ...small, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: surface.badges.blocked.color, fontSize: 12 }}>
               Furlong does not:
             </p>
             <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
@@ -120,7 +126,7 @@ export default function CompassPage() {
             </ul>
           </div>
           <div style={{ display: "grid", gap: 8 }}>
-            <p style={{ ...small, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#0f766e", fontSize: 12 }}>
+            <p style={{ ...small, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: surface.badges.ready.color, fontSize: 12 }}>
               Furlong helps you understand:
             </p>
             <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
@@ -137,15 +143,15 @@ export default function CompassPage() {
           </div>
 
           {/* Canonical disclosures — single source of truth (see Disclosures.tsx). */}
-          <Disclosures variant="compact" />
+          <Disclosures variant="compact" tone="dark" />
         </section>
 
         {/* ── Links (does one job; links to the others) ─────────────────── */}
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-          <Link href="/" style={{ color: "#0f766e", fontWeight: 700, textDecoration: "none", fontSize: 14 }}>
+          <Link href="/" style={{ ...surface.link, fontSize: 14 }}>
             Explore Your Possibilities on the Map →
           </Link>
-          <Link href="/trust#your-data" style={{ color: "#0f766e", fontWeight: 700, textDecoration: "none", fontSize: 14 }}>
+          <Link href="/trust#your-data" style={{ ...surface.link, fontSize: 14 }}>
             Review Your Data Rights →
           </Link>
         </div>

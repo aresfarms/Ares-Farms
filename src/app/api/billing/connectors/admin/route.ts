@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import {
   PaymentConnectorAdminRecord,
@@ -81,7 +83,7 @@ function parseQuery(req: NextRequest): PaymentConnectorAdminQuery {
   const params = req.nextUrl.searchParams;
 
   return {
-    role: params.get("role") ?? "user",
+    role: effectiveRole(req),
     userId: normalizeText(params.get("userId")),
     tenantId: normalizeText(params.get("tenantId")),
     adapterId: normalizeText(params.get("adapterId")),

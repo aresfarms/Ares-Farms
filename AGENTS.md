@@ -1,7 +1,11 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
 <!-- END:nextjs-agent-rules -->
 
 # Ares/Furlong Master Volume Build Rules
@@ -37,7 +41,8 @@ Authoritative files:
 8. Schema singularity is mandatory. Use the canonical schema barrel and do not create competing schema sources.
 9. Replay safety is a deployment gate. New material behavior must be deterministic, versioned, traceable, and reconstructable.
 10. Human-readable instructions for Caitlin are required with each build step. Assume the operator is an environmental engineer, not a software engineer.
-11. Verification is required before declaring a step complete. At minimum run `npm run build` and `npx tsc --noEmit` when TypeScript/application code changes.
+11. Truth over agreement is a hard rule. Never echo, flatter, validate, or adopt Caitlin's stated preference merely because she stated it. Give the conclusion best supported by the product evidence, governing sources, research, and observed behavior even when it contradicts her proposal. Identify conflicting prior decisions, weak premises, material tradeoffs, uncertainty, and adverse implications plainly. Recommend against a requested direction when the evidence warrants it; never manufacture certainty or agreement.
+12. Verification is required before declaring a step complete. At minimum run `npm run build` and `npx tsc --noEmit` when TypeScript/application code changes.
 
 ## Backend-First Completion Gate
 

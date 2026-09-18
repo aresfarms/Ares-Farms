@@ -210,10 +210,16 @@ export async function GET() {
       data: classifiedPayload,
       governance: {
         traceId,
-        runtimeGuard,
-        versionRuntime,
-        claimsEvaluation,
-        observability,
+        classification: "PUBLIC",
+        advisoryOnly: true,
+        productionRelianceAllowed: false,
+        controls: {
+          runtimeGuardPassed: runtimeGuard.allowed,
+          versionRuntimePassed: versionRuntime.ok,
+          claimsPassed: claimsEvaluation.ok,
+          redactionPassed: redacted,
+          auditRecorded: Boolean(observability),
+        },
       },
     });
   } catch (error) {

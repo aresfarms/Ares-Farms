@@ -1,7 +1,18 @@
+import { randomUUID } from "node:crypto";
+
 import { eq } from "drizzle-orm";
 
-import { applicationDocuments, applications } from "@/db/schema";
+import {
+  applicationDocuments,
+  applications,
+  syntheticFixtureLineageRecords,
+} from "@/db/schema";
 import { db } from "@/lib/db";
+import {
+  bindSyntheticFixtureLineage,
+  syntheticFixtureContextFromBoundLineage,
+} from "@/lib/testing/syntheticFixtureLineage";
+import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixtureLineageStore";
 
 /**
  * Canonical Document Intake Runtime
@@ -73,7 +84,9 @@ function normalizeByteSize(value: unknown): number | null {
   return numeric;
 }
 
-export function assertNoRawDocumentContent(input: Record<string, unknown>): void {
+export function assertNoRawDocumentContent(
+  input: Record<string, unknown>,
+): void {
   const blockedKeys = [
     "file",
     "fileContent",
@@ -86,26 +99,26 @@ export function assertNoRawDocumentContent(input: Record<string, unknown>): void
   for (const key of blockedKeys) {
     if (input[key] !== undefined && input[key] !== null) {
       throw new Error(
-        "Raw document content is not accepted by this metadata intake route."
+        "Raw document content is not accepted by this metadata intake route.",
       );
     }
   }
 }
 
 export async function persistDocumentSubmission(
-  input: PersistDocumentInput
+  input: PersistDocumentInput,
 ): Promise<PersistedDocumentSubmission> {
   const applicationId = normalizeRequiredText(
     input.applicationId,
-    "applicationId"
+    "applicationId",
   );
   const documentType = normalizeRequiredText(
     input.documentType,
-    "documentType"
+    "documentType",
   );
   const documentName = normalizeRequiredText(
     input.documentName,
-    "documentName"
+    "documentName",
   );
 
   const existingApplication = await db
@@ -113,49 +126,91 @@ export async function persistDocumentSubmission(
     .from(applications)
     .where(eq(applications.id, applicationId))
     .limit(1);
-
   if (existingApplication.length === 0) {
     throw new Error("Application not found for document submission.");
   }
 
   const application = existingApplication[0];
+  const applicationLineage = await syntheticFixtureLineageForRecord(
+    "application",
+    applicationId,
+  );
+  const fixtureContext = applicationLineage
+    ? syntheticFixtureContextFromBoundLineage(applicationLineage.lineagePayload)
+    : null;
+  const documentId = randomUUID();
+  const syntheticFixture = fixtureContext
+    ? bindSyntheticFixtureLineage(
+        fixtureContext,
+        "application_document",
+        documentId,
+      )
+    : null;
   const now = new Date();
-  const inserted = await db
-    .insert(applicationDocuments)
-    .values({
-      applicationId,
-      borrowerId: normalizeText(input.borrowerId) ?? application.borrowerId,
-      tenantId: normalizeText(input.tenantId) ?? application.tenantId,
-      propertyId: application.propertyId,
-      documentType,
-      documentName,
-      fileName: normalizeText(input.fileName),
-      mimeType: normalizeText(input.mimeType),
-      byteSize: normalizeByteSize(input.byteSize),
-      checksum: normalizeText(input.checksum),
-      storageUri: normalizeText(input.storageUri),
-      status: input.storageUri ? "RECEIVED" : "PENDING_SECURE_STORAGE",
-      reviewStatus: "REVIEW_REQUIRED",
-      retentionStatus: "RETAIN_PER_POLICY",
-      governanceVersion: GOVERNANCE_VERSION,
-      classification: CLASSIFICATION,
-      replayRef: input.traceId,
-      source: input.source,
-      metadata: {
-        ...(input.metadata ?? {}),
-        traceId: input.traceId,
-        source: input.source,
-        documentIntakeVersion: "document-intake-runtime-v0.1.0",
-        rawContentAccepted: false,
-      },
-      receivedAt: now,
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning();
 
-  return {
-    application,
-    document: inserted[0],
-  };
+  const document = await db.transaction(async (tx) => {
+    const [inserted] = await tx
+      .insert(applicationDocuments)
+      .values({
+        id: documentId,
+        applicationId,
+        borrowerId: normalizeText(input.borrowerId) ?? application.borrowerId,
+        tenantId: normalizeText(input.tenantId) ?? application.tenantId,
+        propertyId: application.propertyId,
+        documentType,
+        documentName,
+        fileName: normalizeText(input.fileName),
+        mimeType: normalizeText(input.mimeType),
+        byteSize: normalizeByteSize(input.byteSize),
+        checksum: normalizeText(input.checksum),
+        storageUri: normalizeText(input.storageUri),
+        status: input.storageUri ? "RECEIVED" : "PENDING_SECURE_STORAGE",
+        reviewStatus: "REVIEW_REQUIRED",
+        retentionStatus: "RETAIN_PER_POLICY",
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: CLASSIFICATION,
+        replayRef: input.traceId,
+        source: input.source,
+        metadata: {
+          ...(input.metadata ?? {}),
+          traceId: input.traceId,
+          source: input.source,
+          documentIntakeVersion: "document-intake-runtime-v0.1.0",
+          rawContentAccepted: false,
+          syntheticFixture,
+        },
+        receivedAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    if (syntheticFixture) {
+      await tx.insert(syntheticFixtureLineageRecords).values({
+        syntheticPersonaId: syntheticFixture.syntheticPersonaId,
+        humanVisibleName: syntheticFixture.humanVisibleName,
+        testRunId: syntheticFixture.testRunId,
+        fixtureVersion: syntheticFixture.fixtureVersion,
+        registryVersion: syntheticFixture.registryVersion,
+        lineageVersion: syntheticFixture.lineageVersion,
+        environment: syntheticFixture.environment,
+        operatorIdentity: syntheticFixture.operatorIdentity,
+        fixtureCreatedAt: new Date(syntheticFixture.createdAt),
+        scenarioId: syntheticFixture.scenarioId,
+        providerTargets: [...syntheticFixture.providerTargets],
+        recordType: syntheticFixture.recordType,
+        recordId: syntheticFixture.recordId,
+        lineageSha256: syntheticFixture.lineageSha256,
+        lineagePayload: syntheticFixture,
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: "RESTRICTED",
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: "document-intake.synthetic-fixture",
+      });
+    }
+    return inserted;
+  });
+
+  return { application, document };
 }

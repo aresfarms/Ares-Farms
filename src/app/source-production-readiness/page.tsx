@@ -171,6 +171,18 @@ export default function SourceProductionReadinessGatePage() {
     data.readiness.json,
     "externalActionsPerformed"
   );
+  const responseEvidence = isRecord(data.readiness.json)
+    ? data.readiness.json
+    : {};
+  const legalReviewEvidence = isRecord(responseEvidence.legalReviewEvidence)
+    ? responseEvidence.legalReviewEvidence
+    : null;
+  const promotionPacketEvidence = isRecord(responseEvidence.promotionPacketEvidence)
+    ? responseEvidence.promotionPacketEvidence
+    : null;
+  const readinessHoldEvidence = isRecord(responseEvidence.readinessHold)
+    ? responseEvidence.readinessHold
+    : null;
   const selectedSourceName =
     stringValue(selectedReview?.sourceName) ?? "No source selected";
   const badges = [
@@ -217,7 +229,7 @@ export default function SourceProductionReadinessGatePage() {
 
         setActionMessage(
           `Production readiness hold recorded: ${shortId(
-            readinessHold.readinessHoldId
+            readinessHold.evidenceId
           )}. No source promotion, live fetch, legal advice, public verification, or official reliance was approved.`
         );
         await loadAll({ clearActionMessage: false });
@@ -476,6 +488,47 @@ export default function SourceProductionReadinessGatePage() {
                   </div>
                 ))}
               </div>
+            </section>
+
+            <section
+              style={{
+                ...panelStyle,
+                padding: 16,
+                display: "grid",
+                gap: 12,
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 18 }}>Evidence Chain</h2>
+              {[
+                ["Legal review hold", legalReviewEvidence],
+                ["Promotion packet hold", promotionPacketEvidence],
+                ["Production readiness hold", readinessHoldEvidence],
+              ].map(([label, evidence]) => {
+                const record = isRecord(evidence) ? evidence : null;
+                return (
+                  <div
+                    key={String(label)}
+                    style={{
+                      border: "1px solid #d5dce8",
+                      borderRadius: 8,
+                      padding: 12,
+                    }}
+                  >
+                    <strong>{String(label)}</strong>
+                    <div style={{ marginTop: 6, color: record ? "#0f766e" : "#7f1d1d" }}>
+                      {record ? `Recorded ${stringValue(record.recordedAtUtc) ?? ""}` : "Not recorded"}
+                    </div>
+                    {record ? (
+                      <div style={{ marginTop: 4, color: "#64748b", fontSize: 13 }}>
+                        Evidence {shortId(record.evidenceId)} · Actor {shortId(record.actorId)}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+              <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
+                Recorded holds are durable review evidence only. They do not approve legal use, promotion, live fetch, or production activation.
+              </p>
             </section>
 
             <section

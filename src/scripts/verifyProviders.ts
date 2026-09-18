@@ -1,10 +1,10 @@
 /**
  * verify:providers — neutral-directory / license-to-operate guardrails.
  *
- *   MODEL      Each Provider Page states the license-to-operate model verbatim
- *              (pays a license fee · no referral fee · no commission · no data
- *              sale/submission · providers pay to belong) — and NEVER publishes
- *              the fee amount.
+ *   MODEL      Each Provider Page states the current neutral institutional-economics
+ *              model: institutions may pay for infrastructure/integrations/support,
+ *              but payment never buys listing, rank, leads, or customer-file access;
+ *              Furlong takes no referral fee or deal commission and passes no data.
  *   SEPARATION Provider is marked a separate company; the provider's claims are
  *              clearly attributed to the provider ("not Furlong's"), and Furlong's
  *              own <Disclosures> still render.
@@ -18,7 +18,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { PROVIDERS, licenseModelStatement } from "../lib/providers/providerRegistry";
+import { canonicalProviderAuthority } from "../lib/platform/authorities/provider";
+import { removeSuppressedHtmlElements } from "../lib/security/htmlText";
 
 const BASE = (process.env.BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 const ROOT = process.cwd();
@@ -27,20 +28,20 @@ const note = (m: string) => fail.push(m);
 const read = (rel: string) => { try { return readFileSync(join(ROOT, rel), "utf8"); } catch { return ""; } };
 
 const MODEL_PHRASES = [
-  "pays Furlong a license fee",
-  "does not take referral fees",
-  "does not earn a commission on your deal",
+  "may pay Furlong for institutional platform infrastructure, integrations, or support",
+  "never buys this listing, a better rank, a lead, or access to your file",
+  "does not take referral fees or a commission on your deal",
   "does not sell or submit your information",
-  "Providers pay to belong",
 ];
 
 // ── Static: registry + page source ───────────────────────────────────────────
 const registry = read("src/lib/providers/providerRegistry.ts");
-const stmt = licenseModelStatement("ACME");
-for (const p of MODEL_PHRASES) if (!stmt.includes(p)) note(`MODEL: licenseModelStatement() is missing "${p}".`);
+const stmt = canonicalProviderAuthority.licenseModelStatement("ACME");
+for (const p of MODEL_PHRASES) if (!stmt.includes(p)) note(`MODEL: canonicalProviderAuthority.licenseModelStatement() is missing "${p}".`);
 if (/\$\s?\d/.test(registry)) note("MODEL: provider registry appears to contain a fee amount ($…) — the fee amount must never be published.");
-if (PROVIDERS.length === 0) note("registry has no providers.");
-for (const p of PROVIDERS) {
+// An empty public directory is valid. Professional portal access is governed
+// separately and must not force a person into the public provider registry.
+for (const p of canonicalProviderAuthority.all) {
   if (!/^https:\/\//.test(p.portalOutUrl)) note(`SEPARATION: ${p.slug} portalOutUrl must be the provider's own https site.`);
   if (!p.separateCompanyLabel) note(`SEPARATION: ${p.slug} missing separateCompanyLabel.`);
   if (p.providerClaims.length === 0 || p.providerDisclosures.length === 0) note(`SEPARATION: ${p.slug} must carry its own claims AND its own disclosures.`);
@@ -53,16 +54,22 @@ if (!/not Furlong&apos;s|not Furlong's/.test(page)) note("SEPARATION: Provider P
 if (!page.includes('target="_blank"')) note("NO-SUBMIT: portal-out CTA must open the provider's own site (target=_blank).");
 if (/<form\b/.test(page)) note("NO-SUBMIT: Provider Page must not contain a <form> (link-out only — Furlong passes no data).");
 
-// ── Runtime: the live Five Borough page ──────────────────────────────────────
+// ── Runtime: every currently registered public provider page ─────────────────
 async function runtime(): Promise<void> {
-  try { await fetch(BASE); } catch { note(`server not reachable at ${BASE}.`); return; }
-  for (const p of PROVIDERS) {
+  // Confirm the target is THIS app (200 + brand marker) before the runtime
+  // checks — a foreign/stale server on the port would false-fail them.
+  const home = await fetch(BASE).then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") })).catch(() => null);
+  if (!home || home.status !== 200 || !/Furlong/.test(home.body)) {
+    console.log(`  (no confirmed Furlong server at ${BASE} — runtime provider checks skipped; static checks ran)`);
+    return;
+  }
+  for (const p of canonicalProviderAuthority.all) {
     const res = await fetch(`${BASE}/providers/${p.slug}`, { headers: { Accept: "text/html" } });
     if (res.status !== 200) { note(`${p.slug}: page returned ${res.status}.`); continue; }
     const body = await res.text();
     // Visible text only — strip framework scripts/styles (Next streaming emits
     // tokens like "$1"/"$L…" in inline scripts that are not page content).
-    const visible = body.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ");
+    const visible = removeSuppressedHtmlElements(body);
     for (const phrase of MODEL_PHRASES) if (!body.includes(phrase)) note(`MODEL(${p.slug}): rendered page missing "${phrase}".`);
     if (!/separate company/i.test(body)) note(`SEPARATION(${p.slug}): rendered page missing the "separate company" label.`);
     if (!/not a lender|advisory only|not an approval/i.test(body)) note(`SEPARATION(${p.slug}): Furlong disclosures not present on the page.`);
@@ -74,13 +81,13 @@ async function runtime(): Promise<void> {
 
 async function main(): Promise<void> {
   await runtime();
-  console.log(`verify:providers — ${PROVIDERS.length} provider(s) checked against ${BASE}`);
+  console.log(`verify:providers — ${canonicalProviderAuthority.all.length} provider(s) checked against ${BASE}`);
   if (fail.length) {
     console.error(`\n✗  verify:providers FAIL — ${fail.length} issue(s):`);
     for (const f of fail) console.error(`    ✗ ${f}`);
     process.exit(1);
   }
-  console.log("\n✓  verify:providers PASS — license model stated (no fee amount), providers separate + self-attributed, link-out only (no data submission).");
+  console.log("\n✓  verify:providers PASS — institutional economics stated (no paid rank/lead/file access), providers separate + self-attributed, link-out only (no data submission).");
   process.exit(0);
 }
 

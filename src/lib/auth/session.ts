@@ -14,7 +14,7 @@ export async function createSession() {
 
   cookieStore.set(COOKIE_NAME, sessionId, {
     httpOnly: true,
-    secure: false, // dev-safe
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     sameSite: "lax",
   });
@@ -37,7 +37,9 @@ export async function clearSession() {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, "", {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     path: "/",
+    sameSite: "lax",
     maxAge: 0,
   });
 }

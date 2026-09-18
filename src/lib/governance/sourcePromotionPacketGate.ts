@@ -4,7 +4,7 @@ import {
   SOURCE_STACK_REQUIRED_DISCLOSURES,
   SOURCE_STACK_VERSION,
   SourceStackSourceProfile,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 import { sourceLegalReviewForSource } from "@/lib/governance/sourceLegalReviewGate";
 import { evaluateLiveScraperActivationGate } from "@/lib/governance/liveScraperActivationGate";
 

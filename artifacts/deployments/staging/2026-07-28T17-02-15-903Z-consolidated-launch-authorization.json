@@ -1,0 +1,426 @@
+{
+  "schemaVersion": "consolidated-launch-authorization-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00103-lgb",
+  "targetImage": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:de51ce47ca10d26cae42029aeea2eb44eabd593e2ed3610eab6ac1333f72d4ac",
+  "ledgerVersion": "p6-consolidated-launch-authorization-v1",
+  "blockerStatus": "OPEN",
+  "outcome": "FAIL",
+  "requirements": [
+    {
+      "blockerId": "P5-B01",
+      "title": "Named tester acceptance",
+      "authorityRoles": [
+        "CAITLIN_NAMED_TESTER",
+        "STUART_NAMED_TESTER"
+      ],
+      "evidencePattern": "runtime-state named tester attestations",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B02",
+      "title": "Production data classification and PII authorization",
+      "authorityRoles": [
+        "DATA_RIGHTS_OFFICER"
+      ],
+      "evidencePattern": "p5-b02-data-classification",
+      "minimumApprovals": 1
+    },
+    {
+      "blockerId": "P5-B03",
+      "title": "Financing activation authority",
+      "authorityRoles": [
+        "CREDIT_ELIGIBILITY_AUTHORITY",
+        "LEGAL_COMPLIANCE_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b03-financing-authority",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B04",
+      "title": "Live source legal and licensing approval",
+      "authorityRoles": [
+        "SOURCE_LEGAL_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b04-source-legal",
+      "minimumApprovals": 1
+    },
+    {
+      "blockerId": "P5-B05",
+      "title": "External connector activation",
+      "authorityRoles": [
+        "CONNECTOR_ACTIVATION_AUTHORITY",
+        "SECURITY_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b05-connector-activation",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B06",
+      "title": "Official report authority",
+      "authorityRoles": [
+        "QUALIFIED_REPORT_AUTHORITY",
+        "LEGAL_COMPLIANCE_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b06-official-report-authority",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B07",
+      "title": "Payments and treasury authorization",
+      "authorityRoles": [
+        "TREASURY_AUTHORITY",
+        "LEGAL_COMPLIANCE_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b07-payments-treasury-authorization",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B08",
+      "title": "Security and incident readiness",
+      "authorityRoles": [
+        "SECURITY_AUTHORITY",
+        "INCIDENT_COMMAND_AUTHORITY"
+      ],
+      "evidencePattern": "p6-security-incident",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B09",
+      "title": "Database backup and recovery readiness",
+      "authorityRoles": [
+        "DATABASE_RECOVERY_AUTHORITY",
+        "SECURITY_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b09-database-recovery",
+      "minimumApprovals": 2
+    },
+    {
+      "blockerId": "P5-B10",
+      "title": "Domain, DNS, cutover, and final launch hold",
+      "authorityRoles": [
+        "RELEASE_MANAGER",
+        "RELEASE_BOARD",
+        "FINAL_LAUNCH_AUTHORITY"
+      ],
+      "evidencePattern": "p5-b10-domain-cutover-authorization",
+      "minimumApprovals": 3
+    }
+  ],
+  "decisions": [
+    {
+      "blockerId": "P5-B01",
+      "authorityRole": "CAITLIN_NAMED_TESTER",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B01",
+      "authorityRole": "STUART_NAMED_TESTER",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B02",
+      "authorityRole": "DATA_RIGHTS_OFFICER",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B03",
+      "authorityRole": "CREDIT_ELIGIBILITY_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B03",
+      "authorityRole": "LEGAL_COMPLIANCE_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B04",
+      "authorityRole": "SOURCE_LEGAL_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B05",
+      "authorityRole": "CONNECTOR_ACTIVATION_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B05",
+      "authorityRole": "SECURITY_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B06",
+      "authorityRole": "QUALIFIED_REPORT_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B06",
+      "authorityRole": "LEGAL_COMPLIANCE_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B07",
+      "authorityRole": "TREASURY_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B07",
+      "authorityRole": "LEGAL_COMPLIANCE_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B08",
+      "authorityRole": "SECURITY_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B08",
+      "authorityRole": "INCIDENT_COMMAND_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B09",
+      "authorityRole": "DATABASE_RECOVERY_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B09",
+      "authorityRole": "SECURITY_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B10",
+      "authorityRole": "RELEASE_MANAGER",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B10",
+      "authorityRole": "RELEASE_BOARD",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    },
+    {
+      "blockerId": "P5-B10",
+      "authorityRole": "FINAL_LAUNCH_AUTHORITY",
+      "decision": "PENDING",
+      "decidedBy": null,
+      "decidedAtUtc": null,
+      "conditions": [],
+      "evidenceRef": null
+    }
+  ],
+  "evidenceCatalog": [
+    {
+      "blockerId": "P5-B01",
+      "pattern": "runtime-state named tester attestations",
+      "matchingFiles": []
+    },
+    {
+      "blockerId": "P5-B02",
+      "pattern": "p5-b02-data-classification",
+      "matchingFiles": [
+        "2026-07-21T17-28-46-020Z-p5-b02-data-classification.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B03",
+      "pattern": "p5-b03-financing-authority",
+      "matchingFiles": [
+        "2026-07-21T18-13-41-554Z-p5-b03-financing-authority.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B04",
+      "pattern": "p5-b04-source-legal",
+      "matchingFiles": [
+        "2026-07-21T17-48-58-225Z-p5-b04-source-legal.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B05",
+      "pattern": "p5-b05-connector-activation",
+      "matchingFiles": [
+        "2026-07-21T18-42-01-194Z-p5-b05-connector-activation.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B06",
+      "pattern": "p5-b06-official-report-authority",
+      "matchingFiles": [
+        "2026-07-21T19-16-44-724Z-p5-b06-official-report-authority.json",
+        "2026-07-22T03-33-48-607Z-p5-b06-official-report-authority.json",
+        "2026-07-22T03-34-24-975Z-p5-b06-official-report-authority.json",
+        "2026-07-22T03-36-14-464Z-p5-b06-official-report-authority.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B07",
+      "pattern": "p5-b07-payments-treasury-authorization",
+      "matchingFiles": [
+        "2026-07-21T19-35-09-809Z-p5-b07-payments-treasury-authorization.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B08",
+      "pattern": "p6-security-incident",
+      "matchingFiles": [
+        "2026-07-21T16-27-40-160Z-furlong-core-00095-xxr-p6-security-incident.json",
+        "2026-07-22T04-12-53-969Z-furlong-core-00108-kmg-p6-security-incident.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B09",
+      "pattern": "p5-b09-database-recovery",
+      "matchingFiles": [
+        "2026-07-21T17-07-27-754Z-p5-b09-database-recovery.json"
+      ]
+    },
+    {
+      "blockerId": "P5-B10",
+      "pattern": "p5-b10-domain-cutover-authorization",
+      "matchingFiles": [
+        "2026-07-21T19-58-20-047Z-p5-b10-domain-cutover-authorization.json"
+      ]
+    }
+  ],
+  "authorization": {
+    "approvalRequired": true,
+    "allTechnicalEvidenceRequired": true,
+    "allHumanDecisionsRequired": true,
+    "separationOfDutiesRequired": true,
+    "proxyApprovalForbidden": true,
+    "approvalsComplete": false,
+    "finalLaunchHoldReleased": false,
+    "productionAuthorized": false
+  },
+  "checks": [
+    {
+      "name": "target revision is live",
+      "pass": false,
+      "evidence": "furlong-core-896810b expected furlong-core-00103-lgb"
+    },
+    {
+      "name": "live image is digest pinned",
+      "pass": true,
+      "evidence": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:de51ce47ca10d26cae42029aeea2eb44eabd593e2ed3610eab6ac1333f72d4ac"
+    },
+    {
+      "name": "all P5 blockers represented",
+      "pass": true,
+      "evidence": "10 blockers"
+    },
+    {
+      "name": "all authority roles have decision slots",
+      "pass": true,
+      "evidence": "19 decisions"
+    },
+    {
+      "name": "all human decisions remain pending",
+      "pass": true,
+      "evidence": "no automated approvals"
+    },
+    {
+      "name": "proxy approval forbidden",
+      "pass": true,
+      "evidence": "true"
+    },
+    {
+      "name": "separation of duties required",
+      "pass": true,
+      "evidence": "true"
+    },
+    {
+      "name": "signed technical evidence catalogued",
+      "pass": true,
+      "evidence": "[{\"blockerId\":\"P5-B01\",\"pattern\":\"runtime-state named tester attestations\",\"matchingFiles\":[]},{\"blockerId\":\"P5-B02\",\"pattern\":\"p5-b02-data-classification\",\"matchingFiles\":[\"2026-07-21T17-28-46-020Z-p5-b02-data-classification.json\"]},{\"blockerId\":\"P5-B03\",\"pattern\":\"p5-b03-financing-authority\",\"matchingFiles\":[\"2026-07-21T18-13-41-554Z-p5-b03-financing-authority.json\"]},{\"blockerId\":\"P5-B04\",\"pattern\":\"p5-b04-source-legal\",\"matchingFiles\":[\"2026-07-21T17-48-58-225Z-p5-b04-source-legal.json\"]},{\"blockerId\":\"P5-B05\",\"pattern\":\"p5-b05-connector-activation\",\"matchingFiles\":[\"2026-07-21T18-42-01-194Z-p5-b05-connector-activation.json\"]},{\"blockerId\":\"P5-B06\",\"pattern\":\"p5-b06-official-report-authority\",\"matchingFiles\":[\"2026-07-21T19-16-44-724Z-p5-b06-official-report-authority.json\",\"2026-07-22T03-33-48-607Z-p5-b06-official-report-authority.json\",\"2026-07-22T03-34-24-975Z-p5-b06-official-report-authority.json\",\"2026-07-22T03-36-14-464Z-p5-b06-official-report-authority.json\"]},{\"blockerId\":\"P5-B07\",\"pattern\":\"p5-b07-payments-treasury-authorization\",\"matchingFiles\":[\"2026-07-21T19-35-09-809Z-p5-b07-payments-treasury-authorization.json\"]},{\"blockerId\":\"P5-B08\",\"pattern\":\"p6-security-incident\",\"matchingFiles\":[\"2026-07-21T16-27-40-160Z-furlong-core-00095-xxr-p6-security-incident.json\",\"2026-07-22T04-12-53-969Z-furlong-core-00108-kmg-p6-security-incident.json\"]},{\"blockerId\":\"P5-B09\",\"pattern\":\"p5-b09-database-recovery\",\"matchingFiles\":[\"2026-07-21T17-07-27-754Z-p5-b09-database-recovery.json\"]},{\"blockerId\":\"P5-B10\",\"pattern\":\"p5-b10-domain-cutover-authorization\",\"matchingFiles\":[\"2026-07-21T19-58-20-047Z-p5-b10-domain-cutover-authorization.json\"]}]"
+    },
+    {
+      "name": "named tester approval remains separate",
+      "pass": true,
+      "evidence": "runtime attestation required"
+    },
+    {
+      "name": "final launch hold remains intact",
+      "pass": true,
+      "evidence": "false"
+    },
+    {
+      "name": "production authorization remains false",
+      "pass": true,
+      "evidence": "false"
+    }
+  ],
+  "productionAuthorized": false,
+  "generatedAtUtc": "2026-07-28T17:02:15.903Z"
+}

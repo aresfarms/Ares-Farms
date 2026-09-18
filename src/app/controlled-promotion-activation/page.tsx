@@ -11,6 +11,7 @@ import {
 import {
   ActionButton,
   EmptyState,
+  formatDateTime,
   LoadResult,
   ModuleHeader,
   StatusPill,
@@ -139,6 +140,12 @@ export default function ControlledPromotionActivationGatePage() {
   );
   const checks = arrayFromRecord(selectedReview, "checks");
   const blockingReasons = arrayFromRecord(selectedReview, "blockingReasons");
+  const readinessEvidence = isRecord(data.activation.json?.readinessEvidence)
+    ? data.activation.json.readinessEvidence
+    : null;
+  const activationHistory = Array.isArray(data.activation.json?.activationHistory)
+    ? data.activation.json.activationHistory
+    : [];
   const contentClaims = useMemo(() => {
     return evaluateContentClaims({
       text: [
@@ -540,6 +547,38 @@ export default function ControlledPromotionActivationGatePage() {
                   })}
                 </div>
               )}
+            </section>
+
+            <section
+              style={{
+                ...panelStyle,
+                padding: 16,
+                display: "grid",
+                gap: 12,
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 18 }}>Evidence Chain</h2>
+              <div style={{ display: "grid", gap: 8 }}>
+                <div style={{ border: "1px solid #d5dce8", borderRadius: 8, padding: 12 }}>
+                  <strong>Production readiness evidence</strong>
+                  <p style={{ margin: "6px 0 0", color: "#64748b" }}>
+                    {readinessEvidence
+                      ? `${shortId(readinessEvidence.evidenceId)} · ${formatDateTime(readinessEvidence.recordedAtUtc)}`
+                      : "No persisted production-readiness hold for this source."}
+                  </p>
+                </div>
+                <div style={{ border: "1px solid #d5dce8", borderRadius: 8, padding: 12 }}>
+                  <strong>Controlled-promotion hold history</strong>
+                  <p style={{ margin: "6px 0 0", color: "#64748b" }}>
+                    {activationHistory.length > 0
+                      ? `${activationHistory.length} persisted record(s); latest ${formatDateTime(isRecord(activationHistory[0]) ? activationHistory[0].recordedAtUtc : null)}`
+                      : "No controlled-promotion hold has been recorded for this source."}
+                  </p>
+                </div>
+              </div>
+              <p style={{ margin: 0, color: "#7f1d1d", fontSize: 13 }}>
+                Evidence continuity does not authorize activation. Production, live fetch, and external action remain blocked.
+              </p>
             </section>
 
             <section

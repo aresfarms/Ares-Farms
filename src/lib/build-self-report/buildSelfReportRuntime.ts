@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
 import {
@@ -549,12 +549,21 @@ function probeRouteFile(
   fsRoot: string
 ): { exists: boolean; pageRef: string | null; apiRef: string | null } {
   const trimmed = route.replace(/^\/+/, "");
-  const pageCandidates = [
-    path.join(fsRoot, "src", "app", trimmed, "page.tsx"),
-    path.join(fsRoot, "src", "app", trimmed, "page.ts"),
-    path.join(fsRoot, "src", "app", trimmed, "page.jsx"),
-    path.join(fsRoot, "src", "app", trimmed, "page.js"),
-  ];
+  const appRoot = path.join(fsRoot, "src", "app");
+  const routeGroupRoots = existsSync(appRoot)
+    ? readdirSync(appRoot, { withFileTypes: true })
+        .filter((entry) =>
+          entry.isDirectory() && entry.name.startsWith("(") && entry.name.endsWith(")")
+        )
+        .map((entry) => path.join(appRoot, entry.name))
+    : [];
+  const pageRoots = [appRoot, ...routeGroupRoots];
+  const pageCandidates = pageRoots.flatMap((root) => [
+    path.join(root, trimmed, "page.tsx"),
+    path.join(root, trimmed, "page.ts"),
+    path.join(root, trimmed, "page.jsx"),
+    path.join(root, trimmed, "page.js"),
+  ]);
   const apiCandidates = [
     path.join(fsRoot, "src", "app", "api", trimmed, "route.ts"),
     path.join(fsRoot, "src", "app", "api", trimmed, "route.js"),
@@ -594,7 +603,7 @@ function buildRouteLoadsCheck(
   }
   return {
     status: "FAIL",
-    reason: `no page file or route handler found at src/app/${manifest.route.replace(/^\/+/, "")}/page.* or src/app/api/${manifest.route.replace(/^\/+/, "")}/route.*`,
+    reason: `no page file (including App Router route groups) or route handler found for ${manifest.route}`,
   };
 }
 

@@ -1,0 +1,1283 @@
+{
+  "schemaVersion": "p5-source-legal-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00097-kds",
+  "targetImage": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:733eb21ba9e4affea9436b71f9b030e6a07dacdffaa9fa625d7bcad3a3eea248",
+  "blockerId": "P5-B04",
+  "blockerStatus": "EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",
+  "outcome": "PASS",
+  "productionAuthorized": false,
+  "liveSourceUsePermitted": false,
+  "productionReliancePermitted": false,
+  "inventoryVersion": "p5-b04-source-legal-inventory-v1",
+  "inventory": [
+    {
+      "sourceId": "crexi",
+      "sourceName": "CREXI",
+      "sourceCategory": "CREXI",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "land-com",
+      "sourceName": "Land.com Ecosystem",
+      "sourceCategory": "Land.com ecosystem",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "landwatch",
+      "sourceName": "LandWatch",
+      "sourceCategory": "LandWatch",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "landsearch",
+      "sourceName": "LandSearch",
+      "sourceCategory": "LandSearch",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "loopnet",
+      "sourceName": "LoopNet",
+      "sourceCategory": "LoopNet",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "realtor",
+      "sourceName": "Realtor.com",
+      "sourceCategory": "Realtor.com",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "redfin",
+      "sourceName": "Redfin",
+      "sourceCategory": "Redfin",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "zillow",
+      "sourceName": "Zillow",
+      "sourceCategory": "Zillow",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "county-gis",
+      "sourceName": "County GIS",
+      "sourceCategory": "County GIS",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "county",
+        "state"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "tax-assessor",
+      "sourceName": "Tax Assessor",
+      "sourceCategory": "Tax assessor",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "county",
+        "state"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "usda",
+      "sourceName": "USDA",
+      "sourceCategory": "USDA",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "state",
+        "county"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "fsa",
+      "sourceName": "Farm Service Agency",
+      "sourceCategory": "FSA",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "state",
+        "county"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "sba",
+      "sourceName": "Small Business Administration",
+      "sourceCategory": "SBA",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "state"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "noaa",
+      "sourceName": "NOAA",
+      "sourceCategory": "NOAA",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "regional"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "nrcs",
+      "sourceName": "NRCS",
+      "sourceCategory": "NRCS",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "state",
+        "county"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "fema",
+      "sourceName": "FEMA",
+      "sourceCategory": "FEMA",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "state",
+        "county"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "census",
+      "sourceName": "Census",
+      "sourceCategory": "Census",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "state",
+        "county"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "fred",
+      "sourceName": "FRED",
+      "sourceCategory": "FRED",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "federal",
+        "regional"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "state-grants",
+      "sourceName": "State Grant Portals",
+      "sourceCategory": "State grant portals",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "state"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "philanthropic-grants",
+      "sourceName": "Philanthropic Grants",
+      "sourceCategory": "Philanthropic grants",
+      "sourceAuthorityTier": "Tier 4 advisory/discovery",
+      "jurisdictionScope": [
+        "national",
+        "regional",
+        "local"
+      ],
+      "licenseBasis": "advisory/discovery source terms require qualified review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "tractorhouse",
+      "sourceName": "TractorHouse",
+      "sourceCategory": "TractorHouse",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "machinery-pete",
+      "sourceName": "Machinery Pete",
+      "sourceCategory": "Machinery Pete",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "fastline",
+      "sourceName": "Fastline",
+      "sourceCategory": "Fastline",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "equipment-auctions",
+      "sourceName": "Equipment Auction Systems",
+      "sourceCategory": "Equipment auction systems",
+      "sourceAuthorityTier": "Tier 3 commercial marketplace",
+      "jurisdictionScope": [
+        "marketplace"
+      ],
+      "licenseBasis": "commercial marketplace terms and display license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "commodity-exchanges",
+      "sourceName": "Commodity Exchanges",
+      "sourceCategory": "Commodity exchanges",
+      "sourceAuthorityTier": "Tier 2 certified institutional/commercial",
+      "jurisdictionScope": [
+        "market"
+      ],
+      "licenseBasis": "contract, subscription, API, or institutional license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "weather-climate",
+      "sourceName": "Weather and Climate Sources",
+      "sourceCategory": "Weather/climate",
+      "sourceAuthorityTier": "Tier 2 certified institutional/commercial",
+      "jurisdictionScope": [
+        "regional"
+      ],
+      "licenseBasis": "contract, subscription, API, or institutional license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "soil-water",
+      "sourceName": "Soil and Water Sources",
+      "sourceCategory": "Soil/water",
+      "sourceAuthorityTier": "Tier 2 certified institutional/commercial",
+      "jurisdictionScope": [
+        "regional",
+        "parcel"
+      ],
+      "licenseBasis": "contract, subscription, API, or institutional license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "state-licensing",
+      "sourceName": "State Licensing",
+      "sourceCategory": "State licensing",
+      "sourceAuthorityTier": "Tier 1 authoritative government/public",
+      "jurisdictionScope": [
+        "state"
+      ],
+      "licenseBasis": "public-record or agency terms subject to source-specific review",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    },
+    {
+      "sourceId": "utility-infrastructure",
+      "sourceName": "Utility and Infrastructure Sources",
+      "sourceCategory": "Utility/infrastructure",
+      "sourceAuthorityTier": "Tier 2 certified institutional/commercial",
+      "jurisdictionScope": [
+        "regional",
+        "parcel"
+      ],
+      "licenseBasis": "contract, subscription, API, or institutional license required",
+      "termsReviewRequired": true,
+      "termsEvidenceRef": null,
+      "antiBulkRule": "No bulk acquisition, automated harvesting, rate-limit bypass, or credential sharing without source-specific written approval.",
+      "permittedUses": [
+        "internal discovery",
+        "candidate evidence",
+        "human-reviewed advisory analysis"
+      ],
+      "prohibitedUses": [
+        "underwriting truth",
+        "official eligibility decision",
+        "collateral certification",
+        "unreviewed republication",
+        "public certainty claim"
+      ],
+      "retentionRule": "Retain only the minimum governed evidence necessary for provenance, replay, dispute, and audit obligations; source terms control shorter limits.",
+      "cacheRule": "No persistent cache beyond the approved source-specific period; purge or refresh on expiry, revocation, or terms change.",
+      "republicationRule": "No raw-content republication without express source-specific license and qualified legal approval.",
+      "publicDisplayRule": "Public DTO may expose only reviewed aliases, citations, and derived advisory facts after redaction and claims review.",
+      "attributionRule": "Preserve source name, retrieval time, URL/reference, license posture, provenance envelope, and replay reference.",
+      "credentialRule": "Credentials, subscriptions, and licensed sessions resolve only through the governed credential vault and may not be embedded in records or logs.",
+      "reviewCadence": "before activation; on terms/license change; on credential renewal; and at least annually",
+      "qualifiedReviewerRole": "Source Legal Authority",
+      "approvalGranted": false,
+      "approvedBy": null,
+      "approvedAtUtc": null,
+      "approvalEvidenceRef": null,
+      "liveFetchAllowed": false,
+      "productionRelianceAllowed": false,
+      "officialUseAllowed": false
+    }
+  ],
+  "authorization": {
+    "blockerId": "P5-B04",
+    "authorityRole": "Source Legal Authority",
+    "approvalRequired": true,
+    "approvalGranted": false,
+    "sourceApprovalsGranted": 0,
+    "liveSourceUsePermitted": false,
+    "productionReliancePermitted": false,
+    "republicationPermitted": false,
+    "reason": "Each source requires source-specific qualified legal/compliance approval; automation only assembles evidence and cannot grant legal authority."
+  },
+  "checks": [
+    {
+      "name": "target revision is live",
+      "pass": true,
+      "evidence": "furlong-core-00097-kds expected prefix furlong-core-00097"
+    },
+    {
+      "name": "live image is digest pinned",
+      "pass": true,
+      "evidence": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:733eb21ba9e4affea9436b71f9b030e6a07dacdffaa9fa625d7bcad3a3eea248"
+    },
+    {
+      "name": "existing source legal gate",
+      "pass": true,
+      "evidence": "npm run smoke:source-legal-review"
+    },
+    {
+      "name": "production source inventory gate",
+      "pass": true,
+      "evidence": "npm run smoke:production-source-legal"
+    },
+    {
+      "name": "all canonical sources inventoried",
+      "pass": true,
+      "evidence": "29 sources"
+    },
+    {
+      "name": "all sources require terms review",
+      "pass": true,
+      "evidence": "termsReviewRequired=true"
+    },
+    {
+      "name": "permitted and prohibited uses mapped",
+      "pass": true,
+      "evidence": "all sources mapped"
+    },
+    {
+      "name": "anti-bulk controls mapped",
+      "pass": true,
+      "evidence": "all sources mapped"
+    },
+    {
+      "name": "retention and cache controls mapped",
+      "pass": true,
+      "evidence": "all sources mapped"
+    },
+    {
+      "name": "republication and display controls mapped",
+      "pass": true,
+      "evidence": "all sources mapped"
+    },
+    {
+      "name": "attribution and credential controls mapped",
+      "pass": true,
+      "evidence": "all sources mapped"
+    },
+    {
+      "name": "no automated legal approval",
+      "pass": true,
+      "evidence": "sourceApprovalsGranted=0"
+    },
+    {
+      "name": "live fetch remains blocked",
+      "pass": true,
+      "evidence": "liveFetchAllowed=false"
+    },
+    {
+      "name": "production reliance remains blocked",
+      "pass": true,
+      "evidence": "reliance=false; official=false"
+    },
+    {
+      "name": "qualified human authorization preserved",
+      "pass": true,
+      "evidence": "{\"blockerId\":\"P5-B04\",\"authorityRole\":\"Source Legal Authority\",\"approvalRequired\":true,\"approvalGranted\":false,\"sourceApprovalsGranted\":0,\"liveSourceUsePermitted\":false,\"productionReliancePermitted\":false,\"republicationPermitted\":false,\"reason\":\"Each source requires source-specific qualified legal/compliance approval; automation only assembles evidence and cannot grant legal authority.\"}"
+    }
+  ],
+  "generatedAtUtc": "2026-07-21T17:48:58.225Z"
+}

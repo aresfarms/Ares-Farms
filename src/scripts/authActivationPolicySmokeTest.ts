@@ -82,6 +82,23 @@ function main() {
     "Allowlisted credential auth should pass with the correct shared secret."
   );
 
+  const stagingTwentyCharacterSecret = evaluateCredentialAuthPolicy({
+    email: "allowed@aresfarms.test",
+    password: "12345678901234567890",
+    env: {
+      ...productionEnv,
+      AUTH_CREDENTIALS_MODE: "email-allowlist",
+      AUTH_CREDENTIAL_EMAIL_ALLOWLIST: "allowed@aresfarms.test",
+      AUTH_CREDENTIAL_MIN_LENGTH: "20",
+      AUTH_CREDENTIAL_SHARED_SECRET: "12345678901234567890",
+    },
+  });
+
+  assert(
+    stagingTwentyCharacterSecret.allowed,
+    "Staging may explicitly lower the credential minimum to 20 characters."
+  );
+
   const wrongPassword = evaluateCredentialAuthPolicy({
     email: "allowed@aresfarms.test",
     password: "wrong",

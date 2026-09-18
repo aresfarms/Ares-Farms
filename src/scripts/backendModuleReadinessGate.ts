@@ -556,7 +556,7 @@ function main() {
     passed: allIncluded(scripts["verify:backend"] ?? "", [
       "verify:schema",
       "tsc --noEmit",
-      "verify:master-volumes",
+      "verify:master-volume-mirror",
       "verify:missing-doctrines",
       "verify:scraper-source-intelligence",
       "verify:revenue-source-intelligence",
@@ -571,9 +571,9 @@ function main() {
       "smoke:integration",
     ]),
     summary:
-      "Backend verification must include schema, types, security, auth, production readiness, module readiness, and integration readiness.",
+      "Backend verification must include schema, strict Master Volume parity/mirror, types, security, auth, production readiness, module readiness, and integration readiness.",
     passDetail:
-      "Backend verification includes schema, type, security, auth, production readiness, module readiness, and integration gates.",
+      "Backend verification includes schema, strict Master Volume parity/mirror, type, security, auth, production readiness, module readiness, and integration gates.",
     failDetail:
       "Backend verification is missing one or more readiness gates.",
   });

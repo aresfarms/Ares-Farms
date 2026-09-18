@@ -1,42 +1,12 @@
 /**
  * treasuryPublicSafeGenerated — GENERATED FILE. Do not edit by hand.
  * CLIENT-SAFE projection (no exact address, no lat/long).
- * Ingested at: 2026-06-10T23:40:00.586Z
+ * Ingested at: 2026-07-17T16:15:58.006Z
  */
 
 import type { PublicSafeProperty } from "./propertyTypes";
 
 export const TREASURY_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
-  "CO": {
-    "id": "treasury-26-66-877",
-    "sourceId": "treasury",
-    "state": "CO",
-    "county": "Unknown",
-    "town": "Penrose",
-    "propertyType": "home",
-    "acreageBand": "Acreage not specified",
-    "priceBand": "Price on request",
-    "whyMayFit": "U.S. Treasury seized-property auction in Penrose, CO — providers can help you explore financing options.",
-    "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
-    "isCurrent": true,
-    "vintageStamp": "current listing"
-  },
-  "FL": {
-    "id": "treasury-26-66-847",
-    "sourceId": "treasury",
-    "state": "FL",
-    "county": "Unknown",
-    "town": "Panama City Beach",
-    "propertyType": "land",
-    "acreageBand": "Acreage not specified",
-    "priceBand": "Price on request",
-    "whyMayFit": "U.S. Treasury seized-property auction in Panama City Beach, FL — providers can help you explore financing options.",
-    "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
-    "isCurrent": true,
-    "vintageStamp": "current listing"
-  },
   "GA": {
     "id": "treasury-26-66-876",
     "sourceId": "treasury",
@@ -48,7 +18,37 @@ export const TREASURY_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> =
     "priceBand": "Price on request",
     "whyMayFit": "U.S. Treasury seized-property auction in Lawrenceville, GA — providers can help you explore financing options.",
     "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
+    "asOf": "2026-07-17T16:15:58.006Z",
+    "isCurrent": true,
+    "vintageStamp": "current listing"
+  },
+  "KS": {
+    "id": "treasury-26-66-842",
+    "sourceId": "treasury",
+    "state": "KS",
+    "county": "Unknown",
+    "town": "Overland Park",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Price on request",
+    "whyMayFit": "U.S. Treasury seized-property auction in Overland Park, KS — providers can help you explore financing options.",
+    "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
+    "asOf": "2026-07-17T16:15:58.006Z",
+    "isCurrent": true,
+    "vintageStamp": "current listing"
+  },
+  "MS": {
+    "id": "treasury-26-66-882",
+    "sourceId": "treasury",
+    "state": "MS",
+    "county": "Unknown",
+    "town": "Olive Branch",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Price on request",
+    "whyMayFit": "U.S. Treasury seized-property auction in Olive Branch, MS — providers can help you explore financing options.",
+    "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
+    "asOf": "2026-07-17T16:15:58.006Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -63,37 +63,37 @@ export const TREASURY_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> =
     "priceBand": "Price on request",
     "whyMayFit": "U.S. Treasury seized-property auction in Merry Hill, NC — providers can help you explore financing options.",
     "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
+    "asOf": "2026-07-17T16:15:58.006Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
   "NJ": {
-    "id": "treasury-26-66-866",
+    "id": "treasury-26-66-867",
     "sourceId": "treasury",
     "state": "NJ",
     "county": "Unknown",
-    "town": "East Orange",
+    "town": "Franklin Lakes",
     "propertyType": "home",
     "acreageBand": "Acreage not specified",
     "priceBand": "Price on request",
-    "whyMayFit": "U.S. Treasury seized-property auction in East Orange, NJ — providers can help you explore financing options.",
+    "whyMayFit": "U.S. Treasury seized-property auction in Franklin Lakes, NJ — providers can help you explore financing options.",
     "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
+    "asOf": "2026-07-17T16:15:58.006Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
-  "OR": {
-    "id": "treasury-26-66-166",
+  "OH": {
+    "id": "treasury-26-66-195",
     "sourceId": "treasury",
-    "state": "OR",
+    "state": "OH",
     "county": "Unknown",
-    "town": "Salem",
+    "town": "Valley City",
     "propertyType": "home",
     "acreageBand": "Acreage not specified",
     "priceBand": "Price on request",
-    "whyMayFit": "U.S. Treasury seized-property auction in Salem, OR — providers can help you explore financing options.",
+    "whyMayFit": "U.S. Treasury seized-property auction in Valley City, OH — providers can help you explore financing options.",
     "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
+    "asOf": "2026-07-17T16:15:58.006Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -108,37 +108,22 @@ export const TREASURY_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> =
     "priceBand": "Price on request",
     "whyMayFit": "U.S. Treasury seized-property auction in San Juan, PR — providers can help you explore financing options.",
     "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
-    "isCurrent": true,
-    "vintageStamp": "current listing"
+    "asOf": "2026-07-17T16:15:58.006Z",
+    "isCurrent": false,
+    "vintageStamp": "2026 record · historical snapshot"
   },
   "TX": {
-    "id": "treasury-26-66-168",
+    "id": "treasury-26-66-189",
     "sourceId": "treasury",
     "state": "TX",
     "county": "Unknown",
-    "town": "San Benito",
-    "propertyType": "land",
+    "town": "Bruni",
+    "propertyType": "commercial",
     "acreageBand": "Acreage not specified",
     "priceBand": "Price on request",
-    "whyMayFit": "U.S. Treasury seized-property auction in San Benito, TX — providers can help you explore financing options.",
+    "whyMayFit": "U.S. Treasury seized-property auction in Bruni, TX — providers can help you explore financing options.",
     "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
-    "isCurrent": true,
-    "vintageStamp": "current listing"
-  },
-  "WA": {
-    "id": "treasury-26-66-177",
-    "sourceId": "treasury",
-    "state": "WA",
-    "county": "Unknown",
-    "town": "Vashon",
-    "propertyType": "home",
-    "acreageBand": "Acreage not specified",
-    "priceBand": "Price on request",
-    "whyMayFit": "U.S. Treasury seized-property auction in Vashon, WA — providers can help you explore financing options.",
-    "sourceCitation": "Source: U.S. Treasury — Seized Real Property Auctions (TEOAF)",
-    "asOf": "2026-06-10T23:40:00.586Z",
+    "asOf": "2026-07-17T16:15:58.006Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   }

@@ -10,6 +10,7 @@ import {
   BorrowerOnboardingCoreV2Result,
   composeBorrowerOnboardingCoreV2,
 } from "@/lib/borrower/onboardingCoreV2Runtime";
+import { readJsonResponse } from "@/lib/http/readJsonResponse";
 
 type ApiResponse = {
   ok: boolean;
@@ -183,16 +184,16 @@ export default function BorrowerOnboardingCoreV2Page() {
         .map((t) => t.trim())
         .filter(Boolean),
       scope: { sovereignFederationAllowed: sovereignAllowed },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       onboardingState: {
         stage,
         location: { country: "US", state: stateValue, county },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         farmTypes: farmTypes
           .split(",")
           .map((t) => t.trim())
           .filter(Boolean) as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         goals: goals
           .split(",")
           .map((t) => t.trim())
@@ -240,7 +241,7 @@ export default function BorrowerOnboardingCoreV2Page() {
           body: JSON.stringify(localInput),
         }
       );
-      const data: ApiResponse = await response.json();
+      const data = await readJsonResponse<ApiResponse>(response);
       setServerResult(data);
       if (!data.ok) {
         setError(data.error ?? "Unknown error from API");

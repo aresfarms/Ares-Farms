@@ -6,6 +6,7 @@ import {
   composeBuildSelfReport,
   renderBuildSelfReportMarkdown,
 } from "@/lib/build-self-report/buildSelfReportRuntime";
+import { loadOperationalAnnexFilledRoles } from "@/lib/human-authority/operationalAnnexRoleFills";
 
 /**
  * Build Self-Report CLI
@@ -38,6 +39,7 @@ function main() {
     commit,
     branch,
     treeStatus: treeStatus as "clean" | "dirty",
+    humanAuthorityFilledRoles: loadOperationalAnnexFilledRoles(),
   });
 
   const today = new Date().toISOString().slice(0, 10);

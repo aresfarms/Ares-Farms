@@ -1,7 +1,13 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
-import { stripe } from "@/lib/stripe";
+import {
+  assertStripeCheckoutAvailable,
+  stripe,
+  stripeConfiguredForLivePayments,
+} from "@/lib/stripe/client";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
@@ -34,9 +40,7 @@ type CheckoutRequest = {
 };
 
 function createCheckoutTraceId(): string {
-  return `checkout-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `checkout-${randomUUID()}`;
 }
 
 function getBaseUrl(): string {
@@ -109,6 +113,25 @@ function billingEventResponse(
 
 export async function POST(req: Request) {
   const traceId = createCheckoutTraceId();
+
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "This legacy client-priced checkout is disabled. Use the server-priced public or institutional checkout route.",
+        governance: {
+          traceId,
+          route: "/api/checkout",
+          disabledReason: "client-supplied-price",
+        },
+      },
+      {
+        status: 410,
+        headers: { "Cache-Control": "private, no-store" },
+      },
+    );
+  }
 
   try {
     const body = (await req.json()) as CheckoutRequest;
@@ -321,6 +344,9 @@ export async function POST(req: Request) {
     }
 
     const baseUrl = getBaseUrl();
+    assertStripeCheckoutAvailable();
+    const livePaymentConnector = stripeConfiguredForLivePayments();
+
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -390,7 +416,7 @@ export async function POST(req: Request) {
       checkoutSessionCreated: true,
       webhookReceived: false,
       entitlementGranted: false,
-      paymentConnectorLiveMode: false,
+      paymentConnectorLiveMode: livePaymentConnector,
       stubSignatureVerification: false,
       regulatedDecisionImpactAllowed: false,
       humanReviewRequired: true,

@@ -1,7 +1,15 @@
 import { and, desc, eq } from "drizzle-orm";
 
-import { billingEvents, entitlements } from "@/db/schema";
+import {
+  billingEvents,
+  entitlements,
+  syntheticFixtureLineageRecords,
+} from "@/db/schema";
 import { db } from "@/lib/db";
+import {
+  bindSyntheticFixtureLineage,
+  type SyntheticFixtureContext,
+} from "@/lib/testing/syntheticFixtureLineage";
 
 /**
  * Canonical Billing Event Runtime
@@ -51,6 +59,7 @@ export type PersistBillingEventInput = {
   requestPayload?: Record<string, unknown>;
   responsePayload?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
+  syntheticFixtureContext?: SyntheticFixtureContext | null;
 };
 
 export type ListBillingAdminRecordsInput = {
@@ -125,7 +134,7 @@ function normalizeAmount(value: number | null | undefined): number | null {
 
 async function loadEntitlementForEvent(
   event: typeof billingEvents.$inferSelect,
-  includeEntitlement: boolean
+  includeEntitlement: boolean,
 ): Promise<typeof entitlements.$inferSelect | null> {
   if (!includeEntitlement) {
     return null;
@@ -157,61 +166,102 @@ async function loadEntitlementForEvent(
 }
 
 export async function persistBillingEvent(
-  input: PersistBillingEventInput
+  input: PersistBillingEventInput,
 ): Promise<typeof billingEvents.$inferSelect> {
   const now = new Date();
-  const rows = await db
-    .insert(billingEvents)
-    .values({
-      billingEventId:
-        normalizeText(input.billingEventId) ??
-        normalizeRequiredText(input.traceId, "traceId"),
-      eventType: normalizeRequiredText(input.eventType, "eventType")
-        .toUpperCase(),
-      eventStatus: normalizeRequiredText(input.eventStatus, "eventStatus")
-        .toUpperCase(),
-      route: normalizeRequiredText(input.route, "route"),
-      tenantId: normalizeText(input.tenantId),
-      actorId: normalizeText(input.actorId),
-      userId: normalizeText(input.userId),
-      reportId: normalizeText(input.reportId),
-      applicationId: normalizeText(input.applicationId),
-      sessionId: normalizeText(input.sessionId),
-      entitlementId: normalizeText(input.entitlementId),
-      stripeEventType: normalizeText(input.stripeEventType),
-      plan: normalizeText(input.plan),
-      productName: normalizeText(input.productName),
-      amountTotal: normalizeAmount(input.amountTotal),
-      currency: normalizeText(input.currency)?.toLowerCase() ?? null,
-      checkoutSessionCreated: input.checkoutSessionCreated ?? false,
-      webhookReceived: input.webhookReceived ?? false,
-      entitlementGranted: input.entitlementGranted ?? false,
-      paymentConnectorLiveMode: input.paymentConnectorLiveMode ?? false,
-      stubSignatureVerification: input.stubSignatureVerification ?? false,
-      regulatedDecisionImpactAllowed:
-        input.regulatedDecisionImpactAllowed ?? false,
-      humanReviewRequired: input.humanReviewRequired ?? true,
-      requestPayload: input.requestPayload ?? {},
-      responsePayload: input.responsePayload ?? {},
-      governanceVersion: GOVERNANCE_VERSION,
-      classification: CLASSIFICATION,
-      replayRef: input.traceId,
-      traceId: input.traceId,
-      source: BILLING_EVENT_SOURCE,
-      metadata: {
-        ...(input.metadata ?? {}),
-        billingEventRuntimeVersion: "billing-event-runtime-v0.1.0",
+  const billingEventId =
+    normalizeText(input.billingEventId) ??
+    normalizeRequiredText(input.traceId, "traceId");
+  const syntheticFixture = input.syntheticFixtureContext
+    ? bindSyntheticFixtureLineage(
+        input.syntheticFixtureContext,
+        "billing_event",
+        billingEventId,
+      )
+    : null;
+
+  return db.transaction(async (tx) => {
+    const rows = await tx
+      .insert(billingEvents)
+      .values({
+        billingEventId,
+        eventType: normalizeRequiredText(
+          input.eventType,
+          "eventType",
+        ).toUpperCase(),
+        eventStatus: normalizeRequiredText(
+          input.eventStatus,
+          "eventStatus",
+        ).toUpperCase(),
+        route: normalizeRequiredText(input.route, "route"),
+        tenantId: normalizeText(input.tenantId),
+        actorId: normalizeText(input.actorId),
+        userId: normalizeText(input.userId),
+        reportId: normalizeText(input.reportId),
+        applicationId: normalizeText(input.applicationId),
+        sessionId: normalizeText(input.sessionId),
+        entitlementId: normalizeText(input.entitlementId),
+        stripeEventType: normalizeText(input.stripeEventType),
+        plan: normalizeText(input.plan),
+        productName: normalizeText(input.productName),
+        amountTotal: normalizeAmount(input.amountTotal),
+        currency: normalizeText(input.currency)?.toLowerCase() ?? null,
+        checkoutSessionCreated: input.checkoutSessionCreated ?? false,
+        webhookReceived: input.webhookReceived ?? false,
+        entitlementGranted: input.entitlementGranted ?? false,
+        paymentConnectorLiveMode: input.paymentConnectorLiveMode ?? false,
+        stubSignatureVerification: input.stubSignatureVerification ?? false,
         regulatedDecisionImpactAllowed:
           input.regulatedDecisionImpactAllowed ?? false,
         humanReviewRequired: input.humanReviewRequired ?? true,
-      },
-      occurredAt: now,
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning();
+        requestPayload: input.requestPayload ?? {},
+        responsePayload: input.responsePayload ?? {},
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: CLASSIFICATION,
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: BILLING_EVENT_SOURCE,
+        metadata: {
+          ...(input.metadata ?? {}),
+          billingEventRuntimeVersion: "billing-event-runtime-v0.1.0",
+          regulatedDecisionImpactAllowed:
+            input.regulatedDecisionImpactAllowed ?? false,
+          humanReviewRequired: input.humanReviewRequired ?? true,
+          syntheticFixture,
+        },
+        occurredAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
-  return rows[0];
+    if (syntheticFixture) {
+      await tx.insert(syntheticFixtureLineageRecords).values({
+        syntheticPersonaId: syntheticFixture.syntheticPersonaId,
+        humanVisibleName: syntheticFixture.humanVisibleName,
+        testRunId: syntheticFixture.testRunId,
+        fixtureVersion: syntheticFixture.fixtureVersion,
+        registryVersion: syntheticFixture.registryVersion,
+        lineageVersion: syntheticFixture.lineageVersion,
+        environment: syntheticFixture.environment,
+        operatorIdentity: syntheticFixture.operatorIdentity,
+        fixtureCreatedAt: new Date(syntheticFixture.createdAt),
+        scenarioId: syntheticFixture.scenarioId,
+        providerTargets: [...syntheticFixture.providerTargets],
+        recordType: syntheticFixture.recordType,
+        recordId: syntheticFixture.recordId,
+        lineageSha256: syntheticFixture.lineageSha256,
+        lineagePayload: syntheticFixture,
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: CLASSIFICATION,
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: "synthetic-fixture-lineage-runtime",
+      });
+    }
+
+    return rows[0];
+  });
 }
 
 export async function getBillingAdminScopeRecord(input: {
@@ -289,11 +339,14 @@ export async function getBillingAdminScopeRecord(input: {
 }
 
 export async function listBillingAdminRecords(
-  input: ListBillingAdminRecordsInput
+  input: ListBillingAdminRecordsInput,
 ): Promise<BillingAdminRecord[]> {
   const filters = [
     normalizeText(input.billingEventId)
-      ? eq(billingEvents.billingEventId, normalizeText(input.billingEventId) ?? "")
+      ? eq(
+          billingEvents.billingEventId,
+          normalizeText(input.billingEventId) ?? "",
+        )
       : undefined,
     normalizeStatus(input.eventType)
       ? eq(billingEvents.eventType, normalizeStatus(input.eventType) ?? "")
@@ -314,7 +367,10 @@ export async function listBillingAdminRecords(
       ? eq(billingEvents.sessionId, normalizeText(input.sessionId) ?? "")
       : undefined,
     normalizeText(input.entitlementId)
-      ? eq(billingEvents.entitlementId, normalizeText(input.entitlementId) ?? "")
+      ? eq(
+          billingEvents.entitlementId,
+          normalizeText(input.entitlementId) ?? "",
+        )
       : undefined,
     normalizeText(input.plan)
       ? eq(billingEvents.plan, normalizeText(input.plan) ?? "")
@@ -341,7 +397,7 @@ export async function listBillingAdminRecords(
       billingEvent,
       entitlement: await loadEntitlementForEvent(
         billingEvent,
-        input.includeEntitlement !== false
+        input.includeEntitlement !== false,
       ),
     });
   }

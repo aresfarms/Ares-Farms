@@ -14,7 +14,7 @@ import {
   sourceFailover,
   sourceStackOverview,
   marketplaceIngestion,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 import { eventContractRegistry } from "@/lib/modules/eventContractRegistry";
 
 /**

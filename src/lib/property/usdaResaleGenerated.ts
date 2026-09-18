@@ -8,7 +8,7 @@
  * Development resale open dataset on data.gov (CC0 1.0 public domain). The live
  * HTML portal is NOT scraped. Re-run `npm run ingest:usda-resale` to refresh.
  *
- * Ingested at: 2026-06-10T23:40:26.673Z
+ * Ingested at: 2026-07-17T16:15:57.094Z
  * Vintage: USDA last refreshed these feeds in 2022 (listings dated 2014–2018);
  * each record keeps its own listingDate so display shows vintage honestly.
  *
@@ -19,7 +19,7 @@
 import type { CanonicalProperty } from "./propertyTypes";
 
 export const USDA_INGEST_PROVENANCE = {
-  "fetchedAt": "2026-06-10T23:40:26.673Z",
+  "fetchedAt": "2026-07-17T16:15:57.094Z",
   "feeds": [
     {
       "feed": "REO",
@@ -75,7 +75,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "2a0262aee5c0af2812d7df6b6f82ea99505f1d212b31a60191285c30967612ad"
       }
     ],
@@ -87,10 +87,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "2a0262aee5c0af2812d7df6b6f82ea99505f1d212b31a60191285c30967612ad",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9080197194",
+    "replay_ref": "usda-replay-p9080197194",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -129,7 +129,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "c0f30a4cac63dc7277102ec43ee59c49b80ee0fe05fbf6101153c178d4ec8692"
       }
     ],
@@ -141,10 +141,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "c0f30a4cac63dc7277102ec43ee59c49b80ee0fe05fbf6101153c178d4ec8692",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9080197178",
+    "replay_ref": "usda-replay-p9080197178",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -183,7 +183,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "78ce9622621e339dc5fe8d1573aac169e3718637bfc1c114d68f1a8bae6ccc71"
       }
     ],
@@ -195,10 +195,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "78ce9622621e339dc5fe8d1573aac169e3718637bfc1c114d68f1a8bae6ccc71",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9035588172",
+    "replay_ref": "usda-replay-p9035588172",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -237,7 +237,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "8c2b5cdfcd5f738c21871eee36dbad6818203c8e3ed18be204cdcb3cbed43e91"
       }
     ],
@@ -249,10 +249,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "8c2b5cdfcd5f738c21871eee36dbad6818203c8e3ed18be204cdcb3cbed43e91",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9040509382",
+    "replay_ref": "usda-replay-p9040509382",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -291,7 +291,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "3367ff27a382a84aca30ab02c2f39aa6701b63442d26c95a4a45cb65dd05eb5d"
       }
     ],
@@ -303,10 +303,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "3367ff27a382a84aca30ab02c2f39aa6701b63442d26c95a4a45cb65dd05eb5d",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9003045663",
+    "replay_ref": "usda-replay-p9003045663",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -345,7 +345,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "c7bfa686227e8e62ccaf8502008e5325e8508cd25fcf7a0abaed2c9a86af7c78"
       }
     ],
@@ -357,10 +357,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "c7bfa686227e8e62ccaf8502008e5325e8508cd25fcf7a0abaed2c9a86af7c78",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9001997289",
+    "replay_ref": "usda-replay-p9001997289",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -399,7 +399,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "b9bb82ea54b445538a0567f5bd3421e10085782f081847b11897313742d8ba82"
       }
     ],
@@ -411,10 +411,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "b9bb82ea54b445538a0567f5bd3421e10085782f081847b11897313742d8ba82",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082091573",
+    "replay_ref": "usda-replay-p9082091573",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -453,7 +453,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "b84539240f26ef08a93b1b6ae9c7881ada32f2531421f9ac1baf8aae43f9aae6"
       }
     ],
@@ -465,10 +465,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "b84539240f26ef08a93b1b6ae9c7881ada32f2531421f9ac1baf8aae43f9aae6",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9032769428",
+    "replay_ref": "usda-replay-p9032769428",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -507,7 +507,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a1750b34b569e242b13d677e736e4168b2d02bb27d5740e6105e6a2927d87646"
       }
     ],
@@ -519,10 +519,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a1750b34b569e242b13d677e736e4168b2d02bb27d5740e6105e6a2927d87646",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-02432000",
+    "replay_ref": "usda-replay-p02432000",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -561,7 +561,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a41d0195bc7a20b003ddb2ab9010e19f321fd4f99468d1747d856324c56d42ae"
       }
     ],
@@ -573,10 +573,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a41d0195bc7a20b003ddb2ab9010e19f321fd4f99468d1747d856324c56d42ae",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-6779000",
+    "replay_ref": "usda-replay-p6779000",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -615,7 +615,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "1ef97df8667f4fb7aa5697318cade38d68bd78cfad4a95318c377f40ac43c5fb"
       }
     ],
@@ -627,10 +627,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "1ef97df8667f4fb7aa5697318cade38d68bd78cfad4a95318c377f40ac43c5fb",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082156573",
+    "replay_ref": "usda-replay-p9082156573",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -669,7 +669,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "3049208c93098916aff3ce76227a50887d689d22433fe8fed2516ddfbcca344b"
       }
     ],
@@ -681,10 +681,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "3049208c93098916aff3ce76227a50887d689d22433fe8fed2516ddfbcca344b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-26040705157025",
+    "replay_ref": "usda-replay-p26040705157025",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -723,7 +723,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a56bdc123c136fcddb73f75a9480a433f6dff95e982d2db3343d9c1e7cc34e04"
       }
     ],
@@ -735,10 +735,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a56bdc123c136fcddb73f75a9480a433f6dff95e982d2db3343d9c1e7cc34e04",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-1870080760000",
+    "replay_ref": "usda-replay-p1870080760000",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -777,7 +777,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "ad95d885bf75f95269f8c031d7c4aaae3d808235564f887c281e59f035c30a1b"
       }
     ],
@@ -789,10 +789,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "ad95d885bf75f95269f8c031d7c4aaae3d808235564f887c281e59f035c30a1b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9037752171",
+    "replay_ref": "usda-replay-p9037752171",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -831,7 +831,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "6883a15b8454fb1d5aa4b784ff00683f7ac0df37b0d366911267eefccee450e7"
       }
     ],
@@ -843,10 +843,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "6883a15b8454fb1d5aa4b784ff00683f7ac0df37b0d366911267eefccee450e7",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9030108256",
+    "replay_ref": "usda-replay-p9030108256",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -885,7 +885,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "ea62d2d5fdff36f647c3a75cd35ae7c0686b5aab1a877afe293f046efaa2b8e4"
       }
     ],
@@ -897,10 +897,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "ea62d2d5fdff36f647c3a75cd35ae7c0686b5aab1a877afe293f046efaa2b8e4",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9033561285",
+    "replay_ref": "usda-replay-p9033561285",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -939,7 +939,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "1aa9a52056006cf94806b910bd72630e7272206503b1110a6d8ac9bf93a3ffd1"
       }
     ],
@@ -951,10 +951,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "1aa9a52056006cf94806b910bd72630e7272206503b1110a6d8ac9bf93a3ffd1",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-60000",
+    "replay_ref": "usda-replay-p60000",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -993,7 +993,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "e6b13ffef6271d5ad69fdd56b9539326a86b1adbe91aa75bda8f10d12c4e2255"
       }
     ],
@@ -1005,10 +1005,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "e6b13ffef6271d5ad69fdd56b9539326a86b1adbe91aa75bda8f10d12c4e2255",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9037620452",
+    "replay_ref": "usda-replay-p9037620452",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1047,7 +1047,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "7819e9137fd037551cea1f6a05a40101e8c3e067aaeec24c56a9f6eff904854c"
       }
     ],
@@ -1059,10 +1059,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "7819e9137fd037551cea1f6a05a40101e8c3e067aaeec24c56a9f6eff904854c",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9040508192",
+    "replay_ref": "usda-replay-p9040508192",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1101,7 +1101,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "f827666e584991de61ac984e1c2a3ec12b13d071258015885177bb43570694b0"
       }
     ],
@@ -1113,10 +1113,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "f827666e584991de61ac984e1c2a3ec12b13d071258015885177bb43570694b0",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9080233867",
+    "replay_ref": "usda-replay-p9080233867",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1155,7 +1155,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "ae386e9a24945b8d90e3d49c267abfbfb0d677388e07167787fe3190152046da"
       }
     ],
@@ -1167,10 +1167,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "ae386e9a24945b8d90e3d49c267abfbfb0d677388e07167787fe3190152046da",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-009002001",
+    "replay_ref": "usda-replay-p009002001",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1209,7 +1209,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "1135ceac19979fb6cfe69cb72cf41d6a9423cb0ed631e57d1d0b49a241ac41f1"
       }
     ],
@@ -1221,10 +1221,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "1135ceac19979fb6cfe69cb72cf41d6a9423cb0ed631e57d1d0b49a241ac41f1",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9037370634",
+    "replay_ref": "usda-replay-p9037370634",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1263,7 +1263,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "9218f19c3cff15c1cc61802e4b18b898121e816693ce1e2c84b31e7c6ab14b4b"
       }
     ],
@@ -1275,10 +1275,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "9218f19c3cff15c1cc61802e4b18b898121e816693ce1e2c84b31e7c6ab14b4b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9034676137",
+    "replay_ref": "usda-replay-p9034676137",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1317,7 +1317,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "5e36edce942eb09852a094a09bf755b27810b80b80b4d9e9f5ac500172965683"
       }
     ],
@@ -1329,10 +1329,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "5e36edce942eb09852a094a09bf755b27810b80b80b4d9e9f5ac500172965683",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9030311690",
+    "replay_ref": "usda-replay-p9030311690",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1371,7 +1371,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "5e23824ed267b69ab5e8103d7c71b3e5848c127de19ac3b423d4a9a2fb3061ee"
       }
     ],
@@ -1383,10 +1383,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "5e23824ed267b69ab5e8103d7c71b3e5848c127de19ac3b423d4a9a2fb3061ee",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9012032751",
+    "replay_ref": "usda-replay-p9012032751",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1425,7 +1425,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "f0ec04a780fcaefe07ca9d8c24c74d59519010c66df0c1656c60603639e5fe6f"
       }
     ],
@@ -1437,10 +1437,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "f0ec04a780fcaefe07ca9d8c24c74d59519010c66df0c1656c60603639e5fe6f",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9033110555",
+    "replay_ref": "usda-replay-p9033110555",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1479,7 +1479,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "8161e96de3535335693608e7889ac53bb031edd23922e17fb7fbfc45b7020478"
       }
     ],
@@ -1491,10 +1491,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "8161e96de3535335693608e7889ac53bb031edd23922e17fb7fbfc45b7020478",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9033114467",
+    "replay_ref": "usda-replay-p9033114467",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1533,7 +1533,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "eb3326616cf6832dcee673c3138a1a920de57d1d19da94c481e7c37a1248f297"
       }
     ],
@@ -1545,10 +1545,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "eb3326616cf6832dcee673c3138a1a920de57d1d19da94c481e7c37a1248f297",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007204086",
+    "replay_ref": "usda-replay-p9007204086",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1587,7 +1587,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "681694c4407f632e1d6c40de08318df3441a2f95cd6fca1a3210046540b33d83"
       }
     ],
@@ -1599,10 +1599,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "681694c4407f632e1d6c40de08318df3441a2f95cd6fca1a3210046540b33d83",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9036688194",
+    "replay_ref": "usda-replay-p9036688194",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1641,7 +1641,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "7f2d0c2bbc1d1751b1361ae1efe08fd91e333a0a9e1cd82919c7d7c5024ecc8e"
       }
     ],
@@ -1653,10 +1653,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "7f2d0c2bbc1d1751b1361ae1efe08fd91e333a0a9e1cd82919c7d7c5024ecc8e",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9019732177",
+    "replay_ref": "usda-replay-p9019732177",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1695,7 +1695,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "f7016a52defefb6fe76c67d899faa83783482563043936994a33fd393654d2d6"
       }
     ],
@@ -1707,10 +1707,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "f7016a52defefb6fe76c67d899faa83783482563043936994a33fd393654d2d6",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9022212833",
+    "replay_ref": "usda-replay-p9022212833",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1749,7 +1749,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "519f91e6aff2db73d855a88c991f23cc33cb42428222235804dd19efcc6f3f94"
       }
     ],
@@ -1761,10 +1761,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "519f91e6aff2db73d855a88c991f23cc33cb42428222235804dd19efcc6f3f94",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007439916",
+    "replay_ref": "usda-replay-p9007439916",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1803,7 +1803,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "c53c2d7381af748f80e2f6a78091054856e7845449d92063fc196c960df095c5"
       }
     ],
@@ -1815,10 +1815,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "c53c2d7381af748f80e2f6a78091054856e7845449d92063fc196c960df095c5",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007373674",
+    "replay_ref": "usda-replay-p9007373674",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1857,7 +1857,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "0e277c91f3f6137814d6c8057f22732323288847896c8367f5d5ae3ea4b61593"
       }
     ],
@@ -1869,10 +1869,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "0e277c91f3f6137814d6c8057f22732323288847896c8367f5d5ae3ea4b61593",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9081003290",
+    "replay_ref": "usda-replay-p9081003290",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1911,7 +1911,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "b1196d61e8e84558a6269fdd530b6c4b47862a4feffeb13e25ce090858e82f4b"
       }
     ],
@@ -1923,10 +1923,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "b1196d61e8e84558a6269fdd530b6c4b47862a4feffeb13e25ce090858e82f4b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007358563",
+    "replay_ref": "usda-replay-p9007358563",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -1965,7 +1965,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "535b3bf45a3060590093341e548756e2157ba417d6d663df392a14f15a302c11"
       }
     ],
@@ -1977,10 +1977,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "535b3bf45a3060590093341e548756e2157ba417d6d663df392a14f15a302c11",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9019672318",
+    "replay_ref": "usda-replay-p9019672318",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2019,7 +2019,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "c7ba77b6160629b30de5f21e1ca6949655aedcbba08f43350cd6774f274411f1"
       }
     ],
@@ -2031,10 +2031,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "c7ba77b6160629b30de5f21e1ca6949655aedcbba08f43350cd6774f274411f1",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007198532",
+    "replay_ref": "usda-replay-p9007198532",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2073,7 +2073,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "1c3ef6b8a9c8cd4f7e7398f83d86e9b82676625edf484276b48e22b309814969"
       }
     ],
@@ -2085,10 +2085,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "1c3ef6b8a9c8cd4f7e7398f83d86e9b82676625edf484276b48e22b309814969",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007205690",
+    "replay_ref": "usda-replay-p9007205690",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2127,7 +2127,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "d2784c0141c907c1b02c4568741ae30e332f3b3328e0145fadc9ff3a72f4bab2"
       }
     ],
@@ -2139,10 +2139,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "d2784c0141c907c1b02c4568741ae30e332f3b3328e0145fadc9ff3a72f4bab2",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9022218439",
+    "replay_ref": "usda-replay-p9022218439",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2181,7 +2181,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "7aacb061ad7a8e0ac457a540c4b75f56c2c031e8b402c728ff1d6d504d1e320e"
       }
     ],
@@ -2193,10 +2193,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "7aacb061ad7a8e0ac457a540c4b75f56c2c031e8b402c728ff1d6d504d1e320e",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007177362",
+    "replay_ref": "usda-replay-p9007177362",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2235,7 +2235,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "e31f3457e631bf1f4bbc12092f7109f782ef928e2d738b923e472dcbbde518d0"
       }
     ],
@@ -2247,10 +2247,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "e31f3457e631bf1f4bbc12092f7109f782ef928e2d738b923e472dcbbde518d0",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007512642",
+    "replay_ref": "usda-replay-p9007512642",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2289,7 +2289,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "2a10ed2ebc8d6b175e64a8ebf973af2dcea7eed31f199a655d632024f6c2bb1d"
       }
     ],
@@ -2301,10 +2301,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "2a10ed2ebc8d6b175e64a8ebf973af2dcea7eed31f199a655d632024f6c2bb1d",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082149797",
+    "replay_ref": "usda-replay-p9082149797",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2343,7 +2343,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a7c8505a4291092c31febf550ee2bbd6dd14be2d88487cce5b0c5e8cbe9b9cb0"
       }
     ],
@@ -2355,10 +2355,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a7c8505a4291092c31febf550ee2bbd6dd14be2d88487cce5b0c5e8cbe9b9cb0",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9038444996",
+    "replay_ref": "usda-replay-p9038444996",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2397,7 +2397,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "2fe3210f25dd4cd7a824ada01a1fafd43eecf3d722038934c6c2638f15958867"
       }
     ],
@@ -2409,10 +2409,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "2fe3210f25dd4cd7a824ada01a1fafd43eecf3d722038934c6c2638f15958867",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007315881",
+    "replay_ref": "usda-replay-p9007315881",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2451,7 +2451,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "68cf779d714a43f37d630779385e2e924c7bdfedbf45d8e46526e407995ae825"
       }
     ],
@@ -2463,10 +2463,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "68cf779d714a43f37d630779385e2e924c7bdfedbf45d8e46526e407995ae825",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007251932",
+    "replay_ref": "usda-replay-p9007251932",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2505,7 +2505,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "d8e3fbc5186247e991f9a66d5d9b6fe04b9c432b180b668f9cb02d6580e3fc81"
       }
     ],
@@ -2517,10 +2517,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "d8e3fbc5186247e991f9a66d5d9b6fe04b9c432b180b668f9cb02d6580e3fc81",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9019726455",
+    "replay_ref": "usda-replay-p9019726455",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2559,7 +2559,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "da13984118c2f7739de888c069873c57bda330136cf41f280f527d231270344c"
       }
     ],
@@ -2571,10 +2571,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "da13984118c2f7739de888c069873c57bda330136cf41f280f527d231270344c",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9035912476",
+    "replay_ref": "usda-replay-p9035912476",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2613,7 +2613,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "760d716166e3f76647dee6bfc0f93c7068f3e1e4036861e3185fdaa2fffc5391"
       }
     ],
@@ -2625,10 +2625,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "760d716166e3f76647dee6bfc0f93c7068f3e1e4036861e3185fdaa2fffc5391",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9033316511",
+    "replay_ref": "usda-replay-p9033316511",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2667,7 +2667,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "08b56157897e724cb7d1bc36d450b584ee5fec299d4ce1b294889710ac8383c8"
       }
     ],
@@ -2679,10 +2679,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "08b56157897e724cb7d1bc36d450b584ee5fec299d4ce1b294889710ac8383c8",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9032806996",
+    "replay_ref": "usda-replay-p9032806996",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2721,7 +2721,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "593a6a3cce816919ac0f307f3fbf763194baa88484ef0b0f7dadc2e97b8ba577"
       }
     ],
@@ -2733,10 +2733,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "593a6a3cce816919ac0f307f3fbf763194baa88484ef0b0f7dadc2e97b8ba577",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007410456",
+    "replay_ref": "usda-replay-p9007410456",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2775,7 +2775,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "6106b0e0d00842fdd422c381f85975d8e012bd9895256858dc7b30040199c479"
       }
     ],
@@ -2787,10 +2787,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "6106b0e0d00842fdd422c381f85975d8e012bd9895256858dc7b30040199c479",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007406871",
+    "replay_ref": "usda-replay-p9007406871",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2829,7 +2829,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "01b09b54758e454dc3a98c3f2c6972a21925f459c2e6866656ffc07715d2fdc9"
       }
     ],
@@ -2841,10 +2841,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "01b09b54758e454dc3a98c3f2c6972a21925f459c2e6866656ffc07715d2fdc9",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-90023365064",
+    "replay_ref": "usda-replay-p90023365064",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2883,7 +2883,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "bcf9b4ad4a219166e26587c2bdeb89dff1d9cbef2c948830a0764ba2684dba3b"
       }
     ],
@@ -2895,10 +2895,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "bcf9b4ad4a219166e26587c2bdeb89dff1d9cbef2c948830a0764ba2684dba3b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9019732601",
+    "replay_ref": "usda-replay-p9019732601",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2937,7 +2937,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "7f1b0793580b618634f0e87f3c52dc27d84f3fe03f96f4b7f8bba9083cd12e7e"
       }
     ],
@@ -2949,10 +2949,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "7f1b0793580b618634f0e87f3c52dc27d84f3fe03f96f4b7f8bba9083cd12e7e",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007514530",
+    "replay_ref": "usda-replay-p9007514530",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -2991,7 +2991,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "d38c522a13bd8f43d38c905df0b3fb8b8303be5284f26d1328ebcb10305d5d50"
       }
     ],
@@ -3003,10 +3003,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "d38c522a13bd8f43d38c905df0b3fb8b8303be5284f26d1328ebcb10305d5d50",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9019718586",
+    "replay_ref": "usda-replay-p9019718586",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3045,7 +3045,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "8149a414ffbd6774eb145b135cb0f1f31e48eb08614ea9558e31d55b71c2cb96"
       }
     ],
@@ -3057,10 +3057,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "8149a414ffbd6774eb145b135cb0f1f31e48eb08614ea9558e31d55b71c2cb96",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9033334140",
+    "replay_ref": "usda-replay-p9033334140",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3099,7 +3099,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "8cbcfb94b40543ff0e792e8afe43368535b71b896e12ff14be39cd9c17c69601"
       }
     ],
@@ -3111,10 +3111,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "8cbcfb94b40543ff0e792e8afe43368535b71b896e12ff14be39cd9c17c69601",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007435473",
+    "replay_ref": "usda-replay-p9007435473",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3153,7 +3153,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "3db8cf6c120510343a31aed1500e1abc1d4d8c9bd7cd6edb4f83f59fb89208fd"
       }
     ],
@@ -3165,10 +3165,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "3db8cf6c120510343a31aed1500e1abc1d4d8c9bd7cd6edb4f83f59fb89208fd",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007517533",
+    "replay_ref": "usda-replay-p9007517533",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3207,7 +3207,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "5ab0d486b83698873ca050b7153daaf3d49e3d751b0b0f7b9cfa21c8ed55b757"
       }
     ],
@@ -3219,10 +3219,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "5ab0d486b83698873ca050b7153daaf3d49e3d751b0b0f7b9cfa21c8ed55b757",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9037885213",
+    "replay_ref": "usda-replay-p9037885213",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3261,7 +3261,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a00965f66cab49f2755e37fcdf43bcb5843c969015814e1d2d301f65199dca8b"
       }
     ],
@@ -3273,10 +3273,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a00965f66cab49f2755e37fcdf43bcb5843c969015814e1d2d301f65199dca8b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007238447",
+    "replay_ref": "usda-replay-p9007238447",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3315,7 +3315,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "66fc01d1c87d5e14e14147d4e219ce83bb1754c3550556db6dd2b055a0294409"
       }
     ],
@@ -3327,10 +3327,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "66fc01d1c87d5e14e14147d4e219ce83bb1754c3550556db6dd2b055a0294409",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007383910",
+    "replay_ref": "usda-replay-p9007383910",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3369,7 +3369,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "9029b908cc0eaf6f97ebbc6889a1e789f5280466e68159fbd50b8846f26f57f5"
       }
     ],
@@ -3381,10 +3381,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "9029b908cc0eaf6f97ebbc6889a1e789f5280466e68159fbd50b8846f26f57f5",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9001009867",
+    "replay_ref": "usda-replay-p9001009867",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3423,7 +3423,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "4822b42f8dd64eb03fdf3496dab143395462b9e3619e8c3f5c9de916fd272e99"
       }
     ],
@@ -3435,10 +3435,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "4822b42f8dd64eb03fdf3496dab143395462b9e3619e8c3f5c9de916fd272e99",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007407207",
+    "replay_ref": "usda-replay-p9007407207",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3477,7 +3477,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "ca581c37f540beb7fc4d56758d048a3df2a93f176b1851f1b0736e178867b8c2"
       }
     ],
@@ -3489,10 +3489,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "ca581c37f540beb7fc4d56758d048a3df2a93f176b1851f1b0736e178867b8c2",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007212515",
+    "replay_ref": "usda-replay-p9007212515",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3531,7 +3531,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "deca83cd8d3c9cbfecbe3cf4f74d323e9eb10c226e4a6430dccf77985b96062b"
       }
     ],
@@ -3543,10 +3543,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "deca83cd8d3c9cbfecbe3cf4f74d323e9eb10c226e4a6430dccf77985b96062b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082056602",
+    "replay_ref": "usda-replay-p9082056602",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3585,7 +3585,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "20ef1ce86e6cc1efe72c6ec934bb32ca7d6124c03c1a803413c0773e53757b02"
       }
     ],
@@ -3597,10 +3597,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "20ef1ce86e6cc1efe72c6ec934bb32ca7d6124c03c1a803413c0773e53757b02",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9081003203",
+    "replay_ref": "usda-replay-p9081003203",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3639,7 +3639,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "d9c8bb074ab000b2f1a1d1ee9cbdb00ff315ed30dcd96a40f0b1e4014e135343"
       }
     ],
@@ -3651,10 +3651,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "d9c8bb074ab000b2f1a1d1ee9cbdb00ff315ed30dcd96a40f0b1e4014e135343",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007459310",
+    "replay_ref": "usda-replay-p9007459310",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3693,7 +3693,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "fc947bf407c2a2ac971912e70136fb92bcd4979e0a470c3e0750f3d20e1febaa"
       }
     ],
@@ -3705,10 +3705,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "fc947bf407c2a2ac971912e70136fb92bcd4979e0a470c3e0750f3d20e1febaa",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007472876",
+    "replay_ref": "usda-replay-p9007472876",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3747,7 +3747,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "ea41c140718324eb6bf278ed0d853c26e5f0100b3a3c4725481782e898270ee6"
       }
     ],
@@ -3759,10 +3759,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "ea41c140718324eb6bf278ed0d853c26e5f0100b3a3c4725481782e898270ee6",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007469452",
+    "replay_ref": "usda-replay-p9007469452",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3801,7 +3801,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "35164b0023c24f0f60bd37f1e31482bb8dd3aa6260f67b3b8bc8d2a5f954ad51"
       }
     ],
@@ -3813,10 +3813,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "35164b0023c24f0f60bd37f1e31482bb8dd3aa6260f67b3b8bc8d2a5f954ad51",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9019671539",
+    "replay_ref": "usda-replay-p9019671539",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3855,7 +3855,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "3d130559628e8278516da6cc608dadc3e254c7b408d629b7fc660c2deb7f9cf7"
       }
     ],
@@ -3867,10 +3867,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "3d130559628e8278516da6cc608dadc3e254c7b408d629b7fc660c2deb7f9cf7",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9035951945",
+    "replay_ref": "usda-replay-p9035951945",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3909,7 +3909,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "78a57b9ab3c7e48db689be484ec8947abf8eac3b757bfe69f5510816acc5d221"
       }
     ],
@@ -3921,10 +3921,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "78a57b9ab3c7e48db689be484ec8947abf8eac3b757bfe69f5510816acc5d221",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-907228185",
+    "replay_ref": "usda-replay-p907228185",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -3963,7 +3963,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "be77aa6017e7c96705f877a01e0eafe190457d6b7d214b84748539f2d61d4df1"
       }
     ],
@@ -3975,10 +3975,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "be77aa6017e7c96705f877a01e0eafe190457d6b7d214b84748539f2d61d4df1",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007412438",
+    "replay_ref": "usda-replay-p9007412438",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4017,7 +4017,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "8aa34934e5f0319bbfdf8c05e4697eb8ec52925724b0839868665a42ef286de6"
       }
     ],
@@ -4029,10 +4029,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "8aa34934e5f0319bbfdf8c05e4697eb8ec52925724b0839868665a42ef286de6",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007418788",
+    "replay_ref": "usda-replay-p9007418788",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4071,7 +4071,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "6022169bc1cc451de60863a2a09bc64900932f2059db973a8cc14a622c67b427"
       }
     ],
@@ -4083,10 +4083,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "6022169bc1cc451de60863a2a09bc64900932f2059db973a8cc14a622c67b427",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007475187",
+    "replay_ref": "usda-replay-p9007475187",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4125,7 +4125,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "93587acce722a16c5dd62de919c3635ec075e25ad9560f46e24934ccaebe669c"
       }
     ],
@@ -4137,10 +4137,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "93587acce722a16c5dd62de919c3635ec075e25ad9560f46e24934ccaebe669c",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9031090059",
+    "replay_ref": "usda-replay-p9031090059",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4179,7 +4179,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "0bd53d710684a6fb17e14397d81e7e4dac16ab3439f0ef2b3b948310c7661e90"
       }
     ],
@@ -4191,10 +4191,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "0bd53d710684a6fb17e14397d81e7e4dac16ab3439f0ef2b3b948310c7661e90",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007245838",
+    "replay_ref": "usda-replay-p9007245838",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4233,7 +4233,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "b5db47cca52082c5964f74aa42d8166f609814987e2d4529b3d4cc50078b89f9"
       }
     ],
@@ -4245,10 +4245,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "b5db47cca52082c5964f74aa42d8166f609814987e2d4529b3d4cc50078b89f9",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082089718",
+    "replay_ref": "usda-replay-p9082089718",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4287,7 +4287,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "bc66e7d972bdb480bca03e4d8eb56526c7de00d1f8f612e08ad12828280a2f78"
       }
     ],
@@ -4299,10 +4299,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "bc66e7d972bdb480bca03e4d8eb56526c7de00d1f8f612e08ad12828280a2f78",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9022212820",
+    "replay_ref": "usda-replay-p9022212820",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4341,7 +4341,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "28e0d30b7c0ea7376c4b0fad524c150c536479736558632691b1cf6bc9bf4edd"
       }
     ],
@@ -4353,10 +4353,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "28e0d30b7c0ea7376c4b0fad524c150c536479736558632691b1cf6bc9bf4edd",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007231295",
+    "replay_ref": "usda-replay-p9007231295",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4395,7 +4395,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "410f1ea932facad7426d13781cba053b562e2881f15d65fb310878e435d6b587"
       }
     ],
@@ -4407,10 +4407,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "410f1ea932facad7426d13781cba053b562e2881f15d65fb310878e435d6b587",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9081008185",
+    "replay_ref": "usda-replay-p9081008185",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4449,7 +4449,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a2abe37b438d058c4d8bf74b2f63c9025b50ab77a83735225653fc4734dd197a"
       }
     ],
@@ -4461,10 +4461,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a2abe37b438d058c4d8bf74b2f63c9025b50ab77a83735225653fc4734dd197a",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9030378646",
+    "replay_ref": "usda-replay-p9030378646",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4503,7 +4503,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "727008a76dd426280ff7d1bf6d5c4e8555b7308319fc81ce985b62a19ee6934f"
       }
     ],
@@ -4515,10 +4515,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "727008a76dd426280ff7d1bf6d5c4e8555b7308319fc81ce985b62a19ee6934f",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9031622715",
+    "replay_ref": "usda-replay-p9031622715",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4557,7 +4557,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "dced84fcb3957d096cfc26a08db01dd1350102df277848ecf434a3d12940140e"
       }
     ],
@@ -4569,10 +4569,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "dced84fcb3957d096cfc26a08db01dd1350102df277848ecf434a3d12940140e",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007201005",
+    "replay_ref": "usda-replay-p9007201005",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4611,7 +4611,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "51d4acafb79938fcd6f9d0b463a9abf7a7ca11979c40b502fd230d70b4c2453d"
       }
     ],
@@ -4623,10 +4623,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "51d4acafb79938fcd6f9d0b463a9abf7a7ca11979c40b502fd230d70b4c2453d",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007374518",
+    "replay_ref": "usda-replay-p9007374518",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4665,7 +4665,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a812be42c106f36ce7968a9e4ac682d271f3d6067eb800bb4c976f0621858c87"
       }
     ],
@@ -4677,10 +4677,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a812be42c106f36ce7968a9e4ac682d271f3d6067eb800bb4c976f0621858c87",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007277631",
+    "replay_ref": "usda-replay-p9007277631",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4719,7 +4719,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "a4243ab0f6bfdf26dec764747dcc6099444e0620cf2bb160756574ff5566cf5b"
       }
     ],
@@ -4731,10 +4731,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "a4243ab0f6bfdf26dec764747dcc6099444e0620cf2bb160756574ff5566cf5b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9040768550",
+    "replay_ref": "usda-replay-p9040768550",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4773,7 +4773,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "0464744e935ac8d6b7bc76d9a469b221e74650adfac94e516a72e13a96564f5b"
       }
     ],
@@ -4785,10 +4785,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "0464744e935ac8d6b7bc76d9a469b221e74650adfac94e516a72e13a96564f5b",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007408099",
+    "replay_ref": "usda-replay-p9007408099",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4827,7 +4827,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "d0b4b20f2e07d01139c3d3046a776080bb594810b4ac23ce0dbee0e127db48f7"
       }
     ],
@@ -4839,10 +4839,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "d0b4b20f2e07d01139c3d3046a776080bb594810b4ac23ce0dbee0e127db48f7",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007379979",
+    "replay_ref": "usda-replay-p9007379979",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4881,7 +4881,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "7550fbcfc1d9b2cd4ebdf84f0894adca0319936651f9f2115a5f774973d2bb42"
       }
     ],
@@ -4893,10 +4893,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "7550fbcfc1d9b2cd4ebdf84f0894adca0319936651f9f2115a5f774973d2bb42",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007452126",
+    "replay_ref": "usda-replay-p9007452126",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4935,7 +4935,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "de384ae9ed4c28bb5f9fbb996826c89265ef2891b5e549589986ecaf3fd0f047"
       }
     ],
@@ -4947,10 +4947,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "de384ae9ed4c28bb5f9fbb996826c89265ef2891b5e549589986ecaf3fd0f047",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007283735",
+    "replay_ref": "usda-replay-p9007283735",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -4989,7 +4989,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "e483d87a7b3763291efbc486f841966a23d3417b5683703a6f781c642f721809"
       }
     ],
@@ -5001,10 +5001,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "e483d87a7b3763291efbc486f841966a23d3417b5683703a6f781c642f721809",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9022835359",
+    "replay_ref": "usda-replay-p9022835359",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5043,7 +5043,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "6786ba187a9f031c8b7afb97ccc7b1d5e18950686399d8180d71ff14cd2b461f"
       }
     ],
@@ -5055,10 +5055,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "6786ba187a9f031c8b7afb97ccc7b1d5e18950686399d8180d71ff14cd2b461f",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007373221",
+    "replay_ref": "usda-replay-p9007373221",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5097,7 +5097,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "eda11f367828872ac59e84467bc6dd5ed9bf98cefcbd42ad48a0a8a9c4d406c6"
       }
     ],
@@ -5109,10 +5109,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "eda11f367828872ac59e84467bc6dd5ed9bf98cefcbd42ad48a0a8a9c4d406c6",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9022838929",
+    "replay_ref": "usda-replay-p9022838929",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5151,7 +5151,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "f3e5daa9a19319ffdb48e488440826ad3a1a0648708dd3a0382c499c9c6a2c1a"
       }
     ],
@@ -5163,10 +5163,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "f3e5daa9a19319ffdb48e488440826ad3a1a0648708dd3a0382c499c9c6a2c1a",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9037657535",
+    "replay_ref": "usda-replay-p9037657535",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5205,7 +5205,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "6d27b079d4057cff21e4aadcaf2ddae423f37fe9f04fa4c377f2c8bf9ee54e51"
       }
     ],
@@ -5217,10 +5217,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "6d27b079d4057cff21e4aadcaf2ddae423f37fe9f04fa4c377f2c8bf9ee54e51",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007446970",
+    "replay_ref": "usda-replay-p9007446970",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5259,7 +5259,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "bb1628ba319c87dc36bdb891cfbf74f09f71153cafd95fab75fe3590b658c606"
       }
     ],
@@ -5271,10 +5271,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "bb1628ba319c87dc36bdb891cfbf74f09f71153cafd95fab75fe3590b658c606",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9007394103",
+    "replay_ref": "usda-replay-p9007394103",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5313,7 +5313,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "b34ea93f93f88bf388d8a7430c00118892e8ed066041ce3a7a8d8e0bd30b9a00"
       }
     ],
@@ -5325,10 +5325,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "b34ea93f93f88bf388d8a7430c00118892e8ed066041ce3a7a8d8e0bd30b9a00",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9034497675",
+    "replay_ref": "usda-replay-p9034497675",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5367,7 +5367,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "08db7473abbded68b32a6b01cb974276c1269a26cf071f55b5e0bc134346d7ce"
       }
     ],
@@ -5379,10 +5379,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "08db7473abbded68b32a6b01cb974276c1269a26cf071f55b5e0bc134346d7ce",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082193756",
+    "replay_ref": "usda-replay-p9082193756",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5421,7 +5421,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "db41bf5c7fdbdbe9389d085aba82aaf5d61ad3b926b9c563fd32eec09a60b1e4"
       }
     ],
@@ -5433,10 +5433,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "db41bf5c7fdbdbe9389d085aba82aaf5d61ad3b926b9c563fd32eec09a60b1e4",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9032954369",
+    "replay_ref": "usda-replay-p9032954369",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5475,7 +5475,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "c98b7c68ddb6d81d41b5f5da03e341947ea9481073226fd66af6039343d91b74"
       }
     ],
@@ -5487,10 +5487,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "c98b7c68ddb6d81d41b5f5da03e341947ea9481073226fd66af6039343d91b74",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9037075890",
+    "replay_ref": "usda-replay-p9037075890",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5529,7 +5529,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "f7a2ef43ec13c0c1e38cee00bf2272d3432fbe7ccf3b2ad396156082fb4a39a9"
       }
     ],
@@ -5541,10 +5541,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "f7a2ef43ec13c0c1e38cee00bf2272d3432fbe7ccf3b2ad396156082fb4a39a9",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9082301331",
+    "replay_ref": "usda-replay-p9082301331",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"
@@ -5583,7 +5583,7 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "usda",
         "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-        "fetched_at": "2026-06-10T23:40:26.673Z",
+        "fetched_at": "2026-07-17T16:15:57.094Z",
         "content_hash": "556cb4d91c9b5d3e02c3d279251f8bef115531fc3c1770c78b554e7966d56d15"
       }
     ],
@@ -5595,10 +5595,10 @@ export const USDA_RESALE_PROPERTIES: CanonicalProperty[] = [
     "source_id": "usda",
     "source_name": "USDA Rural Development / FSA",
     "source_url": "https://www.sc.egov.usda.gov/data/files/Property/FSASFHREOData9-7-18.txt",
-    "fetched_at": "2026-06-10T23:40:26.673Z",
+    "fetched_at": "2026-07-17T16:15:57.094Z",
     "content_hash": "556cb4d91c9b5d3e02c3d279251f8bef115531fc3c1770c78b554e7966d56d15",
     "classification_level": "PUBLIC",
-    "replay_ref": "usda-9080298132",
+    "replay_ref": "usda-replay-p9080298132",
     "connector_id": "usda-connector",
     "jurisdiction_scope": "federal,state,county",
     "scraper_version": "usda-resale-ingest-v0.1.0"

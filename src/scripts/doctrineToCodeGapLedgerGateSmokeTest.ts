@@ -126,7 +126,7 @@ function main() {
   );
   assert(
     review?.currentMasterVolumeVersions.some(
-      (entry) => entry.key === "volumeVI" && entry.governingVersion === "v1.1"
+      (entry) => entry.key === "volumeVI" && entry.governingVersion.startsWith("v1.4")
     ) &&
       review.currentMasterVolumeVersions.some(
         (entry) => entry.key === "volumeVII"
@@ -215,12 +215,14 @@ function main() {
     "Doctrine gap ledger portable vertical surface is missing."
   );
   assert(
-    portableSurface?.safeMessages.includes(
-      "Awaiting controlled promotion is not production approval."
-    ) &&
-      portableSurface.productionBlocks.includes(
-        "no production launch authorization"
-      ),
+    Boolean(
+      portableSurface?.safeMessages.includes(
+        "Awaiting controlled promotion is not production approval."
+      ) &&
+        portableSurface.productionBlocks.includes(
+          "no production launch authorization"
+        )
+    ),
     "Doctrine gap ledger portable surface must carry safe messages and production blocks."
   );
 

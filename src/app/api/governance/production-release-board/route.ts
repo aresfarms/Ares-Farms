@@ -5,6 +5,11 @@ import {
   evaluateProductionReleaseBoard,
 } from "@/lib/governance/productionReleaseBoard";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -160,36 +165,28 @@ async function handleProductionReleaseBoard(
       ],
     });
     const result = evaluateProductionReleaseBoard({ boardScope });
+    const resolvedScope = boardScope ?? "platform";
     const releaseBoard =
-      req.method === "POST"
-        ? {
-            releaseBoardPacketId: `production-release-board-${Date.now()}`,
-            boardScope: boardScope ?? "platform",
-            reviewStatus: "PRODUCTION_RELEASE_BOARD_PACKET_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            releaseBoardApprovalGranted: false,
-            cutoverAuthorityGranted: false,
-            productionCutoverApproved: false,
-            productionCutoverExecuted: false,
-            launchHoldReleased: false,
-            deploymentHoldReleased: false,
-            freezeHoldReleased: false,
-            deploymentExecuted: false,
-            productionSecretsActivated: false,
-            publicDnsCutoverAllowed: false,
-            databaseMigrationAllowed: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            qualifiedReleaseManagerRequired: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_RELEASE_BOARD_PACKET",
+            scope: resolvedScope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            resolvedScope,
+            "PRODUCTION_RELEASE_BOARD_PACKET"
+          );
+    const releaseBoardHistory = releaseGovernanceEvidenceFor(
+      resolvedScope,
+      "PRODUCTION_RELEASE_BOARD_PACKET"
+    );
+    const cutoverEvidence = latestReleaseGovernanceEvidence(
+      resolvedScope,
+      "PRODUCTION_CUTOVER_HOLD"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionReleaseBoardReviews.length,
@@ -198,6 +195,8 @@ async function handleProductionReleaseBoard(
         disclosures: result.disclosures,
         boardPosture: result.boardPosture,
         releaseBoard,
+        releaseBoardHistory,
+        cutoverEvidence,
         productionBlocked: true,
         releaseBoardApprovalGranted: false,
         cutoverAuthorityGranted: false,
@@ -307,6 +306,8 @@ async function handleProductionReleaseBoard(
       disclosures: classifiedOutput.disclosures,
       boardPosture: classifiedOutput.boardPosture,
       releaseBoard: classifiedOutput.releaseBoard,
+      releaseBoardHistory: classifiedOutput.releaseBoardHistory,
+      cutoverEvidence: classifiedOutput.cutoverEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       releaseBoardApprovalGranted:
         classifiedOutput.releaseBoardApprovalGranted,

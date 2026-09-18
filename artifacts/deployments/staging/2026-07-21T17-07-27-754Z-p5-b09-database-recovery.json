@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "p5-b09-database-recovery-readiness-v1",
+  "environment": "staging",
+  "blockerId": "P5-B09",
+  "blockerStatus": "EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",
+  "outcome": "PASS",
+  "productionAuthorized": false,
+  "sourceInstance": "furlong-staging-pg",
+  "temporaryRecoveryInstance": "furlong-p5b09-20260721163218",
+  "selectedRecoveryPointUtc": "2026-07-21T16:27:18Z",
+  "cloneOperationId": "069a0471-96a5-4b8c-8e03-652300000032",
+  "recoveryTimeSeconds": 611,
+  "recoveryTimeHuman": "10m 11s",
+  "migrationExecution": "p5-b09-recovery-migrate-165006-z57qd",
+  "verificationExecution": "p5-b09-recovery-verify-164255-wq4k2",
+  "checks": [
+    {
+      "name": "PITR enabled",
+      "pass": true,
+      "actual": "true",
+      "evidence": "furlong-staging-pg"
+    },
+    {
+      "name": "automated backups enabled",
+      "pass": true,
+      "actual": "true",
+      "evidence": "furlong-staging-pg"
+    },
+    {
+      "name": "backup retention at least seven",
+      "pass": true,
+      "actual": "7",
+      "evidence": "furlong-staging-pg"
+    },
+    {
+      "name": "transaction logs retained at least seven days",
+      "pass": true,
+      "actual": "7",
+      "evidence": "furlong-staging-pg"
+    },
+    {
+      "name": "deletion protection enabled",
+      "pass": true,
+      "actual": "true",
+      "evidence": "furlong-staging-pg"
+    },
+    {
+      "name": "private networking only",
+      "pass": true,
+      "actual": "{\"ipv4Enabled\":false,\"privateNetwork\":\"projects/furlong-staging-499102/global/networks/furlong-staging-vpc\"}",
+      "evidence": "furlong-staging-pg"
+    },
+    {
+      "name": "recent automated backups successful",
+      "pass": true,
+      "actual": "SUCCESSFUL,SUCCESSFUL,SUCCESSFUL,SUCCESSFUL,SUCCESSFUL",
+      "evidence": "Cloud SQL backup history"
+    },
+    {
+      "name": "point-in-time clone completed",
+      "pass": true,
+      "actual": "DONE; 611s",
+      "evidence": "069a0471-96a5-4b8c-8e03-652300000032"
+    },
+    {
+      "name": "migration replay succeeded",
+      "pass": true,
+      "actual": "p5-b09-recovery-migrate-165006-z57qd",
+      "evidence": "immutable migrator image replay"
+    },
+    {
+      "name": "schema and application reads succeeded",
+      "pass": true,
+      "actual": "p5-b09-recovery-verify-164255-wq4k2",
+      "evidence": "private Cloud Run verification job"
+    },
+    {
+      "name": "temporary verification job deleted",
+      "pass": true,
+      "actual": "p5-b09-recovery-verify-164255",
+      "evidence": "post-drill cleanup"
+    },
+    {
+      "name": "temporary migration job deleted",
+      "pass": true,
+      "actual": "p5-b09-recovery-migrate-165006",
+      "evidence": "post-drill cleanup"
+    },
+    {
+      "name": "temporary secret deleted",
+      "pass": true,
+      "actual": "p5-b09-recovery-db-20260721164255",
+      "evidence": "post-drill cleanup"
+    },
+    {
+      "name": "temporary recovery instance deleted",
+      "pass": true,
+      "actual": "furlong-p5b09-20260721163218",
+      "evidence": "post-drill cleanup"
+    },
+    {
+      "name": "source database remained runnable",
+      "pass": true,
+      "actual": "RUNNABLE",
+      "evidence": "furlong-staging-pg"
+    }
+  ],
+  "cleanupVerified": true,
+  "liveDatabaseModifiedByDrill": false,
+  "humanApprovalRequired": true,
+  "generatedAtUtc": "2026-07-21T17:07:27.754Z"
+}

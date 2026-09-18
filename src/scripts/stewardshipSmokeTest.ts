@@ -23,9 +23,9 @@ function main() {
 
   // Current stewards appear as current stewards of domains.
   const expectedStewards: Record<string, string> = {
-    "financing-capital": "Stuart Fraass",
+    "financing-capital": "Furlong Capital Desk",
     "environmental-compliance": "Caitlin Hudson",
-    "communications-public-trust": "Frances Fraass",
+    "communications-public-trust": "Furlong Trust Desk",
   };
   for (const [domainId, steward] of Object.entries(expectedStewards)) {
     const domain = stewardshipDomainById(domainId);

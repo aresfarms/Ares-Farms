@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "p5-official-report-authority-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00100-562",
+  "targetImage": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:070a56b808ced75447266e4eeb3ff2819c0c423b1dc5608e065751f6145baf11",
+  "blockerId": "P5-B06",
+  "blockerStatus": "OPEN",
+  "outcome": "FAIL",
+  "productionAuthorized": false,
+  "officialPublicationPermitted": false,
+  "publicVerificationPermitted": false,
+  "officialReliancePermitted": false,
+  "inventoryVersion": "p5-b06-official-report-authority-v1",
+  "inventory": [
+    {
+      "reportType": "PROPERTY_ADVISORY_REPORT",
+      "advisoryOnlyDisclosureRequired": true,
+      "qualifiedReviewerRequired": true,
+      "legalComplianceReviewRequired": true,
+      "sourceCitationRequired": true,
+      "provenanceRequired": true,
+      "dataClassificationRequired": true,
+      "redactionRequired": true,
+      "deterministicRegenerationRequired": true,
+      "immutableVersionRequired": true,
+      "cryptographicSignatureRequired": true,
+      "publicVerificationApprovalRequired": true,
+      "publicationAuthorityRequired": true,
+      "claimsPolicyRequired": true,
+      "officialRelianceApprovalRequired": true,
+      "publicationApproved": false,
+      "publicVerificationPermitted": false,
+      "officialReliancePermitted": false
+    },
+    {
+      "reportType": "BORROWER_READINESS_REPORT",
+      "advisoryOnlyDisclosureRequired": true,
+      "qualifiedReviewerRequired": true,
+      "legalComplianceReviewRequired": true,
+      "sourceCitationRequired": true,
+      "provenanceRequired": true,
+      "dataClassificationRequired": true,
+      "redactionRequired": true,
+      "deterministicRegenerationRequired": true,
+      "immutableVersionRequired": true,
+      "cryptographicSignatureRequired": true,
+      "publicVerificationApprovalRequired": true,
+      "publicationAuthorityRequired": true,
+      "claimsPolicyRequired": true,
+      "officialRelianceApprovalRequired": true,
+      "publicationApproved": false,
+      "publicVerificationPermitted": false,
+      "officialReliancePermitted": false
+    },
+    {
+      "reportType": "EVIDENCE_PACKET",
+      "advisoryOnlyDisclosureRequired": true,
+      "qualifiedReviewerRequired": true,
+      "legalComplianceReviewRequired": true,
+      "sourceCitationRequired": true,
+      "provenanceRequired": true,
+      "dataClassificationRequired": true,
+      "redactionRequired": true,
+      "deterministicRegenerationRequired": true,
+      "immutableVersionRequired": true,
+      "cryptographicSignatureRequired": true,
+      "publicVerificationApprovalRequired": true,
+      "publicationAuthorityRequired": true,
+      "claimsPolicyRequired": true,
+      "officialRelianceApprovalRequired": true,
+      "publicationApproved": false,
+      "publicVerificationPermitted": false,
+      "officialReliancePermitted": false
+    },
+    {
+      "reportType": "ENVIRONMENTAL_REVIEW_REPORT",
+      "advisoryOnlyDisclosureRequired": true,
+      "qualifiedReviewerRequired": true,
+      "legalComplianceReviewRequired": true,
+      "sourceCitationRequired": true,
+      "provenanceRequired": true,
+      "dataClassificationRequired": true,
+      "redactionRequired": true,
+      "deterministicRegenerationRequired": true,
+      "immutableVersionRequired": true,
+      "cryptographicSignatureRequired": true,
+      "publicVerificationApprovalRequired": true,
+      "publicationAuthorityRequired": true,
+      "claimsPolicyRequired": true,
+      "officialRelianceApprovalRequired": true,
+      "publicationApproved": false,
+      "publicVerificationPermitted": false,
+      "officialReliancePermitted": false
+    },
+    {
+      "reportType": "FINANCING_PATHWAY_REPORT",
+      "advisoryOnlyDisclosureRequired": true,
+      "qualifiedReviewerRequired": true,
+      "legalComplianceReviewRequired": true,
+      "sourceCitationRequired": true,
+      "provenanceRequired": true,
+      "dataClassificationRequired": true,
+      "redactionRequired": true,
+      "deterministicRegenerationRequired": true,
+      "immutableVersionRequired": true,
+      "cryptographicSignatureRequired": true,
+      "publicVerificationApprovalRequired": true,
+      "publicationAuthorityRequired": true,
+      "claimsPolicyRequired": true,
+      "officialRelianceApprovalRequired": true,
+      "publicationApproved": false,
+      "publicVerificationPermitted": false,
+      "officialReliancePermitted": false
+    },
+    {
+      "reportType": "INSTITUTIONAL_GOVERNANCE_REPORT",
+      "advisoryOnlyDisclosureRequired": true,
+      "qualifiedReviewerRequired": true,
+      "legalComplianceReviewRequired": true,
+      "sourceCitationRequired": true,
+      "provenanceRequired": true,
+      "dataClassificationRequired": true,
+      "redactionRequired": true,
+      "deterministicRegenerationRequired": true,
+      "immutableVersionRequired": true,
+      "cryptographicSignatureRequired": true,
+      "publicVerificationApprovalRequired": true,
+      "publicationAuthorityRequired": true,
+      "claimsPolicyRequired": true,
+      "officialRelianceApprovalRequired": true,
+      "publicationApproved": false,
+      "publicVerificationPermitted": false,
+      "officialReliancePermitted": false
+    }
+  ],
+  "authorization": {
+    "blockerId": "P5-B06",
+    "ownerRole": "QUALIFIED_REPORT_AUTHORITY",
+    "legalReviewerRole": "LEGAL_COMPLIANCE_AUTHORITY",
+    "approvalRequired": true,
+    "approvalGranted": false,
+    "publicationApproved": false,
+    "publicVerificationPermitted": false,
+    "officialReliancePermitted": false,
+    "productionAuthorized": false
+  },
+  "checks": [
+    {
+      "name": "target revision is live",
+      "pass": false,
+      "evidence": "furlong-core-00106-w2w expected furlong-core-00100-562"
+    },
+    {
+      "name": "live image is digest pinned",
+      "pass": true,
+      "evidence": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:070a56b808ced75447266e4eeb3ff2819c0c423b1dc5608e065751f6145baf11"
+    },
+    {
+      "name": "official report authority smoke",
+      "pass": true,
+      "evidence": "npm run smoke:production-official-report-authority"
+    },
+    {
+      "name": "content claims policy",
+      "pass": true,
+      "evidence": "npm run smoke:content-claims"
+    },
+    {
+      "name": "governed report PDF route",
+      "pass": true,
+      "evidence": "/api/reports/pdf"
+    },
+    {
+      "name": "report attestation signing",
+      "pass": true,
+      "evidence": "reportAttestation.ts"
+    },
+    {
+      "name": "all report types inventoried",
+      "pass": true,
+      "evidence": "6 report types"
+    },
+    {
+      "name": "qualified reviewer required",
+      "pass": true,
+      "evidence": "all report types"
+    },
+    {
+      "name": "legal compliance review required",
+      "pass": true,
+      "evidence": "all report types"
+    },
+    {
+      "name": "citation and provenance required",
+      "pass": true,
+      "evidence": "all report types"
+    },
+    {
+      "name": "classification and redaction required",
+      "pass": true,
+      "evidence": "all report types"
+    },
+    {
+      "name": "replay version and signature required",
+      "pass": true,
+      "evidence": "all report types"
+    },
+    {
+      "name": "claims and publication authority required",
+      "pass": true,
+      "evidence": "all report types"
+    },
+    {
+      "name": "human approval preserved",
+      "pass": true,
+      "evidence": "{\"blockerId\":\"P5-B06\",\"ownerRole\":\"QUALIFIED_REPORT_AUTHORITY\",\"legalReviewerRole\":\"LEGAL_COMPLIANCE_AUTHORITY\",\"approvalRequired\":true,\"approvalGranted\":false,\"publicationApproved\":false,\"publicVerificationPermitted\":false,\"officialReliancePermitted\":false,\"productionAuthorized\":false}"
+    },
+    {
+      "name": "official publication and reliance remain blocked",
+      "pass": true,
+      "evidence": "fail-closed"
+    }
+  ],
+  "generatedAtUtc": "2026-07-22T03:33:48.607Z"
+}

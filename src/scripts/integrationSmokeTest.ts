@@ -32,7 +32,9 @@ function assert(condition: boolean, message: string): void {
 }
 
 function routeFileExists(route: string): boolean {
-  return fs.existsSync(path.join(repoRoot, `src/app${route}/page.tsx`));
+  return ["src/app", "src/app/(public)"].some((appRoot) =>
+    fs.existsSync(path.join(repoRoot, `${appRoot}${route}/page.tsx`))
+  );
 }
 
 function main() {

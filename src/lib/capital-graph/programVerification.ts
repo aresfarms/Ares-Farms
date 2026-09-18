@@ -31,6 +31,8 @@ export interface VerifiedPlaceFacts {
   propertyId?: string | null; // for the ledger only — never rendered
   ozTractId?: string | null; // 11-digit GEOID when the tract IS designated
   ozAsOf?: string | null;
+  nmtcTractId?: string | null;
+  nmtcAsOf?: string | null;
   hubzone?: {
     hubzoneType: string;
     geoid: string;
@@ -39,6 +41,10 @@ export interface VerifiedPlaceFacts {
     isCurrent: boolean;
   } | null;
   hubzoneAsOf?: string | null;
+  historic?: {
+    historicName: string | null;
+  } | null;
+  historicAsOf?: string | null;
 }
 
 export interface VerifiedProgramMatch {
@@ -49,11 +55,40 @@ export interface VerifiedProgramMatch {
   verifiedStatement: string;
   /** The rule basis + zone/tract id + as-of (checkable). */
   basis: string;
+  /**
+   * Plain-language "what you can do with this" (founder direction 2026-07-18:
+   * a designation without its use is noise — say why the reader cares). Built
+   * HERE once so every surface says the same thing; renders after the locked
+   * statement, never replaces it. Framed as what the PLACE enables — the
+   * person-side caveat still applies.
+   */
+  whyItMatters: string;
   /** The locked person-side caveat — render verbatim with every match. */
   personSideCaveat: string;
   source_citation: string;
   asOf: string;
 }
+
+/** Per-program plain-language use lines (single source for every surface). */
+const WHY_IT_MATTERS: Record<string, string> = {
+  "fed-oz":
+    "What this gives you: investors with capital gains can defer and reduce tax by funding a project here " +
+    "through a Qualified Opportunity Fund — worth knowing if you, or a partner backing you, are reinvesting " +
+    "gains, and a signal this tract is targeted for investment.",
+  "fed-hubzone":
+    "What this gives you: a small business based at this address can gain a real edge in winning federal " +
+    "contracts — SBA HUBZone set-asides and price preferences — provided the business also meets SBA's " +
+    "ownership and employee-residency rules. If you'll run a business from here and ever sell to the " +
+    "government, this designation is money.",
+  "fed-nmtc":
+    "What this gives you: projects in this tract can access below-market, flexible financing through " +
+    "community-development lenders using New Markets Tax Credits — typically for commercial, community, or " +
+    "mixed-use projects that need patient capital.",
+  "fed-historic":
+    "What this gives you: rehabilitating a certified historic building here can qualify for the 20% federal " +
+    "historic rehabilitation tax credit (many states stack their own credit on top) — with preservation " +
+    "review of the work as the trade-off.",
+};
 
 export const PERSON_SIDE_CAVEAT =
   "Whether you personally qualify also depends on your circumstances and the agency's " +
@@ -91,6 +126,7 @@ export function verifyPropertyPrograms(facts: VerifiedPlaceFacts, now: Date = ne
           administering_body: entry.administering_body,
           verifiedStatement: lockedStatement(`Opportunity Zone tract #${tract}`, asOf),
           basis: `census tract ${tract} is on the designated OZ list (2018 designation, locked through 2028) · as of ${asOf}`,
+          whyItMatters: WHY_IT_MATTERS["fed-oz"],
           personSideCaveat: PERSON_SIDE_CAVEAT,
           source_citation: entry.source_citation,
           asOf,
@@ -116,6 +152,7 @@ export function verifyPropertyPrograms(facts: VerifiedPlaceFacts, now: Date = ne
             `location is in a designated HUBZone: ${hz.hubzoneType}, area ${hz.geoid}, effective ${hz.effective}` +
             (hz.expiration ? `, designation expires ${hz.expiration} (time-limited)` : "") +
             ` · as of ${asOf} · verify current designation with SBA`,
+          whyItMatters: WHY_IT_MATTERS["fed-hubzone"],
           personSideCaveat: PERSON_SIDE_CAVEAT,
           source_citation: entry.source_citation,
           asOf,
@@ -126,6 +163,57 @@ export function verifyPropertyPrograms(facts: VerifiedPlaceFacts, now: Date = ne
           program_id: entry.program_id,
           result: hz && !hz.isCurrent ? "omitted:designation-expired" : "omitted:no-positive-determination",
         });
+      }
+      continue;
+    }
+
+    if (entry.program_id === "fed-nmtc") {
+      const tract = (facts.nmtcTractId ?? "").trim();
+      if (/^\d{11}$/.test(tract)) {
+        const asOf = facts.nmtcAsOf ?? now.toISOString().slice(0, 10);
+        out.push({
+          program_id: entry.program_id,
+          name: entry.name,
+          administering_body: entry.administering_body,
+          verifiedStatement: lockedStatement(`NMTC-qualified low-income community tract #${tract}`, asOf),
+          basis: `census tract ${tract} is qualified in the current NMTC low-income community tract dataset · as of ${asOf}`,
+          whyItMatters: WHY_IT_MATTERS["fed-nmtc"],
+          personSideCaveat: PERSON_SIDE_CAVEAT,
+          source_citation: entry.source_citation,
+          asOf,
+        });
+        checked.push({ program_id: entry.program_id, result: `verified:tract=${tract}` });
+      } else {
+        checked.push({ program_id: entry.program_id, result: "omitted:no-positive-determination" });
+      }
+      continue;
+    }
+
+    if (entry.program_id === "fed-historic") {
+      const historic = facts.historic;
+      if (historic) {
+        const asOf = facts.historicAsOf ?? now.toISOString().slice(0, 10);
+        out.push({
+          program_id: entry.program_id,
+          name: entry.name,
+          administering_body: entry.administering_body,
+          verifiedStatement: lockedStatement(
+            historic.historicName
+              ? `National Register area — ${historic.historicName}`
+              : "National Register listed area",
+            asOf,
+          ),
+          basis: historic.historicName
+            ? `location falls within National Register listed area "${historic.historicName}" · as of ${asOf}`
+            : `location falls within a National Register listed area · as of ${asOf}`,
+          whyItMatters: WHY_IT_MATTERS["fed-historic"],
+          personSideCaveat: PERSON_SIDE_CAVEAT,
+          source_citation: entry.source_citation,
+          asOf,
+        });
+        checked.push({ program_id: entry.program_id, result: "verified:national-register-area" });
+      } else {
+        checked.push({ program_id: entry.program_id, result: "omitted:no-positive-determination" });
       }
       continue;
     }

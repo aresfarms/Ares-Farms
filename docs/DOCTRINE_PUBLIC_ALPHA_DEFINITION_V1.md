@@ -1,6 +1,6 @@
 # Furlong — Public Alpha Definition
 
-**Status:** PROPOSED — requires sign-off by named governance authority before any external admission.
+**Status:** Proposed and Signed by Caitlin L. Hudson on August 11, 2026 @ 10:48 PM EST — Caitlin L. Hudson, PhD, PE (named governance authority) signs both Alpha entry (start) and Alpha exit (end). §9 decisions resolved below.
 **Checkpoint context:** `BR-2026-06-01-M41`, review-bound, live-fetch = 0.
 **Purpose:** the single authoritative statement of what Public Alpha *is* — so "required vs optional" module questions become answerable and the Module 42 self-report gate has criteria to enforce.
 
@@ -89,12 +89,12 @@ Alpha is **complete** (not "go-live") when:
 
 ---
 
-## 9. Open decisions for sign-off
+## 9. Decisions (RESOLVED — signed by Caitlin L. Hudson, PhD, PE · August 11, 2026 @ 10:48 PM EST)
 
-1. **Sustained-window duration** for exit criterion 2 (proposed: 30 days).
-2. **Cohort size** — how many borrowers / how many partner lenders.
-3. Whether **Module 21 (environmental-compliance)** is a featured Alpha workflow or deferred.
-4. Whether **Module 10 (connectors)** must be live (only if Alpha integrates a real lender system vs. simulated review).
-5. Named **governance authority** who signs Alpha entry and exit.
+1. **Sustained-window duration** (exit criterion 2): **≤ 30 days.** Thirty days is the ceiling; Alpha may exit sooner if the exit criteria hold.
+2. **Cohort size**: **no more than 15 testers total** (borrowers + partner lenders combined).
+3. **Environmental-compliance (Module 21)**: **FEATURED** — decision accepted by Caitlin L. Hudson, PhD, PE · 8/11/2026 @ 10:54 PM EST; exercised during Alpha, not deferred. *Governed enablement preconditions (not yet met):* (a) the ceremony doctrine permits "featured" **only once a qualified independent environmental reviewer is assigned** — the `ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER` role is currently `HELD_FOR_ALPHA` and must be assigned to an independent reviewer (independent of the deciding founder); (b) the runtime decision node `module_21_environmental_compliance_featured_or_deferred` is resolved through the 2-of-3 founder sign-off, not in code. Until both hold, the workflow stays gated.
+4. **Live lender connector (Module 10)**: **NOT live for Alpha** — simulated / non-binding review first. One tester is a real lender (the largest USDA/SBA lender in the country), participating strictly in the **non-binding review capacity** already permitted by §2; no live credit decision is relied upon.
+5. **Named governance authority**: **Caitlin L. Hudson, PhD, PE** — signs both Alpha entry (start) and Alpha exit (end).
 
-> Once §9 is decided, this becomes the canonical Alpha profile the build and the self-report enforce against.
+> These decisions are the canonical Alpha profile the build and the self-report enforce against. **Enforcement note:** this document records the authority's signed decision; the runtime sign-off gate (`verify:public-alpha-signoff-ceremony-packet`, currently `PENDING_SIGNOFF`) and the enforced capability/decision set (`smoke:public-alpha-profile`) are separate governed mechanisms that must be updated to match — in particular decision #3 requires resolving the Module 21 decision node to "featured" and confirming its gates before Alpha admission.

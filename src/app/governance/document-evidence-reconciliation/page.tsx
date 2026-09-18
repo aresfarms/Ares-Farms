@@ -10,7 +10,7 @@ import {
   DocumentReconciliationFinding,
   DocumentReconciliationSignal,
   composeDocumentEvidenceReconciliation,
-} from "@/lib/evidence/documentEvidenceReconciliationRuntime";
+} from "@/lib/platform/authorities/evidence";
 
 type ApiResponse = {
   ok: boolean;

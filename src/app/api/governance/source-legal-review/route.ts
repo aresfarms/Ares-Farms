@@ -5,6 +5,7 @@ import {
   evaluateSourceLegalReviewGate,
 } from "@/lib/governance/sourceLegalReviewGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { latestSourceReviewEvidence, recordSourceReviewEvidence, sourceReviewEvidenceFor } from "@/lib/governance/sourceReviewEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -136,19 +137,12 @@ async function handleSourceLegalReview(req: NextRequest, operation: string) {
     });
     const result = evaluateSourceLegalReviewGate({ sourceId });
     const reviewHold =
-      req.method === "POST"
-        ? {
-            reviewHoldId: `source-legal-review-hold-${Date.now()}`,
-            sourceId: sourceId ?? null,
-            reviewStatus: "LEGAL_REVIEW_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            legalAdviceProvided: false,
-            liveFetchPerformed: false,
-            activationBlocked: true,
-            humanReviewRequired: true,
-            replayRef: traceId,
-          }
-        : null;
+      req.method === "POST" && sourceId && actorId
+        ? recordSourceReviewEvidence({ kind: "LEGAL_REVIEW_HOLD", sourceId, actorId, reviewNote: body.reviewNote, replayRef: traceId })
+        : sourceId
+          ? latestSourceReviewEvidence(sourceId, "LEGAL_REVIEW_HOLD")
+          : null;
+    const reviewHistory = sourceReviewEvidenceFor(sourceId, "LEGAL_REVIEW_HOLD");
     const classifiedOutput = classifyRecord(
       {
         count: result.sourceLegalReviews.length,
@@ -157,6 +151,7 @@ async function handleSourceLegalReview(req: NextRequest, operation: string) {
         disclosures: result.disclosures,
         legalReviewPosture: result.legalReviewPosture,
         reviewHold,
+        reviewHistory,
         activationBlocked: true,
         liveFetchPerformed: false,
         legalAdviceProvided: false,
@@ -219,6 +214,7 @@ async function handleSourceLegalReview(req: NextRequest, operation: string) {
       disclosures: classifiedOutput.disclosures,
       legalReviewPosture: classifiedOutput.legalReviewPosture,
       reviewHold: classifiedOutput.reviewHold,
+      reviewHistory: classifiedOutput.reviewHistory,
       activationBlocked: classifiedOutput.activationBlocked,
       liveFetchPerformed: classifiedOutput.liveFetchPerformed,
       legalAdviceProvided: classifiedOutput.legalAdviceProvided,

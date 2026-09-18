@@ -31,11 +31,11 @@ Prior to Production Certification:
 - Results shall be separately attested.
 
 ### Attribution
-- **Approved by:** Founder Governance Ceremony / Majority Vote (2 of 3)
+- **Approved by:** Owner-controlled governance transition; independent review remains required before production certification
 - **Effective date:** _[recorded at ceremony]_
 - **Exception Owner:** Governance Authority
-- **Review owners (independent of the builder):** Stuart Fraass, Frances Fraass
-- **Review cadence:** every governance ceremony and prior to Production Certification
+- **Review owner:** Independent Governance Reviewer (appointment pending)
+- **Review cadence:** at each material governance review and prior to Production Certification
 
 ### Time Bound
 Effective at Public Alpha entry. **Remains active until the first independent attestation by an appointed Independent Verification Authority is recorded** (not merely IVA appointment), or Production Certification, whichever is earlier.

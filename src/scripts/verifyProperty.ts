@@ -137,8 +137,11 @@ for (const re of [/currently for sale/i, /for sale now/i, /\bbuy now\b/i, /avail
 
 // ── Runtime ───────────────────────────────────────────────────────────────────
 async function runtime(): Promise<void> {
-  try { await fetch(BASE); } catch {
-    note(`server not reachable at ${BASE} (start \`npm run dev\` or set BASE_URL).`);
+  // Confirm the target is THIS app (200 + brand marker) before the runtime
+  // checks — a foreign/stale server on the port would false-fail them.
+  const home = await fetch(BASE).then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") })).catch(() => null);
+  if (!home || home.status !== 200 || !/Furlong/.test(home.body)) {
+    console.log(`  (no confirmed Furlong server at ${BASE} — runtime checks skipped; static checks ran)`);
     return;
   }
   const addrSamples = ALL

@@ -47,8 +47,26 @@ function main() {
     "Public surface gateway routes should be public-safe gateway routes."
   );
   assert(
+    apiSecurityPublicReason("/api/internal/source-refresh") ===
+      "internal-source-refresh-iam-gated",
+    "Source refresh must be proxy-exempt only because the Cloud Run IAM wall and route-level token gate still apply."
+  );
+  assert(
     apiSecurityPublicReason("/api/apply") === null,
     "Protected application route should not be public."
+  );
+  assert(
+    apiSecurityPublicReason("/api/financing/intake") === "public-surface-gateway",
+    "Customer financing intake must stay public — customers never have a session (staging regression 2026-08-05)."
+  );
+  assert(
+    apiSecurityPublicReason("/api/service-requests/status") ===
+      "public-surface-gateway",
+    "Customer status lookup must stay public — it is minimum-disclosure (ref + email) by design."
+  );
+  assert(
+    apiSecurityPublicReason("/api/lender/deal-desk") === null,
+    "The lender deal desk must NEVER be public — session-derived authority only."
   );
   assert(
     apiAuthEnforcementRequired({

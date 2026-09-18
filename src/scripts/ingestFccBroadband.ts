@@ -18,12 +18,11 @@
  * Provider CLAIMS, aggregated — never a guarantee of service at a given home.
  */
 
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import * as readline from "node:readline";
-import { createReadStream } from "node:fs";
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "src/lib/property/countyBroadbandGenerated.ts");
@@ -41,28 +40,43 @@ async function listLatestAvailability(): Promise<{ asOf: string; files: any[] }>
   return { asOf, files };
 }
 
-function downloadUnzipCsv(fileId: number): Promise<string> {
+type DownloadedArchive = { dir: string; zipPath: string; csvEntry: string };
+
+async function downloadValidatedArchive(fileId: number): Promise<DownloadedArchive> {
+  if (!Number.isInteger(fileId) || fileId <= 0) throw new Error("FCC file identifier is invalid.");
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-bdc-"));
+  fs.chmodSync(dir, 0o700);
   const zipPath = path.join(dir, `availability-${fileId}.zip`);
-  const extractDir = path.join(dir, "extracted");
-  return fetch(`${API}/downloads/downloadFile/availability/${fileId}`, { headers: headers(), signal: AbortSignal.timeout(120000) })
-    .then((r) => r.arrayBuffer())
-    .then((buf) => {
-      fs.writeFileSync(zipPath, Buffer.from(buf));
-      fs.mkdirSync(extractDir, { recursive: true, mode: 0o700 });
-      return new Promise<string>((resolve, reject) => {
-        execFile("unzip", ["-o", zipPath, "-d", extractDir], (err) => {
-          fs.unlinkSync(zipPath);
-          if (err) return reject(err);
-          const csv = fs.readdirSync(extractDir).find((f) => f.endsWith(".csv"));
-          resolve(csv ? path.join(extractDir, csv) : "");
-        });
-      });
+  const response = await fetch(`${API}/downloads/downloadFile/availability/${fileId}`, { headers: headers(), signal: AbortSignal.timeout(120000) });
+  if (!response.ok) throw new Error(`FCC download failed with HTTP ${response.status}.`);
+  const declaredLength = Number(response.headers.get("content-length") ?? "0");
+  if (Number.isFinite(declaredLength) && declaredLength > 1_000_000_000) throw new Error("FCC archive exceeds the 1 GB ingest bound.");
+  const archive = Buffer.from(await response.arrayBuffer());
+  if (archive.byteLength < 4 || archive.byteLength > 1_000_000_000 || archive[0] !== 0x50 || archive[1] !== 0x4b) {
+    throw new Error("FCC response is not a bounded ZIP archive.");
+  }
+  fs.writeFileSync(zipPath, archive, { mode: 0o600 });
+
+  const csvEntry = await new Promise<string>((resolve, reject) => {
+    execFile("unzip", ["-Z1", zipPath], { maxBuffer: 2 * 1024 * 1024 }, (err, stdout) => {
+      if (err) return reject(err);
+      const entries = stdout.split(/\r?\n/).map((value) => value.trim()).filter(Boolean);
+      const csv = entries.filter((name) => name.toLowerCase().endsWith(".csv"));
+      if (csv.length !== 1) return reject(new Error("FCC archive must contain exactly one CSV member."));
+      const name = csv[0];
+      if (name.length > 180 || name.includes("/") || name.includes("\\") || name.includes("..")) {
+        return reject(new Error("FCC archive contains an unsafe member name."));
+      }
+      resolve(name);
     });
+  });
+  return { dir, zipPath, csvEntry };
 }
 
-async function aggregateCounty(csvPath: string, counties: Map<string, CountyAgg>): Promise<void> {
-  const rl = readline.createInterface({ input: createReadStream(csvPath), crlfDelay: Infinity });
+async function aggregateCounty(archive: DownloadedArchive, counties: Map<string, CountyAgg>): Promise<void> {
+  const child = spawn("unzip", ["-p", archive.zipPath, archive.csvEntry], { stdio: ["ignore", "pipe", "pipe"] });
+  if (!child.stdout) throw new Error("FCC archive stream could not be opened.");
+  const rl = readline.createInterface({ input: child.stdout, crlfDelay: Infinity });
   let header: string[] | null = null;
   let iBlock = 1, iAny = 3, iWired = 4;
   for await (const line of rl) {
@@ -82,7 +96,9 @@ async function aggregateCounty(csvPath: string, counties: Map<string, CountyAgg>
     if (c[iWired] === "1") agg.wired += 1;
     counties.set(fips, agg);
   }
-  fs.rmSync(path.dirname(path.dirname(csvPath)), { recursive: true, force: true });
+  const exitCode = await new Promise<number | null>((resolve) => child.once("close", resolve));
+  fs.rmSync(archive.dir, { recursive: true, force: true });
+  if (exitCode !== 0) throw new Error(`FCC archive extraction failed with exit code ${exitCode ?? "unknown"}.`);
 }
 
 async function main(): Promise<void> {
@@ -101,8 +117,8 @@ async function main(): Promise<void> {
   let done = 0;
   for (const f of stateFiles) {
     try {
-      const csv = await downloadUnzipCsv(f.file_id);
-      if (csv) await aggregateCounty(csv, counties);
+      const archive = await downloadValidatedArchive(Number(f.file_id));
+      await aggregateCounty(archive, counties);
     } catch (error) {
       console.error(`  ${f.state_name}: ${error instanceof Error ? error.message : "failed"}`);
     }
@@ -153,7 +169,7 @@ export const COUNTY_BROADBAND: Record<string, CountyBroadband> = {
 ${entries.join("\n")}
 };
 `,
-    "utf8"
+    { encoding: "utf8", mode: 0o600 }
   );
   console.log(`  ${entries.length} counties (BDC ${asOf}) → ${path.relative(ROOT, OUT)}\n`);
 }

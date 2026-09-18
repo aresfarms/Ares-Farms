@@ -28,7 +28,7 @@
 # -----------------------------------------------------------------------------
 # Stage 1 — deps: install the exact locked dependency tree once.
 # -----------------------------------------------------------------------------
-FROM node:24.15.0-bookworm-slim AS deps
+FROM node:26.8.2-bookworm-slim AS deps
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 # Only the manifests, so this layer caches on lockfile changes alone.
@@ -41,7 +41,7 @@ RUN npm ci --no-audit --no-fund
 # The build runs OFFLINE with NO secrets and NO database. `.env*` is excluded
 # from the context (.dockerignore), so `.next/standalone/.env` is never created.
 # -----------------------------------------------------------------------------
-FROM node:24.15.0-bookworm-slim AS builder
+FROM node:26.8.2-bookworm-slim AS builder
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -76,7 +76,10 @@ RUN mkdir -p /migrator \
       --outfile=/migrator/runSourceRefresh.cjs \
  && npx --no-install esbuild src/scripts/runPropertyComparisonWorker.ts \
       --bundle --platform=node --target=node24 --format=cjs \
-      --outfile=/migrator/runPropertyComparisonWorker.cjs
+      --outfile=/migrator/runPropertyComparisonWorker.cjs \
+ && npx --no-install esbuild src/scripts/runPropertyComparisonRankedAcceptance.ts \
+      --bundle --platform=node --target=node24 --format=cjs \
+      --outfile=/migrator/runPropertyComparisonRankedAcceptance.cjs
 
 # -----------------------------------------------------------------------------
 # Stage 3 — migrator: the furlong-db-migrate Job image (STAGING-DEPLOY P2.2).

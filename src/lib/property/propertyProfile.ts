@@ -113,7 +113,7 @@ export function classifyPropertyProfile(args: {
       ? "mobile-home-park"
       : /hotel|motel|inn\b|lodge|lodging|bed and breakfast|b&b|resort|hospitality|short[- ]term rental/.test(text)
         ? "hospitality"
-        : /commercial|retail|industrial|warehouse|restaurant|mixed[- ]use|office (?:building|space|unit|suite)|(?:self[- ]|storage )storage|business (?:park|center)/.test(text)
+        : /commercial|retail|industrial|warehouse|restaurant|casino|gaming|mixed[- ]use|office (?:building|space|unit|suite)|(?:self[- ]|storage )storage|business (?:park|center)/.test(text)
           ? "commercial"
           : /\bfarm\b|ranch|agric|crop|pasture|orchard|vineyard|homestead|dairy|equestrian|poultry|livestock/.test(text)
             ? "farm"

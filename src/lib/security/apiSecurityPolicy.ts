@@ -82,6 +82,21 @@ export const PUBLIC_API_ROUTES = new Set([
   "/api/public/navigator/converse",
   "/api/public/bound-edition-interest",
 
+  // -- Anonymous property decision workflows. Each route has its own input,
+  //    rate, evidence, and/or recovery-token guards; publicity here only
+  //    removes the session perimeter so the public customer journey can call it.
+  "/api/public/property-comparisons",
+  "/api/public/property-operating-model",
+
+  // -- Public report commerce. Checkout is additionally gated by product
+  //    release switches, capacity, governed price review, agreement acceptance,
+  //    and Stripe configuration. Order/report access requires the order-bound
+  //    recovery token or owning session; cancel keeps its own refund controls.
+  "/api/public/purchases",
+  "/api/public/purchases/[orderId]/cancel",
+  "/api/public/purchases/[orderId]/report",
+  "/api/public/purchases/checkout",
+
   // -- The customer's own file. Authorization is a signed token or the
   //    reference+email pair; a customer never has an account. --------------
   "/api/public/secure-upload",
@@ -91,6 +106,11 @@ export const PUBLIC_API_ROUTES = new Set([
   "/api/public/my-data",
   "/api/public/chain-of-custody",
   "/api/public/anon-token",
+
+  // -- Customer-requested professional scope intake. The route validates
+  //    contact/scope fields, requires explicit consent, applies restricted
+  //    classification/runtime governance, and captures no payment.
+  "/api/public/professional-services",
 
   // -- Counterparty intake. Opens no data; it REQUESTS access. -------------
   "/api/public/professional-verification-request",

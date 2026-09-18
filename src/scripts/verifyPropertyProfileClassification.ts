@@ -6,6 +6,7 @@ const cases = [
   { name: "twenty acre agricultural default", input: { propertyType: "residence with barn", acreageText: "20 acres" }, expected: "farm" },
   { name: "large agricultural parcel", input: { propertyType: "country property", acreageText: "500 acres" }, expected: "farm" },
   { name: "warehouse overrides acreage", input: { propertyType: "industrial warehouse", acreageText: "40 acres" }, expected: "commercial" },
+  { name: "casino is commercial", input: { propertyType: "Casino", acreageText: null }, expected: "commercial" },
   { name: "hotel overrides acreage", input: { propertyType: "hotel and conference center", acreageText: "35 acres" }, expected: "hospitality" },
   { name: "vacant land remains land", input: { propertyType: "vacant unimproved land", acreageText: "80 acres" }, expected: "land" },
   { name: "mobile home park is specific", input: { propertyType: "manufactured housing community", acreageText: "30 acres" }, expected: "mobile-home-park" },

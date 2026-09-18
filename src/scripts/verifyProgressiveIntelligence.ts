@@ -7,6 +7,8 @@ const panel = fs.readFileSync(path.join(root, "src/components/property/Progressi
 const chassis = fs.readFileSync(path.join(root, "src/components/property/lanes/GovernedLaneChassis.tsx"), "utf8");
 const answer = fs.readFileSync(path.join(root, "src/components/property/FurlongAnswerCard.tsx"), "utf8");
 const comparison = fs.readFileSync(path.join(root, "src/components/property/PropertyComparison.tsx"), "utf8");
+const collection = fs.readFileSync(path.join(root, "src/components/intelligence/MyFurlongCases.tsx"), "utf8");
+const livingCase = fs.readFileSync(path.join(root, "src/components/intelligence/LivingFurlongCasePanel.tsx"), "utf8");
 
 const failures: string[] = [];
 const requiredDoctrine = [
@@ -34,6 +36,10 @@ if (!answer.includes("Add to My Intelligence")) failures.push("Durable collectio
 if (!answer.includes("Added to My Intelligence privately")) failures.push("Private collection receipt is missing.");
 if (!comparison.includes("Build your shortlist from evidence")) failures.push("Comparison surface is not framed as the shortlist loop.");
 if (!comparison.includes("missing evidence is not treated as zero")) failures.push("Comparison evidence-safety copy was lost.");
+if (!collection.includes("My Intelligence") || !collection.includes("intelligence collection")) failures.push("Durable saved work is not framed as a growing intelligence collection.");
+if (!livingCase.includes('data-testid="real-world-outcome-loop"')) failures.push("Saved investigations do not expose the real-world outcome loop.");
+if (!livingCase.includes('"record-outcome"')) failures.push("Real-world outcome UI is not bound to the governed outcome API.");
+if (!livingCase.includes("pending verification")) failures.push("Customer-reported outcomes are not clearly separated from verified outcomes.");
 if (panel.includes("% complete") || panel.includes("completionPercentage")) failures.push("Fabricated completion scoring is prohibited.");
 
 if (failures.length) {
@@ -49,4 +55,6 @@ console.log(JSON.stringify({
   fabricatedCompletionScore: false,
   durableCollectionPath: true,
   evidenceSafeComparison: true,
+  growingIntelligenceCollection: true,
+  realWorldOutcomeLoop: true,
 }, null, 2));

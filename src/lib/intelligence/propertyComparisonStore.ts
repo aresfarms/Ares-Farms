@@ -208,6 +208,7 @@ export async function loadPropertyComparison(input: {
 export async function claimQueuedPropertyComparisonItems(input: {
   limit?: number;
   traceId: string;
+  comparisonId?: string;
 }) {
   const limit = Math.min(Math.max(Math.trunc(input.limit ?? 5), 1), 20);
   const candidates = await db.select({
@@ -216,7 +217,12 @@ export async function claimQueuedPropertyComparisonItems(input: {
     submittedAddress: furlongPropertyComparisonItems.submittedAddress,
     ordinal: furlongPropertyComparisonItems.ordinal,
   }).from(furlongPropertyComparisonItems)
-    .where(eq(furlongPropertyComparisonItems.status, "QUEUED"))
+    .where(and(
+      eq(furlongPropertyComparisonItems.status, "QUEUED"),
+      input.comparisonId
+        ? eq(furlongPropertyComparisonItems.comparisonId, input.comparisonId)
+        : undefined,
+    ))
     .orderBy(asc(furlongPropertyComparisonItems.createdAt))
     .limit(limit * 3);
 
@@ -308,6 +314,7 @@ export async function recordPropertyComparisonVerification(input: {
 export async function claimVerifiedPropertyComparisonItems(input: {
   limit?: number;
   traceId: string;
+  comparisonId?: string;
 }) {
   const limit = Math.min(Math.max(Math.trunc(input.limit ?? 5), 1), 20);
   const candidates = await db.select({
@@ -318,7 +325,12 @@ export async function claimVerifiedPropertyComparisonItems(input: {
     propertyId: furlongPropertyComparisonItems.propertyId,
     resultSnapshot: furlongPropertyComparisonItems.resultSnapshot,
   }).from(furlongPropertyComparisonItems)
-    .where(eq(furlongPropertyComparisonItems.status, "VERIFIED"))
+    .where(and(
+      eq(furlongPropertyComparisonItems.status, "VERIFIED"),
+      input.comparisonId
+        ? eq(furlongPropertyComparisonItems.comparisonId, input.comparisonId)
+        : undefined,
+    ))
     .orderBy(asc(furlongPropertyComparisonItems.createdAt))
     .limit(limit * 3);
   const claimed = [];

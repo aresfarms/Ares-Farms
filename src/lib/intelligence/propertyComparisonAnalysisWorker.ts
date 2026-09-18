@@ -20,9 +20,14 @@ const defaultDependencies: PropertyComparisonAnalysisWorkerDependencies = {
 export async function processPropertyComparisonAnalysisBatch(input: {
   limit?: number;
   traceId: string;
+  comparisonId?: string;
 }, dependencies: PropertyComparisonAnalysisWorkerDependencies = defaultDependencies) {
   const limit = Math.min(Math.max(Math.trunc(input.limit ?? 5), 1), 10);
-  const claimed = await dependencies.claim({ limit, traceId: input.traceId });
+  const claimed = await dependencies.claim({
+    limit,
+    traceId: input.traceId,
+    comparisonId: input.comparisonId,
+  });
   const results: Array<{
     itemId: string;
     comparisonId: string;

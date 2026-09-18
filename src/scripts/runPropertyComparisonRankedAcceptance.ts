@@ -1,5 +1,9 @@
 import { createHash, randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
+import { and, eq } from "drizzle-orm";
+
+import { furlongPropertyComparisonItems, furlongPropertyComparisons } from "@/db/schema";
+import { db } from "@/lib/db";
 
 import {
   ECONOMIC_EVIDENCE_PACKAGE_VERSION,
@@ -12,21 +16,20 @@ import {
 } from "@/lib/intelligence/economicEvidencePackage";
 import type { ExpenseCategory } from "@/lib/intelligence/enterpriseProjection";
 import { processPropertyComparisonAnalysisBatch } from "@/lib/intelligence/propertyComparisonAnalysisWorker";
+import { processPropertyComparisonVerificationBatch } from "@/lib/intelligence/propertyComparisonVerificationWorker";
 import {
-  claimQueuedPropertyComparisonItems,
   createPropertyComparison,
   loadPropertyComparison,
-  recordPropertyComparisonVerification,
 } from "@/lib/intelligence/propertyComparisonStore";
 import { parsePropertyComparisonIntake } from "@/lib/intelligence/propertyComparisonIntake";
 
-const GENERATED_AT = "2026-09-18T04:30:00.000Z";
-const SOURCE_AS_OF = "2026-09-17T00:00:00.000Z";
+const GENERATED_AT = new Date().toISOString();
+const SOURCE_AS_OF = GENERATED_AT;
 const FIXTURE_ACTOR = "system:staging-ranked-comparison-acceptance";
 const FIXTURE_ADDRESSES = [
-  "100 Ranked Fixture Ave, Testville, MD 21601",
-  "200 Ranked Fixture Ave, Testville, MD 21601",
-  "300 Ranked Fixture Ave, Testville, MD 21601",
+  "84 W Dodridge St, Columbus, OH 43202",
+  "1131 N Dupont Hwy, Dover, DE 19901",
+  "3835 Seippes Rd, Federalsburg, MD 21632",
 ] as const;
 const BASE_REVENUE = new Map<string, number>([
   [FIXTURE_ADDRESSES[0], 760_000],
@@ -266,42 +269,83 @@ async function main(): Promise<void> {
     ownerActorId: FIXTURE_ACTOR,
     traceId,
   });
-  const claimed = await claimQueuedPropertyComparisonItems({ limit: 3, traceId });
-  const fixtureClaims = claimed.filter((item) => item.comparisonId === created.comparisonId);
-  assert.equal(fixtureClaims.length, 3, "Acceptance fixture did not claim all three comparison properties.");
+  const verification = await processPropertyComparisonVerificationBatch({
+    limit: 3,
+    traceId,
+    comparisonId: created.comparisonId,
+  });
+  assert.equal(verification.processed, 3, JSON.stringify(verification.results));
+  assert.equal(
+    verification.results.filter((item) => item.status === "VERIFIED").length,
+    3,
+    JSON.stringify(verification.results),
+  );
 
-  for (const item of fixtureClaims) {
-    const propertyId = `staging-fixture:${item.id}`;
-    const packages = packagesFor(propertyId, item.submittedAddress, traceId);
-    const recorded = await recordPropertyComparisonVerification({
-      itemId: item.id,
-      comparisonId: item.comparisonId,
-      verified: true,
-      normalizedAddress: item.submittedAddress,
-      propertyId,
-      evidenceRefs: packages.flatMap((pkg) => pkg.sources.map((source) => source.replayRef)),
-      resultSnapshot: {
-        verificationStatus: "verified-staging-fixture",
-        syntheticFixture: true,
-        rankingEligible: false,
-        nextRequiredStage: "FULL_PROPERTY_ANALYSIS",
-        economicEvidencePackages: packages,
-      },
-      traceId,
-    });
-    assert.ok(recorded, `Verification transition failed for ${item.submittedAddress}`);
-  }
-
-  const analysis = await processPropertyComparisonAnalysisBatch({ limit: 3, traceId });
-  assert.equal(analysis.completed, 3, JSON.stringify(analysis.results));
-  assert.equal(analysis.needsEvidence, 0, JSON.stringify(analysis.results));
-
-  const loaded = await loadPropertyComparison({
+  let loaded = await loadPropertyComparison({
     comparisonId: created.comparisonId,
     ownerActorId: FIXTURE_ACTOR,
     accessToken: created.accessToken,
   });
-  assert.ok(loaded, "Acceptance comparison could not be reloaded.");
+  assert.ok(loaded, "Acceptance comparison could not be reloaded after verification.");
+
+  const parentMetadata = loaded.comparison.metadata && typeof loaded.comparison.metadata === "object"
+    ? loaded.comparison.metadata as Record<string, unknown>
+    : {};
+  await db.update(furlongPropertyComparisons).set({
+    metadata: {
+      ...parentMetadata,
+      syntheticAcceptance: true,
+      realAddressVerification: true,
+      syntheticEconomicsNeverCustomerEvidence: true,
+      acceptanceVersion: "property-comparison-ranked-acceptance-v2",
+    },
+  }).where(eq(furlongPropertyComparisons.id, created.comparisonId));
+
+  for (const item of loaded.items) {
+    assert.equal(item.status, "VERIFIED", `Acceptance item did not verify: ${item.submittedAddress}`);
+    assert.ok(item.propertyId, `Acceptance item lacks property ID: ${item.submittedAddress}`);
+    const address = item.normalizedAddress ?? item.submittedAddress;
+    const packages = packagesFor(item.propertyId!, address, traceId);
+    const currentSnapshot = item.resultSnapshot && typeof item.resultSnapshot === "object" && !Array.isArray(item.resultSnapshot)
+      ? item.resultSnapshot as Record<string, unknown>
+      : {};
+    const [updated] = await db.update(furlongPropertyComparisonItems).set({
+      resultSnapshot: {
+        ...currentSnapshot,
+        economicEvidencePackages: packages,
+        syntheticAcceptance: true,
+        syntheticEconomicsNeverCustomerEvidence: true,
+      },
+      metadata: {
+        rankingEligible: false,
+        syntheticAcceptance: true,
+        reason: "Real address verification complete; synthetic staging economics attached for ranking acceptance only.",
+      },
+      updatedAt: new Date(),
+      traceId,
+      replayRef: traceId,
+    }).where(and(
+      eq(furlongPropertyComparisonItems.id, item.id),
+      eq(furlongPropertyComparisonItems.comparisonId, created.comparisonId),
+      eq(furlongPropertyComparisonItems.status, "VERIFIED"),
+    )).returning({ id: furlongPropertyComparisonItems.id });
+    assert.ok(updated, `Acceptance evidence could not be attached for ${address}`);
+  }
+
+  const analysis = await processPropertyComparisonAnalysisBatch({
+    limit: 3,
+    traceId,
+    comparisonId: created.comparisonId,
+  });
+  assert.equal(analysis.completed, 3, JSON.stringify(analysis.results));
+  assert.equal(analysis.needsEvidence, 0, JSON.stringify(analysis.results));
+
+  loaded = await loadPropertyComparison({
+    comparisonId: created.comparisonId,
+    ownerActorId: FIXTURE_ACTOR,
+    accessToken: created.accessToken,
+  });
+  assert.ok(loaded, "Acceptance comparison could not be reloaded after analysis.");
   const metadata = loaded.comparison.metadata && typeof loaded.comparison.metadata === "object"
     ? loaded.comparison.metadata as Record<string, unknown>
     : {};
@@ -317,7 +361,7 @@ async function main(): Promise<void> {
   assert.deepEqual(
     ranking?.ranked?.map((entry) => entry.address),
     [...FIXTURE_ADDRESSES],
-    "Ranked order must follow the deliberately descending supported economics.",
+    "Ranked order must follow the deliberately descending synthetic economics after real address verification.",
   );
   for (let index = 1; index < (ranking?.ranked?.length ?? 0); index += 1) {
     assert.ok(
@@ -328,11 +372,15 @@ async function main(): Promise<void> {
 
   console.log(JSON.stringify({
     ok: true,
-    rule: "PROPERTY-COMPARISON-LIVE-RANKED-ACCEPTANCE-001",
+    rule: "PROPERTY-COMPARISON-LIVE-RANKED-ACCEPTANCE-002",
     traceId,
     comparisonId: created.comparisonId,
     status: loaded.comparison.status,
+    realAddressVerification: true,
+    syntheticEconomics: true,
+    customerEvidence: false,
     analyzed: analysis.completed,
+    verification: verification.results,
     ranking: ranking?.ranked?.map((entry) => ({
       rank: entry.rank,
       address: entry.address,

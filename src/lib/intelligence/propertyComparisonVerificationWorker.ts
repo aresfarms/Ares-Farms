@@ -7,10 +7,12 @@ import { verifyImportedPropertyAddress } from "@/lib/property/importedPropertyVe
 export async function processPropertyComparisonVerificationBatch(input: {
   limit?: number;
   traceId: string;
+  comparisonId?: string;
 }) {
   const claimed = await claimQueuedPropertyComparisonItems({
     limit: Math.min(input.limit ?? 5, 10),
     traceId: input.traceId,
+    comparisonId: input.comparisonId,
   });
   const results: Array<{
     itemId: string;

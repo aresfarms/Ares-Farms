@@ -40,7 +40,7 @@ export function FurlongAnswerCard({ answer, allowSave = false, savedCase }: { an
       if (!response.ok || !result.durableCase?.record?.caseId) throw new Error(response.status === 401 || response.status === 403
         ? "Sign in before saving. The answer has not been saved." : result.error || "The case could not be saved.");
       setCaseHref("/intelligence/cases/" + encodeURIComponent(result.durableCase.record.caseId));
-      setSaveNote("Saved privately. No provider received this case.");
+      setSaveNote("Added to My Intelligence privately. No provider received this case.");
     } catch (error) { setSaveNote(error instanceof Error ? error.message : "The case could not be saved."); }
     finally { setSaving(false); }
   }
@@ -64,9 +64,9 @@ export function FurlongAnswerCard({ answer, allowSave = false, savedCase }: { an
       </label>
       <button type="button" disabled={!consent || exporting} onClick={() => void download()} style={{ marginTop: 12, border: 0, borderRadius: 8, padding: "12px 16px", background: "#0c635c", color: "#fff", fontSize: 16, cursor: "pointer", opacity: !consent || exporting ? .55 : 1 }}>{exporting ? "Preparing download…" : "Download this saved answer"}</button>
       <p role="status">{exportNote}</p>
-    </div> : <p>To download a dated package, save privately and open the saved case. Signing in to save is separate from sharing.</p>}
+    </div> : <p>To keep building this investigation over time, add it to My Intelligence. Signing in to save is separate from sharing.</p>}
     {allowSave && <div>
-      {caseHref ? <Link href={caseHref}>Open your saved case</Link> : <button type="button" disabled={saving} onClick={() => void save()} style={{ padding: 12, fontSize: 16 }}>{saving ? "Saving…" : "Save privately to My Cases"}</button>}
+      {caseHref ? <Link href={caseHref}>Open this investigation</Link> : <button type="button" disabled={saving} onClick={() => void save()} style={{ padding: 12, fontSize: 16 }}>{saving ? "Saving…" : "Add to My Intelligence"}</button>}
       <p role="status">{saveNote}</p>
       {saveNote.includes("Sign in") && <Link href="/sign-in">Sign in</Link>}
     </div>}

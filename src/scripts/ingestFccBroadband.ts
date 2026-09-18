@@ -18,11 +18,10 @@
  * Provider CLAIMS, aggregated — never a guarantee of service at a given home.
  */
 
-import { execFile, spawn } from "node:child_process";
 import * as fs from "node:fs";
-import * as os from "node:os";
 import * as path from "node:path";
 import * as readline from "node:readline";
+import * as yauzl from "yauzl";
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "src/lib/property/countyBroadbandGenerated.ts");
@@ -40,53 +39,113 @@ async function listLatestAvailability(): Promise<{ asOf: string; files: any[] }>
   return { asOf, files };
 }
 
-type DownloadedArchive = { dir: string; zipPath: string; csvEntry: string };
+type DownloadedArchive = { bytes: Buffer; csvEntry: string };
+
+function openZipBuffer(bytes: Buffer): Promise<yauzl.ZipFile> {
+  return new Promise((resolve, reject) => {
+    yauzl.fromBuffer(bytes, { lazyEntries: true, validateEntrySizes: true }, (error, zipFile) => {
+      if (error || !zipFile) return reject(error ?? new Error("FCC ZIP could not be opened."));
+      resolve(zipFile);
+    });
+  });
+}
+
+function safeArchiveMemberName(name: string): boolean {
+  if (!name || name.length > 180 || name.includes("\\") || name.includes("..")) return false;
+  const parts = name.split("/").filter(Boolean);
+  return parts.length > 0 && parts.every((part) => part !== "." && part !== "..");
+}
+
+async function identifySingleCsv(bytes: Buffer): Promise<string> {
+  const zipFile = await openZipBuffer(bytes);
+  return new Promise((resolve, reject) => {
+    const csvEntries: string[] = [];
+    let settled = false;
+    const fail = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      zipFile.close();
+      reject(error);
+    };
+    zipFile.on("error", (error) => fail(error));
+    zipFile.on("entry", (entry: yauzl.Entry) => {
+      if (!safeArchiveMemberName(entry.fileName)) return fail(new Error("FCC archive contains an unsafe member name."));
+      if (!entry.fileName.endsWith("/") && entry.fileName.toLowerCase().endsWith(".csv")) csvEntries.push(entry.fileName);
+      zipFile.readEntry();
+    });
+    zipFile.on("end", () => {
+      if (settled) return;
+      settled = true;
+      zipFile.close();
+      if (csvEntries.length !== 1) return reject(new Error("FCC archive must contain exactly one CSV member."));
+      resolve(csvEntries[0]);
+    });
+    zipFile.readEntry();
+  });
+}
 
 async function downloadValidatedArchive(fileId: number): Promise<DownloadedArchive> {
   if (!Number.isInteger(fileId) || fileId <= 0) throw new Error("FCC file identifier is invalid.");
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-bdc-"));
-  fs.chmodSync(dir, 0o700);
-  const zipPath = path.join(dir, `availability-${fileId}.zip`);
   const response = await fetch(`${API}/downloads/downloadFile/availability/${fileId}`, { headers: headers(), signal: AbortSignal.timeout(120000) });
   if (!response.ok) throw new Error(`FCC download failed with HTTP ${response.status}.`);
   const declaredLength = Number(response.headers.get("content-length") ?? "0");
   if (Number.isFinite(declaredLength) && declaredLength > 1_000_000_000) throw new Error("FCC archive exceeds the 1 GB ingest bound.");
-  const archive = Buffer.from(await response.arrayBuffer());
-  if (archive.byteLength < 4 || archive.byteLength > 1_000_000_000 || archive[0] !== 0x50 || archive[1] !== 0x4b) {
+  const bytes = Buffer.from(await response.arrayBuffer());
+  if (bytes.byteLength < 4 || bytes.byteLength > 1_000_000_000 || bytes[0] !== 0x50 || bytes[1] !== 0x4b) {
     throw new Error("FCC response is not a bounded ZIP archive.");
   }
-  fs.writeFileSync(zipPath, archive, { mode: 0o600 });
+  const csvEntry = await identifySingleCsv(bytes);
+  return { bytes, csvEntry };
+}
 
-  const csvEntry = await new Promise<string>((resolve, reject) => {
-    execFile("unzip", ["-Z1", zipPath], { maxBuffer: 2 * 1024 * 1024 }, (err, stdout) => {
-      if (err) return reject(err);
-      const entries = stdout.split(/\r?\n/).map((value) => value.trim()).filter(Boolean);
-      const csv = entries.filter((name) => name.toLowerCase().endsWith(".csv"));
-      if (csv.length !== 1) return reject(new Error("FCC archive must contain exactly one CSV member."));
-      const name = csv[0];
-      if (name.length > 180 || name.includes("/") || name.includes("\\") || name.includes("..")) {
-        return reject(new Error("FCC archive contains an unsafe member name."));
+function openCsvStream(archive: DownloadedArchive): Promise<NodeJS.ReadableStream> {
+  return openZipBuffer(archive.bytes).then((zipFile) => new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      zipFile.close();
+      reject(error);
+    };
+    zipFile.on("error", (error) => fail(error));
+    zipFile.on("entry", (entry: yauzl.Entry) => {
+      if (entry.fileName !== archive.csvEntry) {
+        zipFile.readEntry();
+        return;
       }
-      resolve(name);
+      zipFile.openReadStream(entry, (error, stream) => {
+        if (error || !stream) return fail(error ?? new Error("FCC CSV member could not be streamed."));
+        settled = true;
+        stream.once("end", () => zipFile.close());
+        stream.once("error", () => zipFile.close());
+        resolve(stream);
+      });
     });
-  });
-  return { dir, zipPath, csvEntry };
+    zipFile.on("end", () => {
+      if (!settled) fail(new Error("FCC CSV member disappeared during validation."));
+    });
+    zipFile.readEntry();
+  }));
 }
 
 async function aggregateCounty(archive: DownloadedArchive, counties: Map<string, CountyAgg>): Promise<void> {
-  const child = spawn("unzip", ["-p", archive.zipPath, archive.csvEntry], { stdio: ["ignore", "pipe", "pipe"] });
-  if (!child.stdout) throw new Error("FCC archive stream could not be opened.");
-  const rl = readline.createInterface({ input: child.stdout, crlfDelay: Infinity });
+  const input = await openCsvStream(archive);
+  const rl = readline.createInterface({ input, crlfDelay: Infinity });
   let header: string[] | null = null;
   let iBlock = 1, iAny = 3, iWired = 4;
+  let lineCount = 0;
   for await (const line of rl) {
+    lineCount += 1;
+    if (lineCount > 25_000_000) throw new Error("FCC CSV exceeds the bounded row count.");
     if (!header) {
       header = line.split(",");
       iBlock = header.indexOf("block_geoid");
       iAny = header.indexOf("any_dl100_ul20");
       iWired = header.indexOf("wired_dl100_ul20");
+      if (iBlock < 0 || iAny < 0 || iWired < 0) throw new Error("FCC CSV is missing required columns.");
       continue;
     }
+    if (line.length > 16_384) continue;
     const c = line.split(",");
     const fips = (c[iBlock] ?? "").slice(0, 5);
     if (!/^\d{5}$/.test(fips)) continue;
@@ -96,9 +155,6 @@ async function aggregateCounty(archive: DownloadedArchive, counties: Map<string,
     if (c[iWired] === "1") agg.wired += 1;
     counties.set(fips, agg);
   }
-  const exitCode = await new Promise<number | null>((resolve) => child.once("close", resolve));
-  fs.rmSync(archive.dir, { recursive: true, force: true });
-  if (exitCode !== 0) throw new Error(`FCC archive extraction failed with exit code ${exitCode ?? "unknown"}.`);
 }
 
 async function main(): Promise<void> {

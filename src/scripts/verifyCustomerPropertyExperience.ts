@@ -46,6 +46,10 @@ if (workspace.includes("<PropertyBestCoursePanel"))
   failures.push(
     "Customer workspace still renders the internal best-course governance panel.",
   );
+if (workspace.includes('/api/recommendation-releases'))
+  failures.push(
+    "Customer workspace still calls internal recommendation-release APIs.",
+  );
 if (workspace.includes("import { PropertyBestCoursePanel }"))
   failures.push(
     "Customer workspace still imports the internal best-course governance panel.",

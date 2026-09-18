@@ -86,3 +86,50 @@ resource "google_cloud_scheduler_job" "source_refresh" {
     google_cloud_run_v2_job_iam_member.scheduler_source_refresh_executor,
   ]
 }
+
+# =============================================================================
+# Private property-comparison scheduler
+#
+# This identity can invoke only the bounded Cloud Run Job. It has no database
+# secret access. The worker runtime identity has the reciprocal restriction.
+# =============================================================================
+
+resource "google_cloud_run_v2_job_iam_member" "scheduler_property_comparison_executor" {
+  count = !var.enable_property_comparison_scheduler || local.property_comparison_image_effective == "" ? 0 : 1
+
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_job.property_comparison[0].name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.property_comparison_scheduler.email}"
+}
+
+resource "google_cloud_scheduler_job" "property_comparison" {
+  count = !var.enable_property_comparison_scheduler || local.property_comparison_image_effective == "" ? 0 : 1
+
+  project     = var.project_id
+  region      = var.region
+  name        = "furlong-property-comparison"
+  description = "Processes bounded property-comparison verification and governed economic-analysis batches."
+  schedule    = var.property_comparison_schedule
+  time_zone   = var.property_comparison_time_zone
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.region}/jobs/${google_cloud_run_v2_job.property_comparison[0].name}:run"
+
+    body = base64encode("{}")
+
+    headers = {
+      "Content-Type" = "application/json"
+    }
+
+    oauth_token {
+      service_account_email = google_service_account.property_comparison_scheduler.email
+    }
+  }
+
+  depends_on = [
+    google_cloud_run_v2_job_iam_member.scheduler_property_comparison_executor,
+  ]
+}

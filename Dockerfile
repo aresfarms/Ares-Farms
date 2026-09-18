@@ -58,7 +58,7 @@ RUN npm run build \
       echo "FATAL: .env leaked into standalone output"; exit 1; \
     fi
 
-# Bundle the two migration and two bounded operations programs during build.
+# Bundle the two migration and bounded operations programs during build.
 # The final migrator carries only these bundles plus canonical SQL - no npm,
 # tsx, esbuild, Go tool binaries, or development dependency tree.
 RUN mkdir -p /migrator \
@@ -73,7 +73,10 @@ RUN mkdir -p /migrator \
       --outfile=/migrator/verifyRuntimePrivileges.cjs \
  && npx --no-install esbuild src/scripts/runSourceRefresh.ts \
       --bundle --platform=node --target=node24 --format=cjs \
-      --outfile=/migrator/runSourceRefresh.cjs
+      --outfile=/migrator/runSourceRefresh.cjs \
+ && npx --no-install esbuild src/scripts/runPropertyComparisonWorker.ts \
+      --bundle --platform=node --target=node24 --format=cjs \
+      --outfile=/migrator/runPropertyComparisonWorker.cjs
 
 # -----------------------------------------------------------------------------
 # Stage 3 — migrator: the furlong-db-migrate Job image (STAGING-DEPLOY P2.2).

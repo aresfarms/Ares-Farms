@@ -43,6 +43,24 @@ resource "google_service_account" "scanner_runtime" {
   depends_on = [google_project_service.required]
 }
 
+resource "google_service_account" "property_comparison_worker" {
+  project      = var.project_id
+  account_id   = "furlong-comparison-worker"
+  display_name = "Furlong property comparison worker"
+  description  = "Private Cloud Run Job runtime. Reads DATABASE_URL only; no migration authority and no browser-service invocation role."
+
+  depends_on = [google_project_service.required]
+}
+
+resource "google_service_account" "property_comparison_scheduler" {
+  project      = var.project_id
+  account_id   = "furlong-comparison-scheduler"
+  display_name = "Furlong property comparison scheduler"
+  description  = "Cloud Scheduler identity allowed only to start the private property-comparison Job."
+
+  depends_on = [google_project_service.required]
+}
+
 # ---- Secret access: runtime SA -> DATABASE_URL + NEXTAUTH_SECRET ------------
 
 resource "google_secret_manager_secret_iam_member" "runtime_database_url" {
@@ -50,6 +68,13 @@ resource "google_secret_manager_secret_iam_member" "runtime_database_url" {
   secret_id = google_secret_manager_secret.app["DATABASE_URL"].secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "property_comparison_database_url" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.app["DATABASE_URL"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.property_comparison_worker.email}"
 }
 
 # SENDGRID_API_KEY is created + versioned out of band by the owner (not TF), so

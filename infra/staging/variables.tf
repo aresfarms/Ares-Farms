@@ -259,6 +259,16 @@ variable "source_refresh_image" {
   }
 }
 
+variable "property_comparison_worker_image" {
+  description = "Optional independently pinned operations image for the private property-comparison worker Job. Empty inherits migrator_image."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.property_comparison_worker_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.property_comparison_worker_image))
+    error_message = "property_comparison_worker_image must be pinned by digest."
+  }
+}
+
 variable "founder_testing_lane_enabled" {
   description = "Staging-only founder testing lane. While true, Cloud Run keeps authenticated direct ingress available for Caitlin's licensed and authority pathway testing. Set false only after Caitlin explicitly confirms the complete test program is closed. Production forbids this exception."
   type        = bool
@@ -414,6 +424,30 @@ variable "source_refresh_time_zone" {
   description = "Time zone for the automatic source refresh schedule."
   type        = string
   default     = "Etc/UTC"
+}
+
+variable "enable_property_comparison_scheduler" {
+  description = "Create the private bounded property-comparison worker Job and its Cloud Scheduler trigger."
+  type        = bool
+  default     = false
+}
+
+variable "property_comparison_schedule" {
+  description = "Cron schedule for the private property-comparison worker."
+  type        = string
+  default     = "*/5 * * * *"
+}
+
+variable "property_comparison_time_zone" {
+  description = "Time zone for the private property-comparison worker schedule."
+  type        = string
+  default     = "Etc/UTC"
+}
+
+variable "property_comparison_job_timeout_seconds" {
+  description = "Bounded timeout for one property-comparison worker execution."
+  type        = number
+  default     = 300
 }
 
 variable "enable_security_observability" {

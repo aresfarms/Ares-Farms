@@ -117,6 +117,26 @@ output "source_refresh_run_job_name" {
   value       = try(google_cloud_run_v2_job.source_refresh[0].name, null)
 }
 
+output "property_comparison_worker_sa_email" {
+  description = "Runtime identity for the private property-comparison Job; DATABASE_URL access only."
+  value       = google_service_account.property_comparison_worker.email
+}
+
+output "property_comparison_scheduler_sa_email" {
+  description = "Scheduler identity allowed to start only the private property-comparison Job."
+  value       = google_service_account.property_comparison_scheduler.email
+}
+
+output "property_comparison_run_job_name" {
+  description = "Private Cloud Run Job for bounded comparison verification + analysis."
+  value       = try(google_cloud_run_v2_job.property_comparison[0].name, null)
+}
+
+output "property_comparison_scheduler_job_name" {
+  description = "Cloud Scheduler trigger for the private property-comparison Job."
+  value       = try(google_cloud_scheduler_job.property_comparison[0].name, null)
+}
+
 output "forensics_runtime_bucket_id" {
   description = "Cloud Logging bucket id receiving runtime forensic exports."
   value       = try(google_logging_project_bucket_config.forensics_runtime[0].bucket_id, null)

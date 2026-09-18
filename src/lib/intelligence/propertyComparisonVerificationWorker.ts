@@ -14,6 +14,7 @@ export async function processPropertyComparisonVerificationBatch(input: {
   });
   const results: Array<{
     itemId: string;
+    comparisonId: string;
     status: "VERIFIED" | "UNVERIFIABLE";
     normalizedAddress: string | null;
   }> = [];
@@ -52,6 +53,7 @@ export async function processPropertyComparisonVerificationBatch(input: {
       });
       results.push({
         itemId: item.id,
+        comparisonId: item.comparisonId,
         status: verified ? "VERIFIED" : "UNVERIFIABLE",
         normalizedAddress: verification.normalizedAddress,
       });
@@ -69,7 +71,12 @@ export async function processPropertyComparisonVerificationBatch(input: {
         },
         traceId: input.traceId,
       });
-      results.push({ itemId: item.id, status: "UNVERIFIABLE", normalizedAddress: null });
+      results.push({
+        itemId: item.id,
+        comparisonId: item.comparisonId,
+        status: "UNVERIFIABLE",
+        normalizedAddress: null,
+      });
     }
   }
   return { claimed: claimed.length, processed: results.length, results };

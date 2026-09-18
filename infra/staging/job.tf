@@ -1,6 +1,7 @@
 locals {
-  runtime_verify_image_effective = var.runtime_verify_image != "" ? var.runtime_verify_image : var.migrator_image
-  source_refresh_image_effective = var.source_refresh_image != "" ? var.source_refresh_image : var.migrator_image
+  runtime_verify_image_effective      = var.runtime_verify_image != "" ? var.runtime_verify_image : var.migrator_image
+  source_refresh_image_effective      = var.source_refresh_image != "" ? var.source_refresh_image : var.migrator_image
+  property_comparison_image_effective = var.property_comparison_worker_image != "" ? var.property_comparison_worker_image : var.migrator_image
 }
 
 # =============================================================================
@@ -283,5 +284,83 @@ resource "google_cloud_run_v2_job" "source_refresh" {
     google_storage_bucket_iam_member.runtime_state_refresh_read,
     google_storage_bucket_iam_member.runtime_state_refresh_create,
     google_secret_manager_secret_iam_member.source_refresh_nass_api_key,
+  ]
+}
+
+# =============================================================================
+# Private property-comparison worker Job
+#
+# Scheduler calls the Cloud Run Jobs API directly. The browser-facing service
+# perimeter is never bypassed. The runtime identity can read DATABASE_URL only;
+# the scheduler identity can start this Job only. The bundled program processes
+# at most ten verification items and ten analysis items per execution.
+# =============================================================================
+
+resource "google_cloud_run_v2_job" "property_comparison" {
+  count = !var.enable_property_comparison_scheduler || local.property_comparison_image_effective == "" ? 0 : 1
+
+  name     = "furlong-property-comparison"
+  project  = var.project_id
+  location = var.region
+  labels   = var.labels
+
+  deletion_protection = false
+
+  lifecycle {
+    ignore_changes = [client, client_version]
+  }
+
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+
+  template {
+    task_count  = 1
+    parallelism = 1
+
+    template {
+      service_account = google_service_account.property_comparison_worker.email
+
+      execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
+      max_retries           = 0
+      timeout               = "${var.property_comparison_job_timeout_seconds}s"
+
+      vpc_access {
+        egress = "PRIVATE_RANGES_ONLY"
+        network_interfaces {
+          network    = google_compute_network.vpc.id
+          subnetwork = google_compute_subnetwork.egress.id
+        }
+      }
+
+      containers {
+        image = local.property_comparison_image_effective
+        args  = ["runPropertyComparisonWorker.cjs"]
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+        }
+
+        env {
+          name = "DATABASE_URL"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.app["DATABASE_URL"].secret_id
+              version = var.secret_versions["DATABASE_URL"]
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    google_secret_manager_secret_iam_member.property_comparison_database_url,
   ]
 }

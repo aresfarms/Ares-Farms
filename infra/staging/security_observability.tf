@@ -30,6 +30,7 @@ locals {
       [google_service_account.core_runtime.email, "NOAA_CDO_TOKEN"],
       [google_service_account.db_migrator.email, "MIGRATOR_DATABASE_URL"],
       [google_service_account.source_refresh_scheduler.email, "NASS_API_KEY"],
+      [google_service_account.property_comparison_worker.email, "DATABASE_URL"],
       ["furlong-stripe-webhook-runtime@${var.project_id}.iam.gserviceaccount.com", "DATABASE_URL"],
       ["furlong-stripe-webhook-runtime@${var.project_id}.iam.gserviceaccount.com", "STRIPE_WEBHOOK_SECRET"],
     ] : format("(protoPayload.authenticationInfo.principalEmail=\"%s\" AND protoPayload.resourceName:\"/secrets/%s/\")", pair[0], pair[1])
@@ -89,6 +90,15 @@ locals {
     [
       "resource.type=\"cloud_run_job\"",
       "resource.labels.job_name=\"furlong-source-refresh\"",
+      "(severity>=ERROR OR textPayload:\"Container called exit(1).\" OR protoPayload.status.message:\"failed\")",
+    ]
+  )
+
+  property_comparison_failure_filter = join(
+    " AND ",
+    [
+      "resource.type=\"cloud_run_job\"",
+      "resource.labels.job_name=\"furlong-property-comparison\"",
       "(severity>=ERROR OR textPayload:\"Container called exit(1).\" OR protoPayload.status.message:\"failed\")",
     ]
   )
@@ -447,6 +457,36 @@ resource "google_monitoring_alert_policy" "source_refresh_failure" {
   documentation {
     mime_type = "text/markdown"
     content   = "The scheduled approved-source refresh job failed. Review the Cloud Run Job execution logs before the next map refresh window."
+  }
+
+  alert_strategy {
+    notification_rate_limit {
+      period = "300s"
+    }
+    auto_close = "1800s"
+  }
+}
+
+
+resource "google_monitoring_alert_policy" "property_comparison_failure" {
+  count = var.enable_security_observability && var.enable_property_comparison_scheduler && local.property_comparison_image_effective != "" ? 1 : 0
+
+  project               = var.project_id
+  display_name          = "Furlong staging property comparison worker failure"
+  combiner              = "OR"
+  enabled               = true
+  notification_channels = local.provisioned_security_alert_channels
+
+  conditions {
+    display_name = "Property comparison worker failure observed"
+    condition_matched_log {
+      filter = local.property_comparison_failure_filter
+    }
+  }
+
+  documentation {
+    mime_type = "text/markdown"
+    content   = "The private property-comparison worker failed. Review the bounded Cloud Run Job execution before the next scheduler interval; do not bypass governed evidence requirements to clear the queue."
   }
 
   alert_strategy {

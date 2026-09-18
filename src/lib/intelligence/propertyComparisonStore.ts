@@ -506,13 +506,26 @@ export async function recordPropertyComparisonEvidenceGap(input: {
   itemId: string;
   comparisonId: string;
   missingEvidence: string[];
+  analysisSnapshot?: Record<string, unknown>;
   traceId: string;
 }) {
   const missingEvidence = [...new Set(input.missingEvidence.map((item) => item.trim()).filter(Boolean))];
   if (!missingEvidence.length) throw new Error("At least one missing evidence item is required.");
+  const [existing] = await db.select({
+    resultSnapshot: furlongPropertyComparisonItems.resultSnapshot,
+  }).from(furlongPropertyComparisonItems).where(and(
+    eq(furlongPropertyComparisonItems.id, input.itemId),
+    eq(furlongPropertyComparisonItems.comparisonId, input.comparisonId),
+    eq(furlongPropertyComparisonItems.status, "ANALYZING"),
+  )).limit(1);
+  const priorSnapshot = existing?.resultSnapshot && typeof existing.resultSnapshot === "object" && !Array.isArray(existing.resultSnapshot)
+    ? existing.resultSnapshot as Record<string, unknown>
+    : {};
   const [updated] = await db.update(furlongPropertyComparisonItems).set({
     status: "NEEDS_EVIDENCE",
     resultSnapshot: {
+      ...priorSnapshot,
+      ...(input.analysisSnapshot ?? {}),
       schemaVersion: "comparable-property-analysis-v1",
       rankingEligible: false,
       missingEvidence,

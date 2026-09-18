@@ -629,7 +629,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
     "@neondatabase/serverless": "^1.1.0",
-    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/browser": "^14.0.0",
     "@simplewebauthn/server": "^13.3.2",
     "cookie": "^1.1.1",
     "dotenv": "^17.4.2",

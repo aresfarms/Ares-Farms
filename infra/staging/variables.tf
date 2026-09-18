@@ -435,7 +435,7 @@ variable "enable_property_comparison_scheduler" {
 variable "property_comparison_schedule" {
   description = "Cron schedule for the private property-comparison worker."
   type        = string
-  default     = "*/5 * * * *"
+  default     = "*/10 * * * *"
 }
 
 variable "property_comparison_time_zone" {

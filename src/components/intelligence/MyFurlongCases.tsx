@@ -40,10 +40,10 @@ export function MyFurlongCases() {
   return (
     <section style={{ display: "grid", gap: 24 }}>
       <header style={{ display: "grid", gap: 9 }}>
-        <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: ".1em", textTransform: "uppercase", color: "#0f766e" }}>My Furlong</span>
-        <h1 style={{ margin: 0, color: "#162033", fontSize: "clamp(30px,5vw,44px)", lineHeight: 1.08 }}>Your properties and projects stay together after the first answer.</h1>
+        <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: ".1em", textTransform: "uppercase", color: "#0f766e" }}>My Intelligence</span>
+        <h1 style={{ margin: 0, color: "#162033", fontSize: "clamp(30px,5vw,44px)", lineHeight: 1.08 }}>Your intelligence collection gets more useful every time you return.</h1>
         <p style={{ margin: 0, maxWidth: 760, color: "#526074", lineHeight: 1.65 }}>
-          A saved Furlong Case carries the matter from property analysis through readiness, provider permissions, diligence, closing, and later operating memory. Saving is separate from sharing; no provider is selected here and no saved case is broadcast.
+          Every saved investigation keeps its evidence, unanswered questions, decisions, and later real-world outcomes together. Properties you acquire, reject, improve, operate, or exit can all remain useful intelligence. Saving is separate from sharing; no provider is selected here and no saved investigation is broadcast.
         </p>
       </header>
 
@@ -55,15 +55,15 @@ export function MyFurlongCases() {
         <p role="status" style={{ color: "#64748b" }}>Loading your saved cases…</p>
       ) : cases.length === 0 ? (
         <div style={notice}>
-          <strong style={{ color: "#162033" }}>No saved cases yet.</strong>
-          <span style={{ color: "#526074" }}>Explore a property or project first. You can look around without an account; saving a durable case is a separate choice.</span>
+          <strong style={{ color: "#162033" }}>Your intelligence collection is empty.</strong>
+          <span style={{ color: "#526074" }}>Explore a property or project first. When something is worth remembering, add it here so the evidence, unanswered questions, and later outcome can accumulate over time.</span>
           <Link href="/" style={link}>Explore a property or project →</Link>
         </div>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
-            <h2 style={{ margin: 0, color: "#162033", fontSize: 21 }}>Active Furlong Cases</h2>
-            <span style={{ color: "#64748b", fontSize: 12.5 }}>{cases.length} saved matter{cases.length === 1 ? "" : "s"}</span>
+            <h2 style={{ margin: 0, color: "#162033", fontSize: 21 }}>Your intelligence collection</h2>
+            <span style={{ color: "#64748b", fontSize: 12.5 }}>{cases.length} saved investigation{cases.length === 1 ? "" : "s"}</span>
           </div>
           {cases.map((item) => (
             <article key={item.caseId} style={{ border: "1px solid #ccd6df", borderRadius: 14, padding: 18, background: "#fff", display: "grid", gap: 8 }}>
@@ -76,7 +76,7 @@ export function MyFurlongCases() {
               </div>
               <span style={{ color: "#64748b", fontSize: 12.5 }}>Updated {new Date(item.updatedAt).toLocaleString()}</span>
               <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-                <Link href={`/intelligence/cases/${encodeURIComponent(item.caseId)}`} style={secondary}>Open case</Link>
+                <Link href={`/intelligence/cases/${encodeURIComponent(item.caseId)}`} style={secondary}>Open investigation</Link>
                 <Link href="/provider-compare" style={secondary}>How provider comparison works</Link>
                 <Link href="/financing-compare" style={secondary}>Compare financing terms</Link>
               </div>
@@ -86,7 +86,7 @@ export function MyFurlongCases() {
       )}
 
       <section style={{ border: "1px solid #b9e3d4", borderRadius: 14, background: "#f4fbf8", padding: "16px 18px", display: "grid", gap: 7 }}>
-        <strong style={{ color: "#0f6e56" }}>Operate: the relationship should remain useful after the financing event.</strong>
+        <strong style={{ color: "#0f6e56" }}>Measure: the intelligence should become more valuable after the decision.</strong>
         <span style={{ color: "#526074", fontSize: 13.5, lineHeight: 1.6 }}>Return to the same case for evidence-backed program changes, operating opportunities, environmental obligations, refinancing context, or property records. Furlong should surface a change only when a governed source supports it — never invent activity just to create engagement.</span>
       </section>
 

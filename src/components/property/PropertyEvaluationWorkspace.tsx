@@ -2733,6 +2733,10 @@ export function PropertyEvaluationWorkspace({
     priceLabel: effectivePriceLabel,
   };
   useEffect(() => {
+    setSelectedPlanId(null);
+  }, [context.propertyId]);
+
+  useEffect(() => {
     if (!context.propertyId) return;
     const saved = loadPropertyEvaluationDraft(context.propertyId);
     if (saved) {

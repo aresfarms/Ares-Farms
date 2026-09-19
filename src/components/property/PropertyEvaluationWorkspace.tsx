@@ -2708,6 +2708,7 @@ export function PropertyEvaluationWorkspace({
     null,
   );
   const [manualPriceLabel, setManualPriceLabel] = useState("");
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
   // visibly open reads as broken). The summary card still leads; the complete
@@ -2731,6 +2732,10 @@ export function PropertyEvaluationWorkspace({
     ...context,
     priceLabel: effectivePriceLabel,
   };
+  useEffect(() => {
+    setSelectedPlanId(null);
+  }, [context.propertyId]);
+
   useEffect(() => {
     if (!context.propertyId) return;
     const saved = loadPropertyEvaluationDraft(context.propertyId);
@@ -5125,26 +5130,29 @@ export function PropertyEvaluationWorkspace({
           it is empty. This band says so on screen, and prints as an explicit
           INCOMPLETE stamp so a premature copy can never pass as the real one. */}
       {!deepView && !factsLoading && (
-        <>
-          <PropertyDecisionRankingPanel plan={scenarioRankingPlan} />
-          <PropertyReportOfferPanel
-            plan={scenarioRankingPlan}
-            exactAddress={
-              facts?.propertyRecord?.exactAddress ??
-              analysisContext.exactAddress
-            }
-            propertyId={analysisContext.propertyId}
-            priceKnown={preliminaryCapitalPlan.priceKnown}
-            customerVisionSelected={Boolean(answers.usePlan.trim())}
-            activeTransaction={Boolean(
-              answers.timing.trim() || answers.requestedAmount.trim(),
-            )}
-            materialEvidenceGapCount={
-              effectivePlaceIntelligence?.unknowns.length ?? 0
-            }
-            professionalEvidenceRequired={false}
-          />
-        </>
+        <PropertyDecisionRankingPanel
+          plan={scenarioRankingPlan}
+          onSelectionChange={setSelectedPlanId}
+          reportOffer={
+            <PropertyReportOfferPanel
+              plan={scenarioRankingPlan}
+              exactAddress={
+                facts?.propertyRecord?.exactAddress ??
+                analysisContext.exactAddress
+              }
+              propertyId={analysisContext.propertyId}
+              priceKnown={preliminaryCapitalPlan.priceKnown}
+              customerVisionSelected={Boolean(answers.usePlan.trim())}
+              activeTransaction={Boolean(
+                answers.timing.trim() || answers.requestedAmount.trim(),
+              )}
+              materialEvidenceGapCount={
+                effectivePlaceIntelligence?.unknowns.length ?? 0
+              }
+              professionalEvidenceRequired={false}
+            />
+          }
+        />
       )}
       {!deepView && factsLoading && (
         <div
@@ -5181,6 +5189,14 @@ export function PropertyEvaluationWorkspace({
         </div>
       )}
 
+      <div
+        data-testid="selected-plan-detailed-workspace"
+        hidden={!deepView && !selectedPlanId}
+        style={{
+          display: deepView || selectedPlanId ? "grid" : "none",
+          gap: 16,
+        }}
+      >
       {/* Property Type Stamp (Chaptered Blueprint, founder direction 2026-07-20):
           the property type is front-loaded — right under the header, before the
           verdict — because the financing lanes, costs, and questions all follow
@@ -6884,6 +6900,7 @@ export function PropertyEvaluationWorkspace({
           <PropertyImportLaunchpadEmbedded />
         </div>
       </details>
+      </div>
     </section>
   );
 }

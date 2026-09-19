@@ -23,6 +23,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { FurlongAnswerCard } from "@/components/property/FurlongAnswerCard";
 import { PropertyComparison } from "@/components/property/PropertyComparison";
+import { ProgressiveIntelligencePanel } from "@/components/property/ProgressiveIntelligencePanel";
 import { propertyFurlongAnswer } from "@/lib/property/furlongAnswer";
 import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief";
 import { CHART_THEMES } from "@/lib/property/chartThemes";
@@ -368,6 +369,15 @@ export function GovernedLaneChassis(props: ChassisProps) {
         const totalFacts = facts.length;
         return <>
           <FurlongAnswerCard answer={furlongAnswer} allowSave />
+          <ProgressiveIntelligencePanel
+            answer={furlongAnswer}
+            discoveredFacts={facts.length}
+            unresolvedCount={unknowns.length}
+            ownerAssertionsCount={ownerAssertions.length}
+            onOpenEvidence={() => setTab("property")}
+            onOpenFinance={() => setTab("finance")}
+            onOpenReport={() => setTab("report")}
+          />
           <PropertyComparison answer={furlongAnswer} />
           <details><summary style={{ cursor: "pointer", padding: 12 }}>Detailed property and financing screen</summary>
           <article data-testid="customer-decision-summary" style={{ background: "linear-gradient(145deg,#10243B,#173A43)", color: "#fff", borderRadius: 16, padding: "clamp(20px,4vw,30px)", display: "grid", gap: 18, boxShadow: "0 12px 30px rgba(16,36,59,.16)" }}>

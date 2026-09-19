@@ -24,6 +24,11 @@ export function LivingFurlongCasePanel({ caseId, displayName, goal, state, custo
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [outcomeType, setOutcomeType] = useState("ACQUISITION_UPDATE");
+  const [actualProjectCost, setActualProjectCost] = useState("");
+  const [actualRatePct, setActualRatePct] = useState("");
+  const [environmentalOutcome, setEnvironmentalOutcome] = useState("");
+  const [outcomeNote, setOutcomeNote] = useState("");
   const [reload, setReload] = useState(0);
   const [lastVisit, setLastVisit] = useState<string | null>(null);
   const [rememberVisits, setRememberVisits] = useState(false);
@@ -84,6 +89,35 @@ export function LivingFurlongCasePanel({ caseId, displayName, goal, state, custo
     } catch (error) { setNote(error instanceof Error ? error.message : "The case could not be saved."); }
     finally { setBusy(false); }
   }
+  async function recordOutcome() {
+    setBusy(true); setOutcomeNote("");
+    try {
+      const parsedProjectCost = actualProjectCost.trim() ? Number(actualProjectCost.replace(/[^0-9.]/g, "")) : null;
+      const parsedRatePct = actualRatePct.trim() ? Number(actualRatePct.replace(/[^0-9.]/g, "")) : null;
+      if (parsedProjectCost != null && (!Number.isFinite(parsedProjectCost) || parsedProjectCost < 0)) throw new Error("Enter a valid actual project cost.");
+      if (parsedRatePct != null && (!Number.isFinite(parsedRatePct) || parsedRatePct < 0)) throw new Error("Enter a valid actual interest rate.");
+      const response = await fetch("/api/intelligence/cases/" + encodeURIComponent(caseId), {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "record-outcome",
+          outcomeType,
+          actualProjectCost: parsedProjectCost,
+          actualRateBps: parsedRatePct == null ? null : Math.round(parsedRatePct * 100),
+          environmentalOutcome: environmentalOutcome.trim() || null,
+          evidenceRefs: [],
+          verified: false,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || "The outcome could not be recorded.");
+      setOutcomeNote("Recorded as a customer-reported outcome. It remains separate from verified evidence until an authorized verification step occurs.");
+      setActualProjectCost(""); setActualRatePct(""); setEnvironmentalOutcome("");
+      setReload(value => value + 1);
+    } catch (error) {
+      setOutcomeNote(error instanceof Error ? error.message : "The outcome could not be recorded.");
+    } finally { setBusy(false); }
+  }
+
   return <section data-testid="living-furlong-case" style={{ display: "grid", gap: 18, fontSize: 16, lineHeight: 1.65 }}>
     {loading && <p role="status">Loading your case…</p>}
     {error && <div role="alert" style={box}><p>{error}</p><button type="button" onClick={() => setReload(value => value + 1)}>Try again</button></div>}
@@ -116,10 +150,42 @@ export function LivingFurlongCasePanel({ caseId, displayName, goal, state, custo
         <p>Saving or updating this case shares nothing with a lender. Recipient authorization remains separate.</p>
       </section>
       {answer && <FurlongAnswerCard answer={answer} savedCase={{ caseId, recordVersion: bundle.record.replayRef || bundle.record.updatedAt || "" }} />}
-      <details style={box}><summary>Recorded outcomes ({bundle.outcomes.length})</summary>
-        {bundle.outcomes.length ? bundle.outcomes.map(outcome => <p key={outcome.id}>{outcome.outcomeType} — {outcome.verificationStatus}</p>) : <p>No actual outcomes recorded.</p>}
-        <p>Customer reports remain separate from verified outcomes.</p>
-      </details>
+      <section data-testid="real-world-outcome-loop" style={{ ...box, display: "grid", gap: 12 }}>
+        <div style={{ display: "grid", gap: 5 }}>
+          <span style={{ color: "#8F6E1F", fontSize: 10.5, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase" }}>Measure the real-world result</span>
+          <h2 style={{ margin: 0, fontSize: 20, color: "#162b40" }}>Did the thesis hold up?</h2>
+          <p style={{ margin: 0, color: "#526074" }}>Record what actually happened so later Furlong work can distinguish the original model from the real outcome. Customer-reported outcomes remain pending verification and do not silently certify closing, appraisal, environmental clearance, or lender approval.</p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10 }}>
+          <label style={{ display: "grid", gap: 5, fontSize: 13, fontWeight: 700 }}>Outcome type
+            <select value={outcomeType} onChange={event => setOutcomeType(event.target.value)} style={{ minHeight: 42, border: "1px solid #cbd5e1", borderRadius: 8, padding: "8px 10px", background: "#fff" }}>
+              <option value="ACQUISITION_UPDATE">Acquisition / offer update</option>
+              <option value="FINANCING_UPDATE">Financing update</option>
+              <option value="PROJECT_COST_UPDATE">Renovation / project-cost update</option>
+              <option value="ENVIRONMENTAL_UPDATE">Environmental / diligence update</option>
+              <option value="OPERATING_UPDATE">Operating update</option>
+              <option value="EXIT_UPDATE">Exit / disposition update</option>
+              <option value="PASSED_ON_PROPERTY">Passed on this property</option>
+            </select>
+          </label>
+          <label style={{ display: "grid", gap: 5, fontSize: 13, fontWeight: 700 }}>Actual project cost, if known
+            <input value={actualProjectCost} onChange={event => setActualProjectCost(event.target.value)} inputMode="decimal" placeholder="e.g. 425000" style={{ minHeight: 42, border: "1px solid #cbd5e1", borderRadius: 8, padding: "8px 10px" }} />
+          </label>
+          <label style={{ display: "grid", gap: 5, fontSize: 13, fontWeight: 700 }}>Actual interest rate %, if applicable
+            <input value={actualRatePct} onChange={event => setActualRatePct(event.target.value)} inputMode="decimal" placeholder="e.g. 6.75" style={{ minHeight: 42, border: "1px solid #cbd5e1", borderRadius: 8, padding: "8px 10px" }} />
+          </label>
+        </div>
+        <label style={{ display: "grid", gap: 5, fontSize: 13, fontWeight: 700 }}>What changed in diligence, environmental, or operating reality?
+          <textarea value={environmentalOutcome} onChange={event => setEnvironmentalOutcome(event.target.value)} rows={3} placeholder="Record the actual result or material change. Keep source documents in the governed evidence flow rather than pasting sensitive records here." style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "10px 12px", resize: "vertical" }} />
+        </label>
+        <button type="button" disabled={busy} onClick={() => void recordOutcome()} style={{ justifySelf: "start", border: 0, borderRadius: 9, padding: "11px 15px", background: "#0f766e", color: "#fff", fontWeight: 800, cursor: busy ? "progress" : "pointer" }}>{busy ? "Recording…" : "Record real-world outcome"}</button>
+        {outcomeNote && <p role="status" style={{ margin: 0, color: "#526074" }}>{outcomeNote}</p>}
+        <details>
+          <summary style={{ cursor: "pointer", fontWeight: 800 }}>Recorded outcomes ({bundle.outcomes.length})</summary>
+          {bundle.outcomes.length ? bundle.outcomes.map(outcome => <p key={outcome.id}>{outcome.outcomeType.replaceAll("_"," ").toLowerCase()} — {outcome.verificationStatus.replaceAll("_"," ").toLowerCase()}</p>) : <p>No actual outcomes recorded yet.</p>}
+          <p>Customer reports remain separate from verified outcomes. A rejected or abandoned property is still useful intelligence.</p>
+        </details>
+      </section>
       <button type="button" onClick={() => setReload(value => value + 1)} style={{ justifySelf: "start", padding: 12 }}>Refresh recorded case information</button>
     </>}
     {note && <p role="status">{note}</p>}
@@ -131,6 +197,6 @@ export function LivingFurlongCasePanel({ caseId, displayName, goal, state, custo
         <Link href={`/navigator?${navigatorParams.toString()}`}>Continue this case in Navigator</Link>
       </div>
     </section>
-    <Link href="/intelligence/cases">Back to My Cases</Link>
+    <Link href="/intelligence/cases">Back to My Intelligence</Link>
   </section>;
 }

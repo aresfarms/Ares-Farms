@@ -31,9 +31,8 @@ export function PropertyComparison({ answer }: { answer: FurlongAnswer }) {
     persist([...current.filter(item => item.subjectId !== answer.subjectId), answer]);
   }
   return <section data-testid="property-comparison" style={{ background: "#fff", color: "#162b40", border: "1px solid #ccd6df", borderRadius: 12, padding: 18 }}>
-    <h2 style={{ fontSize: 21, marginTop: 0 }}>Compare your options</h2>
-    <p>Keep up to three property snapshots in this browser tab. Add this property, then check another address in the same tab and add it.
-      No ranking is assigned, and missing evidence is not treated as zero.</p>
+    <span style={{ color: "#8F6E1F", fontSize: 10.5, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase" }}>Compare before you commit</span><h2 style={{ fontSize: 21, marginTop: 4 }}>Build your shortlist from evidence, not tabs</h2>
+    <p>Keep up to three property snapshots beside one another while you investigate. Add this property, check another address in the same tab, and compare the same evidence questions side by side. No ranking is assigned, missing evidence is not treated as zero, and a property can remain useful even when you decide to pass on it.</p>
     <button type="button" onClick={add} style={{ padding: 12, minHeight: 44 }}>Add or update this property</button>
     {items.length > 0 && <button type="button" onClick={() => { try { sessionStorage.removeItem(KEY); setItems([]); setNote("Comparison cleared from this tab."); } catch { setNote("The browser could not clear the comparison. Close this tab to discard it."); } }} style={{ marginLeft: 10, padding: 12, minHeight: 44 }}>Clear comparison</button>}
     <p role="status">{note || (items.length ? items.length + " of 3 properties selected. Tab-local only—not saved to your account." : "No properties selected.")}</p>

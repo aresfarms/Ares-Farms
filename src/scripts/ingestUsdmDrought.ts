@@ -43,6 +43,19 @@ function fmtDate(d: Date): string {
   return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
 }
 
+function boundedPercent(value: unknown): number | null {
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n) || n < 0 || n > 100) return null;
+  return Math.round(n * 10) / 10;
+}
+
+function normalizedMapDate(value: unknown): string | null {
+  if (typeof value !== "string" || value.length > 32) return null;
+  const time = Date.parse(value);
+  if (!Number.isFinite(time)) return null;
+  return new Date(time).toISOString().slice(0, 10);
+}
+
 async function main(): Promise<void> {
   console.log("\n━━━ ingest:usdm-drought ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   const end = new Date(process.env.USDM_AS_OF ? Date.parse(process.env.USDM_AS_OF) : Date.now());
@@ -61,20 +74,15 @@ async function main(): Promise<void> {
     if (rows.length === 0) continue;
     // Newest mapDate wins.
     const row = rows.reduce((a, b) => ((a.mapDate ?? "") >= (b.mapDate ?? "") ? a : b));
-    const mapDate = (row.mapDate ?? "").slice(0, 10);
+    const mapDate = normalizedMapDate(row.mapDate);
+    const d0 = boundedPercent(row.d0 ?? 0), d1 = boundedPercent(row.d1 ?? 0), d2 = boundedPercent(row.d2 ?? 0);
+    const d3 = boundedPercent(row.d3 ?? 0), d4 = boundedPercent(row.d4 ?? 0);
+    if (!mapDate || d0 == null || d1 == null || d2 == null || d3 == null || d4 == null) continue;
     if (mapDate > latestMapDate) latestMapDate = mapDate;
-    const d = {
-      d0: Number(row.d0 ?? 0), d1: Number(row.d1 ?? 0), d2: Number(row.d2 ?? 0),
-      d3: Number(row.d3 ?? 0), d4: Number(row.d4 ?? 0),
-    };
+    const severePlus = Math.min(100, Math.round((d2 + d3 + d4) * 10) / 10);
+    const extremePlus = Math.min(100, Math.round((d3 + d4) * 10) / 10);
     entries.push(
-      `  ${JSON.stringify(usps)}: ${JSON.stringify({
-        mapDate,
-        d0: Number(d.d0.toFixed(1)), d1: Number(d.d1.toFixed(1)), d2: Number(d.d2.toFixed(1)),
-        d3: Number(d.d3.toFixed(1)), d4: Number(d.d4.toFixed(1)),
-        severePlus: Number((d.d2 + d.d3 + d.d4).toFixed(1)),
-        extremePlus: Number((d.d3 + d.d4).toFixed(1)),
-      })},`
+      `  ${JSON.stringify(usps)}: ${JSON.stringify({ mapDate, d0, d1, d2, d3, d4, severePlus, extremePlus })},`
     );
     await new Promise((r) => setTimeout(r, 120));
   }
@@ -113,7 +121,7 @@ export const STATE_DROUGHT: Record<string, StateDrought> = {
 ${entries.join("\n")}
 };
 `,
-    "utf8"
+    { encoding: "utf8", mode: 0o600 }
   );
   console.log(`  ${entries.length} states, latest map ${latestMapDate} → ${path.relative(ROOT, OUT)}\n`);
 }

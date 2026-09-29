@@ -60,8 +60,97 @@ export function readWeeklyAgLive(): WeeklyAgLive | null {
   }
 }
 
+function boundedPercent(value: unknown): number {
+  const n = typeof value === "number" ? value : Number.NaN;
+  if (!Number.isFinite(n) || n < 0 || n > 100) throw new Error("Weekly agricultural percentage is outside 0-100.");
+  return Math.round(n * 10) / 10;
+}
+
+function boundedWeek(value: unknown): number | null {
+  if (value == null) return null;
+  const n = typeof value === "number" ? Math.round(value) : Number.NaN;
+  if (!Number.isFinite(n) || n < 1 || n > 53) throw new Error("Weekly agricultural week is invalid.");
+  return n;
+}
+
+function boundedYear(value: unknown): number | null {
+  if (value == null) return null;
+  const n = typeof value === "number" ? Math.round(value) : Number.NaN;
+  if (!Number.isFinite(n) || n < 2000 || n > 2200) throw new Error("Weekly agricultural year is invalid.");
+  return n;
+}
+
+function normalizedDate(value: unknown): string {
+  if (typeof value !== "string" || value.length > 40) throw new Error("Weekly agricultural date is invalid.");
+  const time = Date.parse(value);
+  if (!Number.isFinite(time)) throw new Error("Weekly agricultural date is invalid.");
+  return new Date(time).toISOString();
+}
+
+function normalizedDay(value: unknown): string | null {
+  if (value == null) return null;
+  const iso = normalizedDate(value);
+  return iso.slice(0, 10);
+}
+
+function normalizedStateCode(value: string): string {
+  if (value.length !== 2) throw new Error("Weekly agricultural state code is invalid.");
+  const upper = value.toUpperCase();
+  for (const char of upper) {
+    const code = char.charCodeAt(0);
+    if (code < 65 || code > 90) throw new Error("Weekly agricultural state code is invalid.");
+  }
+  return upper;
+}
+
+function normalizeWeeklyAgLive(data: WeeklyAgLive): WeeklyAgLive {
+  const drought: Record<string, StateDrought> = {};
+  for (const [rawState, row] of Object.entries(data.drought ?? {})) {
+    const state = normalizedStateCode(rawState);
+    drought[state] = {
+      mapDate: normalizedDay(row?.mapDate) ?? "",
+      d0: boundedPercent(row?.d0), d1: boundedPercent(row?.d1), d2: boundedPercent(row?.d2),
+      d3: boundedPercent(row?.d3), d4: boundedPercent(row?.d4),
+      severePlus: boundedPercent(row?.severePlus),
+      extremePlus: boundedPercent(row?.extremePlus),
+    };
+  }
+
+  const cropConditions: Record<string, StateCropConditions> = {};
+  for (const [rawState, row] of Object.entries(data.cropConditions ?? {})) {
+    const state = normalizedStateCode(rawState);
+    const normalizeCrop = (crop: StateCropConditions["corn"]) => crop ? {
+      week: boundedWeek(crop.week) ?? 1,
+      goodExcellent: boundedPercent(crop.goodExcellent),
+      poorVeryPoor: boundedPercent(crop.poorVeryPoor),
+    } : null;
+    cropConditions[state] = { corn: normalizeCrop(row?.corn ?? null), soybeans: normalizeCrop(row?.soybeans ?? null) };
+  }
+
+  return {
+    drought,
+    droughtMapDate: normalizedDay(data.droughtMapDate),
+    cropConditions,
+    cropYear: boundedYear(data.cropYear),
+    cropLatestWeek: boundedWeek(data.cropLatestWeek),
+    fetchedAt: normalizedDate(data.fetchedAt),
+    sources: {
+      drought: STATE_DROUGHT_PROVENANCE.source,
+      cropConditions: STATE_CROP_CONDITIONS_PROVENANCE.source,
+    },
+  };
+}
+
 export function writeWeeklyAgLive(data: WeeklyAgLive): void {
-  fs.writeFileSync(LIVE_PATH, JSON.stringify(data, null, 2), "utf8");
+  // This file is a bounded JSON cache, never executable source. Normalize the
+  // official-source payload into the declared schema before it crosses the
+  // network-to-disk boundary, then replace atomically to avoid partial state.
+  const normalized = normalizeWeeklyAgLive(data);
+  const serialized = JSON.stringify(normalized, null, 2);
+  if (Buffer.byteLength(serialized, "utf8") > 2_000_000) throw new Error("Weekly agricultural overlay exceeds the bounded cache size.");
+  const tempPath = `${LIVE_PATH}.tmp`;
+  fs.writeFileSync(tempPath, serialized, { encoding: "utf8", mode: 0o600 });
+  fs.renameSync(tempPath, LIVE_PATH);
 }
 
 /** Drought by state — fresh overlay when present, else the committed snapshot. */

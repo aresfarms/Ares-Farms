@@ -102,12 +102,27 @@ function list(value: unknown, upper = false): string[] {
 }
 
 function slug(value: string): string {
-  const cleaned = value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48);
+  // Provider names can originate in customer-controlled data. Bound the scan
+  // and build the slug in one linear pass instead of using a backtracking
+  // trim expression on an unbounded string.
+  const input = value.slice(0, 256).trim().toLowerCase();
+  let cleaned = "";
+  let separatorPending = false;
+
+  for (const char of input) {
+    const code = char.charCodeAt(0);
+    const isDigit = code >= 48 && code <= 57;
+    const isLowerAscii = code >= 97 && code <= 122;
+    if (isDigit || isLowerAscii) {
+      if (separatorPending && cleaned.length > 0 && cleaned.length < 48) cleaned += "-";
+      if (cleaned.length < 48) cleaned += char;
+      separatorPending = false;
+    } else if (cleaned.length > 0) {
+      separatorPending = true;
+    }
+    if (cleaned.length >= 48) break;
+  }
+
   return cleaned || "capital-provider";
 }
 

@@ -31,6 +31,10 @@ export function reportSnapshotDigest(value: unknown): string {
   };
   return createHash("sha256").update(canonical(JSON.parse(JSON.stringify(value)))).digest("hex");
 }
+// Full replay references remain in the immutable evidence snapshot. The PDF
+// shows the source and date without long internal identifiers crowding its text.
+const sourceLabel = (value: string | null | undefined) =>
+  value?.replace(/; replay [^;]+/g, "").trim() || "Source not published";
 const money = (n: number | null) => n === null ? "Not established" :
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
@@ -153,12 +157,12 @@ export function buildAutomatedPropertyReport(input: {
     risks: [...warnings, "The candidate order uses the published preliminary planning rules; it is not a measured probability, appraisal, or purchase recommendation."],
     pathwayAnalysis: programs.map(p => `${p.name} (${p.administering_body}): ${p.verifiedStatement} ${p.personSideCaveat} Source: ${p.source_citation}; as of ${p.asOf}.`),
     propertyVerificationSummary: [`Identity status: ${verification.status}.`, ...verification.warnings],
-    verifiedCriteria: brief.verifiedFacts.map(f => `${f.label}: ${f.value}. ${f.provenance}`),
+    verifiedCriteria: brief.verifiedFacts.map(f => `${f.label}: ${f.value}. ${sourceLabel(f.provenance)}`),
     readinessSectionNotes: ["Borrower financial eligibility and lender approval have not been evaluated."],
     keyQuestions: unknowns.slice(0, 8),
     nextMoves: unknowns.slice(0, 5),
     includedSections: [...reportPolicy.paid.includes],
-    explainabilityNotes: [AUTOMATED_PROPERTY_REPORT_VERSION, `Source snapshot SHA-256: ${evidenceDigest}`,
+    explainabilityNotes: [AUTOMATED_PROPERTY_REPORT_VERSION, `Source snapshot SHA-256:\n${evidenceDigest.slice(0, 32)}\n${evidenceDigest.slice(32)}`,
       "Source observation dates are listed separately from this report's generation date. Free warnings are never withheld behind purchase.",
       "Unadjusted transfers, county averages and assessments are context, not subject-property forecasts.",
       scenarios.rankingRule],
@@ -169,7 +173,7 @@ export function buildAutomatedPropertyReport(input: {
     buyingProcess: brief.mechanics?.paragraphs,
     honestUnknowns: unknowns,
     financingProse: brief.pathwaysProse,
-    placeFacts: brief.verifiedFacts.map(f => ({ label: f.label, value: f.value, source: f.provenance ?? "Source not published" })),
+    placeFacts: brief.verifiedFacts.map(f => ({ label: f.label, value: f.value, source: sourceLabel(f.provenance) })),
     diligenceCosts: brief.diligenceCosts,
     laneAnswers: laneAnswers.length ? { title: "Questions for this property", lines: laneAnswers } : null,
   };

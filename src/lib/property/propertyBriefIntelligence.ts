@@ -1431,7 +1431,7 @@ function buildUnknowns(args: {
     pointer: "Independent inspection",
     url: "https://www.nachi.org/find-an-inspector",
     howToFind:
-      "Government sales are as-is and our snapshot cannot see inside the building. An independent " +
+      "The snapshot cannot establish interior condition or repair scope. An independent " +
       "inspection (plus a contractor walk-through where repairs look likely) is the only real answer.",
   });
   // What you'd actually OWN (founder direction 2026-07-17): lot size, and

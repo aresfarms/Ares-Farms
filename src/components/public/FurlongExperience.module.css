@@ -116,20 +116,30 @@
 .address :global(.fl-front-door-outcomes) {
   display: none;
 }
-.address :global(.fl-front-door-control) {
+.address :global(.fl-front-door-control),
+.modePanel :global(.fl-front-door-control) {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin: 8px 0;
 }
-.address input {
+.address input,
+.modePanel :global(.fl-front-door-control) input {
+  min-height: 48px;
+  font: inherit;
+  font-size: 16px;
+  box-sizing: border-box;
+  width: 100%;
   min-width: 180px;
   flex: 1;
   border: 1px solid #899ea9;
   border-radius: 8px;
   padding: 12px;
 }
-.address button {
+.address button,
+.modePanel :global(.fl-front-door-control) button {
+  min-height: 48px;
+  font: inherit;
   border: 0;
   border-radius: 8px;
   background: #0c635c;
@@ -137,7 +147,8 @@
   padding: 12px;
   cursor: pointer;
 }
-.address :global(.fl-front-door-error) {
+.address :global(.fl-front-door-error),
+.modePanel :global(.fl-front-door-error) {
   display: block;
   color: #9a3323;
 }

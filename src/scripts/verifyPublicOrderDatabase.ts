@@ -105,6 +105,8 @@ async function main() {
     assert(held.handled && held.order.status === "HELD");
     const noGrant = await migrations.query("SELECT COUNT(*)::int n FROM furlong_public_access_grants WHERE order_id=$1 AND active", [absent.order.id]);
     assert.equal(noGrant.rows[0].n, 0);
+    const refundReservation = await store.reservePublicOrderFullRefund({ orderId: absent.order.id, traceId: randomUUID() });
+    assert.equal(refundReservation.state, "RESERVED", "a paid report held before delivery remains refundable");
     const disputed = await create(); await apply(disputed.event);
     await apply({ ...disputed.event, providerEventId: "evt_dispute_" + randomUUID(), eventType: "charge.dispute.created" });
     const disputeOrder = await store.loadPublicOrder({ orderId: disputed.order.id, buyerActorId: null, accessToken: disputed.accessToken });

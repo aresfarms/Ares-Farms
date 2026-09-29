@@ -473,6 +473,10 @@ export async function resolvePropertyFacts(
   input: PropertyFactsRequest,
   options: { fresh?: boolean } = {},
 ): Promise<PropertyFactsSnapshot> {
+  if (!input || typeof input !== "object" || Array.isArray(input) ||
+      Object.values(input).some(value => value != null && (typeof value !== "string" || value.length > 4000))) {
+    return { ok: false, status: 400, error: "Property facts require text input fields within the supported length." };
+  }
   const key = JSON.stringify(input);
   const cached = factsCache.get(key);
   if (!options.fresh && cached && Date.now() - cached.at < FACTS_CACHE_TTL_MS) {

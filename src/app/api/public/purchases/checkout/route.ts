@@ -128,7 +128,7 @@ async function resolveTarget(input: {
     const target = propertyTarget(value);
     const comparisonId = textValue(value.analysisComparisonId, 64);
     if (!target || !comparisonId) return target;
-    if (!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(comparisonId)) return null;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(comparisonId)) return null;
     const bundle = await loadPropertyComparison({ comparisonId, ownerActorId: input.actorId, accessToken: bearer(input.req) });
     const item = bundle?.items.find(item => item.status === "COMPLETED" && item.propertyId === target.snapshot.propertyId &&
       normalizedListingAddress(item.normalizedAddress ?? item.submittedAddress) === normalizedListingAddress(String(target.snapshot.exactAddress)));

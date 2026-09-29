@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - master-volume-build
+      - "release/**"
   pull_request:
     branches:
       - main
       - feature/p2-cloud-run-private
+      - "release/**"
 
 # Master Volume Governance:
 # - Vol III: keeps every push and pull request under deterministic,
@@ -245,6 +247,13 @@ jobs:
       # content, and a malformed/incomplete active CCR each force a failure.
       - name: CI live-state gate fail-closed proof
         run: npm run smoke:ci-live-state-proof
+
+      - name: Property report commerce and payment controls
+        run: |
+          npm run verify:public-order-billing
+          npm run verify:public-report-commerce
+          npm run verify:progressive-intelligence
+          npm run verify:property-decision-front-page
 
       - name: Next.js production build
         run: npm run build

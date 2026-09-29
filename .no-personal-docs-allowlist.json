@@ -1,0 +1,42 @@
+[
+  {
+    "path": "src/lib/property/propertyFloodHistoricGenerated.ts",
+    "reason": "Release-only false-positive review: generated PUBLIC USDA property data contains a numeric listing identifier that matches the card-prefix regex but is not cardholder data and fails the Luhn checksum.",
+    "approvingAuthority": "Repository owner — authorized build/deploy/test on 2026-09-17",
+    "expirationDate": "2026-09-18T03:59:00Z",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/propertyHubzonesGenerated.ts",
+    "reason": "Release-only false-positive review: generated PUBLIC USDA property data contains a numeric listing identifier that matches the card-prefix regex but is not cardholder data and fails the Luhn checksum.",
+    "approvingAuthority": "Repository owner — authorized build/deploy/test on 2026-09-17",
+    "expirationDate": "2026-09-18T03:59:00Z",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/propertyNmtcGenerated.ts",
+    "reason": "Release-only false-positive review: generated PUBLIC USDA property data contains a numeric listing identifier that matches the card-prefix regex but is not cardholder data and fails the Luhn checksum.",
+    "approvingAuthority": "Repository owner — authorized build/deploy/test on 2026-09-17",
+    "expirationDate": "2026-09-18T03:59:00Z",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/propertyOpportunityZonesGenerated.ts",
+    "reason": "Release-only false-positive review: generated PUBLIC USDA property data contains a numeric listing identifier that matches the card-prefix regex but is not cardholder data and fails the Luhn checksum.",
+    "approvingAuthority": "Repository owner — authorized build/deploy/test on 2026-09-17",
+    "expirationDate": "2026-09-18T03:59:00Z",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/usdaResaleGenerated.ts",
+    "reason": "Release-only false-positive review: generated PUBLIC USDA property data contains a numeric listing identifier that matches the card-prefix regex but is not cardholder data and fails the Luhn checksum.",
+    "approvingAuthority": "Repository owner — authorized build/deploy/test on 2026-09-17",
+    "expirationDate": "2026-09-18T03:59:00Z",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  }
+]

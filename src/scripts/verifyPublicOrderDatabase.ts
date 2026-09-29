@@ -33,9 +33,9 @@ async function main() {
     const bytes = Buffer.from("%PDF-1.7\nsynthetic delivery-byte fixture\n%%EOF");
     const digest = createHash("sha256").update(bytes).digest("hex");
     const sourceDigest = "b".repeat(64);
-    async function create(ready = true, targetRef = "synthetic-property") {
+    async function create(ready = true, targetRef = "synthetic-property", product = PUBLIC_PRODUCTS.focused_property_report) {
       const result = await store.createPublicOrder({ checkoutRequestId: randomUUID(), buyerActorId: null,
-        product: PUBLIC_PRODUCTS.focused_property_report, targetType: "PROPERTY", targetRef,
+        product, targetType: "PROPERTY", targetRef,
         targetSnapshot: { exactAddress: "SYNTHETIC TEST PROPERTY" }, priceReviewId: "synthetic-price-review",
         maxOpenOrders: 100, traceId: randomUUID() });
       const artifactId = randomUUID(), now = new Date().toISOString();
@@ -54,9 +54,9 @@ async function main() {
       const session = "cs_test_" + randomUUID();
       await store.attachPublicOrderCheckout({ orderId: result.order.id, checkoutSessionId: session, traceId: randomUUID() });
       const event: PublicOrderStripeEventInput = { signatureVerified: true, providerEventId: "evt_test_" + randomUUID(),
-        eventType: "checkout.session.completed", orderId: result.order.id, productCode: "focused_property_report",
+        eventType: "checkout.session.completed", orderId: result.order.id, productCode: product.code,
         productCatalogVersion: PUBLIC_PRODUCT_CATALOG_VERSION, checkoutSessionId: session,
-        paymentIntentId: "pi_test_" + randomUUID(), amountCents: 4900, amountRefundedCents: null,
+        paymentIntentId: "pi_test_" + randomUUID(), amountCents: result.order.amountTotalCents, amountRefundedCents: null,
         currency: "usd", paymentStatus: "paid" };
       return { ...result, event, artifactId };
     }
@@ -69,6 +69,9 @@ async function main() {
     assert.equal(loaded?.order.status, "FULFILLED");
     assert.equal(artifactStore.readPublicOrderReportArtifact(loaded?.order.metadata)?.status, "AVAILABLE");
     assert.equal(await store.loadPublicOrder({ orderId: order.order.id, buyerActorId: null, accessToken: "another-customer" }), null);
+    const paidAgain = await apply({...order.event, providerEventId: "evt_second_confirmation_" + randomUUID(),
+      eventType: "checkout.session.async_payment_succeeded"});
+    assert(paidAgain.handled && paidAgain.order.status === "FULFILLED", "a different payment confirmation must not reset fulfillment");
     const count = await migrations.query("SELECT COUNT(*)::int n FROM furlong_public_order_events WHERE event_type='public_order.automated_report_fulfilled'");
     assert.equal(count.rows[0].n, 1);
     process.env.DOCUMENT_STORAGE_BUCKET = "synthetic-private-bucket";
@@ -107,6 +110,8 @@ async function main() {
     assert.equal(noGrant.rows[0].n, 0);
     const refundReservation = await store.reservePublicOrderFullRefund({ orderId: absent.order.id, traceId: randomUUID() });
     assert.equal(refundReservation.state, "RESERVED", "a paid report held before delivery remains refundable");
+    const duringRefund = await apply({...absent.event, providerEventId: "evt_payment_during_refund_" + randomUUID()});
+    assert(duringRefund.handled && duringRefund.order.status === "REFUND_PENDING");
     const disputed = await create(); await apply(disputed.event);
     await apply({ ...disputed.event, providerEventId: "evt_dispute_" + randomUUID(), eventType: "charge.dispute.created" });
     const disputeOrder = await store.loadPublicOrder({ orderId: disputed.order.id, buyerActorId: null, accessToken: disputed.accessToken });
@@ -119,9 +124,52 @@ async function main() {
       maxOpenOrders: 1, traceId: randomUUID(),
     })));
     assert.equal(requests.filter(r => r.status === "fulfilled").length, 1);
+    const supervised = await create(false, "supervised-fixture", PUBLIC_PRODUCTS.custom_property_analysis);
+    const supervisedPaid = await apply(supervised.event);
+    assert(supervisedPaid.handled && supervisedPaid.order.status === "FULFILLMENT_PENDING");
+    const action = (orderId: string, action: "START" | "COMPLETE", reportRef?: string) => ({
+      orderId, action, operatorActorId: "synthetic-test-operator", reportRef,
+      evidenceRefs: ["synthetic-review-only"], idempotencyKey: randomUUID(), traceId: randomUUID(),
+    });
+    await assert.rejects(store.transitionPublicOrderFulfillment(action(absent.order.id, "START")), /Automated reports/);
+    await store.transitionPublicOrderFulfillment(action(supervised.order.id, "START"));
+    await assert.rejects(store.reservePublicOrderFullRefund({orderId: supervised.order.id, traceId: randomUUID()}));
+    await assert.rejects(store.transitionPublicOrderFulfillment(action(supervised.order.id, "COMPLETE", "missing-artifact")));
+    const frozen = artifactStore.readPublicOrderReportArtifact(loaded!.order.metadata)!;
+    await db.update(tables.furlongPublicOrders).set({metadata: { reportArtifact: { ...frozen,
+      status: "VERIFIED", objectKey: `public-orders/${supervised.order.id}/${frozen.artifactId}.pdf` } }})
+      .where(eq(tables.furlongPublicOrders.id, supervised.order.id));
+    const completedAction = action(supervised.order.id, "COMPLETE", frozen.artifactId);
+    const completed = await store.transitionPublicOrderFulfillment(completedAction);
+    assert.equal(completed.order.status, "FULFILLED");
+    assert.equal((await store.transitionPublicOrderFulfillment(completedAction)).duplicate, true);
+    const supervisedAgain = await apply({...supervised.event, providerEventId: "evt_second_supervised_confirmation_" + randomUUID()});
+    assert(supervisedAgain.handled && supervisedAgain.order.status === "FULFILLED");
+    const consumedGrant = await migrations.query("SELECT active, units_remaining FROM furlong_public_access_grants WHERE order_id=$1", [supervised.order.id]);
+    assert.equal(consumedGrant.rows[0].active, false);
+    assert.equal(consumedGrant.rows[0].units_remaining, 0);
+
+    const creditSource = await create(true, "upgrade-fixture"); await apply(creditSource.event);
+    const upgrade = () => store.createPublicOrder({checkoutRequestId: randomUUID(), buyerActorId: null,
+      product: PUBLIC_PRODUCTS.custom_property_analysis, targetType: "PROPERTY", targetRef: "upgrade-fixture",
+      targetSnapshot: {}, priceReviewId: "synthetic-price-review", maxOpenOrders: 100, traceId: randomUUID(),
+      upgradeSource: {orderId: creditSource.order.id, accessToken: creditSource.accessToken}});
+    const upgrades = await Promise.allSettled([upgrade(), upgrade()]);
+    assert.equal(upgrades.filter(result => result.status === "fulfilled").length, 1);
+    const upgraded = upgrades.find(result => result.status === "fulfilled")!;
+    assert(upgraded.status === "fulfilled");
+    assert.equal(upgraded.value.order.creditAmountCents, 4900);
+    assert.equal(upgraded.value.order.amountTotalCents, 20000);
+    await apply({...creditSource.event, providerEventId: "evt_refund_" + randomUUID(),
+      eventType: "charge.refunded", amountRefundedCents: 4900});
+    const heldUpgrade = await store.loadPublicOrder({orderId: upgraded.value.order.id,
+      buyerActorId: null, accessToken: upgraded.value.accessToken});
+    assert.equal(heldUpgrade?.order.status, "HELD");
+    await assert.rejects(store.transitionPublicOrderFulfillment(action(upgraded.value.order.id, "START")));
+
     console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["concurrent webhook replay", "atomic automatic fulfillment",
       "missing artifact held", "cross-customer denial", "exact private PDF bytes", "changed object rejected",
-      "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit"] }));
+      "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit", "different-event payment confirmation preserves fulfillment", "payment during refund stays pending", "supervised completion replay", "supervised artifact required", "post-start cancellation denied", "single-use upgrade credit", "source-refund holds upgrade"] }));
   } finally {
     globalThis.fetch = originalFetch;
     await migrations.end();

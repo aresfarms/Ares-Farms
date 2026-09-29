@@ -796,10 +796,18 @@ export async function applyPublicOrderProviderEvent(input: {
       .where(eq(furlongPublicOrders.id, order.id)).limit(1);
     if (!order) return { handled: false as const };
 
-    const decision = evaluatePublicOrderPaymentEvent(
+    let decision = evaluatePublicOrderPaymentEvent(
       paymentSnapshot(order),
       input.event,
     );
+    // Stripe can confirm one payment with different event IDs/types. Preserve
+    // processing/completion and consumed grants once this payment is recorded.
+    if (decision.action === "CONFIRM_PAID" && order.paidAt &&
+        order.amountPaidCents === order.amountTotalCents && order.amountRefundedCents === 0 &&
+        ["FULFILLMENT_PENDING", "IN_FULFILLMENT", "FULFILLED"].includes(order.status)) {
+      decision = { ...decision, action: "RECORD_CHARGE_EVIDENCE", grantAccess: false,
+        reasons: ["SIGNED_PAYMENT_ALREADY_RECORDED_FULFILLMENT_PRESERVED"] };
+    }
     const insertedEvent = await tx
       .insert(furlongPublicOrderEvents)
       .values({
@@ -1605,11 +1613,15 @@ export async function transitionPublicOrderFulfillment(input: {
       order.metadata as Record<string, unknown> | undefined,
     );
     const reportArtifact = readPublicOrderReportArtifact(priorMetadata);
+    if (order.fulfillmentMode !== "SUPERVISED") {
+      throw new PublicOrderConflictError("Automated reports cannot be released through manual fulfillment.");
+    }
     if (input.action === "COMPLETE" && order.fulfillmentMode === "SUPERVISED") {
       if (
         !reportArtifact ||
         reportArtifact.artifactId !== reportRef ||
-        reportArtifact.status !== "VERIFIED" ||
+        !(reportArtifact.status === "VERIFIED" ||
+          (order.status === "FULFILLED" && reportArtifact.status === "AVAILABLE")) ||
         !reportArtifact.verifiedSha256
       ) {
         throw new PublicOrderConflictError(

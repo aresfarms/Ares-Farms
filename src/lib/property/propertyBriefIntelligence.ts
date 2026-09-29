@@ -1185,6 +1185,9 @@ export function applyResolvedFarmParcelContext(
 
   return {
     ...intelligence,
+    profile: classifyPropertyProfile({ propertyType: args.propertyType ?? args.landUse ?? "farm" }),
+    residentialAnswers: null,
+    commercialAnswers: null,
     farmEnterpriseAnswers: answerFarmQuestions(farmFacts),
     farmBestUse: farmBestUse(farmFacts),
   };

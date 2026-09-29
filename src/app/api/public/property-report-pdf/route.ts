@@ -37,6 +37,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "A report payload is required." }, { status: 400 });
   }
 
+  if (body.report.tier?.id !== "free") {
+    return NextResponse.json({ ok: false, error: "Paid reports are prepared and delivered through the private purchase flow." }, { status: 403 });
+  }
+
   if (!body.token || typeof body.token !== "string") {
     return NextResponse.json(
       { ok: false, error: "A short-lived report attestation token is required before export." },

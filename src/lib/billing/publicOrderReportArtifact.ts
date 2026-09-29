@@ -35,6 +35,7 @@ export type PublicOrderReportArtifact = {
   verifiedSha256: string | null;
   objectKey: string;
   storageProvider: string;
+  storageGeneration?: string | null;
   createdAt: string;
   verifiedAt: string | null;
   availableAt: string | null;
@@ -143,6 +144,7 @@ export function readPublicOrderReportArtifact(
       verifiedSha256 && SHA256.test(verifiedSha256) ? verifiedSha256 : null,
     objectKey,
     storageProvider: text(value.storageProvider) ?? "unknown",
+    storageGeneration: /^[0-9]+$/.test(text(value.storageGeneration) ?? "") ? text(value.storageGeneration) : null,
     createdAt,
     verifiedAt: iso(value.verifiedAt),
     availableAt: iso(value.availableAt),

@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,7 +9,7 @@ import {
   recordPublicOrderReportDownload,
 } from "@/lib/billing/publicOrderReportArtifact";
 import { loadPublicOrder } from "@/lib/billing/publicOrderStore";
-import { fetchObjectStream } from "@/lib/documents/gcsResumableUpload";
+import { fetchObjectBytes } from "@/lib/documents/gcsResumableUpload";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 
 const UUID =
@@ -104,8 +104,8 @@ export async function GET(
       409,
     );
   }
-  const object = await fetchObjectStream(artifact.objectKey);
-  if (!object) {
+  const bytes = await fetchObjectBytes(artifact.objectKey, artifact.byteSize, artifact.storageGeneration);
+  if (!bytes) {
     return json(
       {
         ok: false,
@@ -113,6 +113,12 @@ export async function GET(
       },
       503,
     );
+  }
+
+  if (bytes.length !== artifact.byteSize ||
+      createHash("sha256").update(bytes).digest("hex") !== customerArtifact.sha256 ||
+      customerArtifact.sha256 !== artifact.expectedSha256) {
+    return json({ ok: false, error: "Report integrity verification failed. No file was delivered." }, 503);
   }
 
   try {
@@ -133,12 +139,10 @@ export async function GET(
   }
 
   const fileName = customerArtifact.fileName.replace(/[^\w.\- ]+/g, "_");
-  return new NextResponse(object.stream, {
+  return new NextResponse(new Uint8Array(bytes), {
     headers: {
       "Content-Type": "application/pdf",
-      ...(object.contentLength
-        ? { "Content-Length": object.contentLength }
-        : {}),
+      "Content-Length": String(bytes.length),
       "Content-Disposition": `attachment; filename="${fileName}"`,
       "X-Content-Type-Options": "nosniff",
       "Cache-Control": "private, no-store",

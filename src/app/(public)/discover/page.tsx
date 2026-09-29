@@ -6,7 +6,7 @@ import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { PropertyEvaluationWorkspace } from "@/components/property/PropertyEvaluationWorkspace";
 import { PropertyPlaceIntelligence } from "@/components/property/PropertyPlaceIntelligence";
 import { buildPropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
-import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
+import { captureGeneratedEvidenceArtifactDurably } from "@/lib/property/durableEvidenceGenerationCapture";
 import type { ChartVariant } from "@/lib/property/chartThemes";
 import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
 import { resolveOwnershipCostContext } from "@/lib/property/ownershipCostContext";
@@ -203,7 +203,7 @@ function addressFirstAnalysisContext(flow: ReturnType<typeof resolveDiscoveryFlo
 }
 
 /** Render the journey chosen by the resolver. Exported for the path entrypoints. */
-export function DiscoverSurface({ route, query }: { route: string; query: SP }) {
+export async function DiscoverSurface({ route, query }: { route: string; query: SP }) {
   const flow = resolveDiscoveryFlow({ route, query });
   const navigatorCaseId = one(query.caseId);
   const navigatorCaseContext = navigatorCaseId ? {
@@ -292,7 +292,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
       })
     : null;
   if (briefIntelligence && propertyContext?.propertyId) {
-    captureGeneratedEvidenceArtifact({
+    await captureGeneratedEvidenceArtifactDurably({
       kind: "property-report",
       propertyId: propertyContext.propertyId,
       artifactId: `property-report:${propertyContext.propertyId}`,

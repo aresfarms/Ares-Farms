@@ -17,6 +17,7 @@ export type PublicOrderCheckoutTarget =
       type: "PROPERTY";
       exactAddress: string;
       propertyId?: string | null;
+      analysisComparisonId?: string | null;
     }
   | {
       type: "PROPERTY_COMPARISON";
@@ -29,6 +30,7 @@ type CheckoutResponse = {
   orderId?: string;
   orderAccessToken?: string;
   checkoutUrl?: string | null;
+  retryWithNewRequest?: boolean;
 };
 
 function moneyLine(amountCents: number, currency: string): string {
@@ -51,6 +53,7 @@ export function PublicOrderCheckoutAgreement(props: {
   excluded: readonly string[];
   upgradeFromOrderId: string | null;
 }) {
+  const [customerVision, setCustomerVision] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +65,7 @@ export function PublicOrderCheckoutAgreement(props: {
     props.upgradeFromOrderId ? "Confirming prior-report credit…" : null,
   );
   const requestId = useRef<string | null>(null);
+  const recoveryToken = useRef<string | null>(null);
   const payableAmountCents = Math.max(0, props.amountCents - creditAmountCents);
   const upgradeBlocked = Boolean(
     props.upgradeFromOrderId && !upgradeAccessToken,
@@ -146,17 +150,35 @@ export function PublicOrderCheckoutAgreement(props: {
     if (!accepted || busy || upgradeBlocked) return;
     setBusy(true);
     setError(null);
-    requestId.current ??= "public-checkout-" + window.crypto.randomUUID();
+    const recoveryKey = "furlong:checkout:" + JSON.stringify([props.productCode, props.target, customerVision, props.upgradeFromOrderId]);
     try {
+      const saved = window.sessionStorage.getItem(recoveryKey);
+      if (saved) {
+        const value = JSON.parse(saved) as { requestId: string; token: string };
+        requestId.current = value.requestId;
+        recoveryToken.current = value.token;
+      } else {
+        requestId.current = "public-checkout-" + window.crypto.randomUUID();
+        const bytes = window.crypto.getRandomValues(new Uint8Array(32));
+        recoveryToken.current = "furlong-order-" + window.btoa(String.fromCharCode(...bytes))
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        window.sessionStorage.setItem(recoveryKey, JSON.stringify({ requestId: requestId.current, token: recoveryToken.current }));
+      }
+      const storedComparison = window.sessionStorage.getItem("furlong:property-comparison-access:v1");
+      const comparisonAccess = storedComparison ? JSON.parse(storedComparison) as { comparisonId?: string; accessToken?: string } : null;
+      const analysisToken = props.target.type === "PROPERTY" && props.target.analysisComparisonId &&
+        comparisonAccess?.comparisonId === props.target.analysisComparisonId ? comparisonAccess.accessToken : null;
       const response = await fetch("/api/public/purchases/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Idempotency-Key": requestId.current,
+          "Idempotency-Key": requestId.current!,
+          "X-Checkout-Recovery": recoveryToken.current!,
+          ...(analysisToken ? { Authorization: `Bearer ${analysisToken}` } : {}),
         },
         body: JSON.stringify({
           productCode: props.productCode,
-          target: props.target,
+          target: props.target.type === "PROPERTY" ? { ...props.target, customerVision } : props.target,
           agreement: {
             accepted: true,
             version: PUBLIC_ORDER_AGREEMENT_VERSION,
@@ -171,6 +193,7 @@ export function PublicOrderCheckoutAgreement(props: {
         }),
       });
       const result = (await response.json()) as CheckoutResponse;
+      if (result.retryWithNewRequest) window.sessionStorage.removeItem(recoveryKey);
       if (
         !response.ok ||
         !result.ok ||
@@ -188,7 +211,6 @@ export function PublicOrderCheckoutAgreement(props: {
       );
       window.location.assign(result.checkoutUrl);
     } catch (caught) {
-      requestId.current = null;
       setError(
         caught instanceof Error
           ? caught.message
@@ -262,6 +284,14 @@ export function PublicOrderCheckoutAgreement(props: {
         </p>
       ) : null}
 
+      {props.productCode === "focused_property_report" ? (
+        <label>
+          What would you like to do with this property? (optional)
+          <textarea value={customerVision} maxLength={1000} disabled={busy}
+            onChange={event => setCustomerVision(event.target.value)} />
+          <span>Your idea is treated as a proposed use, not a verified property fact.</span>
+        </label>
+      ) : null}
       <div className={styles.refundTerms}>
         <h3>{PUBLIC_ORDER_AGREEMENT_TITLE}</h3>
         {PUBLIC_ORDER_AGREEMENT_TERMS.map((term) => (
@@ -285,7 +315,7 @@ export function PublicOrderCheckoutAgreement(props: {
         onClick={() => void beginCheckout()}
       >
         {busy
-          ? "OPENING SECURE CHECKOUT…"
+          ? (props.productCode === "focused_property_report" ? "VERIFYING YOUR REPORT BEFORE CHECKOUT…" : "OPENING SECURE CHECKOUT…")
           : publicOrderPaymentButtonLabel(payableAmountCents, props.currency)}
       </button>
       {error ? (

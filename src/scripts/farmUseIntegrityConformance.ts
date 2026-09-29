@@ -63,6 +63,6 @@ assert.equal(zoning?.zoningLabel, "R - Rural District");
 const chassis = readFileSync("src/components/property/lanes/GovernedLaneChassis.tsx", "utf8");
 assert(!chassis.includes("leads Furlong's preliminary agricultural enterprise screen"));
 assert(chassis.includes("farmScreen?.headline"));
-const route = readFileSync("src/app/api/public/property-facts/route.ts", "utf8");
+const route = readFileSync("src/lib/property/propertyFactsService.ts", "utf8");
 assert(route.includes("fetchMarylandParcelSoils") && route.includes("basePlaceIntelligence.soilProfile = parcelSoils"));
 console.log(JSON.stringify({ok:true,rule:"FARM-EVIDENCE-INTEGRITY-002",seippesDoesNotRankAlfalfa:true,adequateEvidenceUnlocksScreen:true,wholeParcelBudgetArithmetic:40000,fieldPhNotMappedPh:true,pointNotParcel:true}));

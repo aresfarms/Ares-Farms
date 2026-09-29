@@ -55,6 +55,7 @@ type PropertyEvaluationPdfInput = {
     requiredInputs: string[];
   };
   conceptSummary: string[];
+  scenarioComparison?: string[];
   strengths: string[];
   risks: string[];
   pathwayAnalysis: string[];
@@ -724,6 +725,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   if (input.laneAnswers && input.laneAnswers.lines.length > 0) {
     heading(input.laneAnswers.title);
     bullets(input.laneAnswers.lines);
+  }
+
+  if (input.scenarioComparison?.length) {
+    heading("Preliminary Use Comparison");
+    bullets(input.scenarioComparison);
   }
 
   // ── COST POSTURE ───────────────────────────────────────────────────────────

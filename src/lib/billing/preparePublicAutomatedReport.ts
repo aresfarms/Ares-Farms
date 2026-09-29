@@ -36,7 +36,8 @@ export async function preparePublicAutomatedReport(input: {
   const packages = Array.isArray(captured.packages) && captured.packages.every(isEnterpriseEconomicEvidencePackage) ? captured.packages : null;
   const economicEvidence = packages && typeof captured.propertyId === "string" && typeof captured.comparisonItemId === "string"
     ? { propertyId: captured.propertyId, comparisonItemId: captured.comparisonItemId, packages } : null;
-  const report = buildAutomatedPropertyReport({ facts, requestedAddress: exactAddress, customerVision, generatedAt, economicEvidence });
+  const selectedReportCandidateId = typeof target.selectedReportCandidateId === "string" ? target.selectedReportCandidateId : null;
+  const report = buildAutomatedPropertyReport({ facts, requestedAddress: exactAddress, customerVision, selectedReportCandidateId, generatedAt, economicEvidence });
   // A parseable PDF is not product acceptance. The current planning-only
   // engine cannot authorize a charge without complete server-owned economic
   // evidence. Review artifacts remain available through the internal script.

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Disclosures } from "@/components/public/Disclosures";
 import { DiscoveryEngine } from "@/components/discovery/DiscoveryEngine";
@@ -329,6 +330,9 @@ export async function DiscoverSurface({ route, query }: { route: string; query: 
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       {propertyContext ? (
         <>
+          {propertyContext.exactAddress ? <p>
+            <Link href={`/property-evidence?${new URLSearchParams({ address: propertyContext.exactAddress })}`}>Save this property and prepare its report</Link>
+          </p> : null}
           {/* The Chart Table renders the full Place Brief (chart concept,
               founder-selected 2026-07-16) — no separate intelligence section. */}
           <PropertyEvaluationWorkspace

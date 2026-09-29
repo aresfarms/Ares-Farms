@@ -27,9 +27,47 @@ async function main() {
   const migrations = new Pool({ connectionString: url.toString(), ssl: false });
   const originalFetch = globalThis.fetch;
   try {
-    for (const name of ["0064_furlong_public_orders.sql", "0065_public_order_upgrade_credit.sql"]) {
+    for (const name of ["0058_furlong_case_lifecycle.sql", "0060_furlong_case_living_record_upgrade.sql", "0063_furlong_property_comparisons.sql", "0064_furlong_public_orders.sql", "0065_public_order_upgrade_credit.sql"]) {
       await migrations.query(await readFile("src/lib/db/migrations/" + name, "utf8"));
     }
+    const comparisons = await import("@/lib/intelligence/propertyComparisonStore");
+    const { basePackage } = await import("./fixtures/economicEvidence");
+    const { propertyReportPreparation } = await import("@/lib/intelligence/propertyReportPreparation");
+    const address = "123 Fixture Rd, Testville, MD 00000";
+    const savedCase = await comparisons.createPropertyComparison({
+      intake: { addresses: [address], excludedAddresses: [], requestedResultCount: 1 }, ownerActorId: null, traceId: randomUUID(),
+    });
+    const access = { comparisonId: savedCase.comparisonId, ownerActorId: null, accessToken: savedCase.accessToken };
+    assert.equal(await comparisons.loadPropertyComparison({ ...access, accessToken: "wrong-customer" }), null);
+    const [claimed] = await comparisons.claimQueuedPropertyComparisonItems({ comparisonId: savedCase.comparisonId, limit: 1, traceId: randomUUID() });
+    assert(claimed);
+    await comparisons.recordPropertyComparisonVerification({ itemId: claimed.id, comparisonId: savedCase.comparisonId,
+      verified: true, normalizedAddress: address, propertyId: "synthetic-comparison-property", traceId: randomUUID(),
+      resultSnapshot: { verificationStatus: "verified" } });
+    await comparisons.claimVerifiedPropertyComparisonItems({ comparisonId: savedCase.comparisonId, limit: 1, traceId: randomUUID() });
+    await comparisons.recordPropertyComparisonEvidenceGap({ itemId: claimed.id, comparisonId: savedCase.comparisonId,
+      missingEvidence: ["Synthetic missing operating budget"], analysisSnapshot: { evidenceCapture: { version: "property-evidence-capture-v1", classification: "CONFIDENTIAL", synthetic: true } }, traceId: randomUUID() });
+    const reopened = await comparisons.loadPropertyComparison(access);
+    assert.equal(reopened?.items[0].status, "NEEDS_EVIDENCE");
+    assert.equal((reopened?.items[0].resultSnapshot as { evidenceCapture: { synthetic: boolean } }).evidenceCapture.synthetic, true);
+    const packages = (["best-single-enterprise", "best-mixed-use", "best-distinct-alternative"] as const).map((role, index) => {
+      const p = structuredClone(basePackage);
+      p.propertyId = "synthetic-comparison-property"; p.address = address;
+      p.packageId = `database-fixture-${index}`; p.candidate.id = `candidate-${index}`;
+      p.candidate.title = `Synthetic use ${index}`; p.candidate.candidateRole = role;
+      p.candidate.enterpriseComponents = index === 1 ? ["A", "B"] : ["A"];
+      return p;
+    });
+    const finished = await comparisons.recordCompletedPropertyComparisonAnalysis({ itemId: claimed.id,
+      comparisonId: savedCase.comparisonId, evidencePackages: packages, traceId: randomUUID() });
+    assert(finished);
+    const readyCase = await comparisons.loadPropertyComparison(access);
+    assert(readyCase);
+    assert.equal((readyCase.items[0].resultSnapshot as { evidenceCapture: { synthetic: boolean } }).evidenceCapture.synthetic, true, "completion must preserve captured source evidence");
+    assert(propertyReportPreparation(readyCase.items[0], new Date("2026-09-29")).evidenceReady, "stored JSONB wrappers must reopen for report preparation");
+    assert(!propertyReportPreparation(readyCase.items[0], new Date("2028-01-01")).evidenceReady);
+    assert.equal(await comparisons.loadPropertyComparison({ ...access, accessToken: "another-customer-token" }), null);
+
     const bytes = Buffer.from("%PDF-1.7\nsynthetic delivery-byte fixture\n%%EOF");
     const digest = createHash("sha256").update(bytes).digest("hex");
     const sourceDigest = "b".repeat(64);
@@ -188,7 +226,7 @@ async function main() {
     assert.equal(heldUpgrade?.order.status, "HELD");
     await assert.rejects(store.transitionPublicOrderFulfillment(action(upgraded.value.order.id, "START")));
 
-    console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["concurrent webhook replay", "atomic automatic fulfillment",
+    console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["saved evidence and recovery", "comparison ownership denial", "completed evidence JSONB round trip", "stale saved evidence denied", "concurrent webhook replay", "atomic automatic fulfillment",
       "missing artifact held", "cross-customer denial", "exact private PDF bytes", "changed object rejected",
       "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit", "different-event payment confirmation preserves fulfillment", "out-of-order pre-payment notifications cannot undo payment or refund", "payment during refund stays pending", "supervised completion replay", "supervised artifact required", "post-start cancellation denied", "single-use upgrade credit", "concurrent source-refund holds upgrade"] }));
   } finally {

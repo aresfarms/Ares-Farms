@@ -3,7 +3,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
-import { isEnterpriseEconomicEvidencePackage } from "@/lib/intelligence/economicEvidencePackage";
+import { storedEconomicPackages, supportedReportChoices, assessStoredEconomicEvidence } from "@/lib/intelligence/storedEconomicEvidence";
 import { preparePublicAutomatedReport } from "@/lib/billing/preparePublicAutomatedReport";
 import { verifiedAutomatedReportForOrder } from "@/lib/billing/publicAutomatedReportPolicy";
 import { AutomatedReportNotReadyError } from "@/lib/reports/automatedPropertyReport";
@@ -111,7 +111,8 @@ function propertyTarget(value: Record<string, unknown>): CheckoutTarget | null {
     snapshot: {
       exactAddress,
       propertyId,
-      customerVision: textValue(value.customerVision, 1000),
+      customerVision: null,
+      selectedReportCandidateId: null,
       source: "customer-selected-public-property",
     },
   };
@@ -127,16 +128,22 @@ async function resolveTarget(input: {
   if (type === "PROPERTY") {
     const target = propertyTarget(value);
     const comparisonId = textValue(value.analysisComparisonId, 64);
-    if (!target || !comparisonId) return target;
+    // Free-form visions cannot enter automated ranking. Resolve a supported
+    // candidate selector against this customer's saved, current evidence.
+    if (textValue(value.customerVision, 1000)) return null;
+    const selectedCandidateId = textValue(value.selectedReportCandidateId, 200);
+    if (!target || !comparisonId) return selectedCandidateId ? null : target;
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(comparisonId)) return null;
     const bundle = await loadPropertyComparison({ comparisonId, ownerActorId: input.actorId, accessToken: bearer(input.req) });
     const item = bundle?.items.find(item => item.status === "COMPLETED" && item.propertyId === target.snapshot.propertyId &&
       normalizedListingAddress(item.normalizedAddress ?? item.submittedAddress) === normalizedListingAddress(String(target.snapshot.exactAddress)));
     if (!item) return null;
-    const snapshot = record(item.resultSnapshot);
-    const packages = Array.isArray(snapshot.economicEvidencePackages)
-      ? snapshot.economicEvidencePackages.map(entry => record(entry).package) : [];
-    if (packages.length !== 3 || !packages.every(isEnterpriseEconomicEvidencePackage)) return null;
+    const packages = storedEconomicPackages(item.resultSnapshot);
+    if (!packages || !assessStoredEconomicEvidence(item, new Date())?.ok) return null;
+    const choice = selectedCandidateId ? supportedReportChoices(packages).find(c => c.id === selectedCandidateId) : null;
+    if (selectedCandidateId && !choice) return null;
+    target.snapshot.selectedReportCandidateId = choice?.id ?? null;
+    target.snapshot.customerVision = choice?.title ?? null;
     target.snapshot.economicEvidence = { propertyId: item.propertyId, comparisonItemId: item.id, packages };
     target.snapshot.analysisComparisonId = comparisonId;
     return target;

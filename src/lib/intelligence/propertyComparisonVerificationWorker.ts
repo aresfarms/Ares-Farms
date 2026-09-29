@@ -2,6 +2,7 @@ import {
   claimQueuedPropertyComparisonItems,
   recordPropertyComparisonVerification,
 } from "@/lib/intelligence/propertyComparisonStore";
+import { findCanonicalPropertyByExactAddress } from "@/lib/property/propertyData";
 import { verifyImportedPropertyAddress } from "@/lib/property/importedPropertyVerification";
 
 export async function processPropertyComparisonVerificationBatch(input: {
@@ -38,7 +39,7 @@ export async function processPropertyComparisonVerificationBatch(input: {
         comparisonId: item.comparisonId,
         verified,
         normalizedAddress: verification.normalizedAddress,
-        propertyId: verified ? "imported:comparison:" + item.id : null,
+        propertyId: verified ? (findCanonicalPropertyByExactAddress(verification.normalizedAddress ?? "")?.canonical_property_id ?? "imported:comparison:" + item.id) : null,
         failureCode: verified ? null : verification.status.toUpperCase(),
         evidenceRefs: [input.traceId],
         resultSnapshot: {

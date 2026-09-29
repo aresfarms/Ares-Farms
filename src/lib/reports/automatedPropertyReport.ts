@@ -4,6 +4,7 @@ import type { PropertyFactsSnapshot } from "@/lib/property/propertyFactsService"
 import { classifyPropertyProfile } from "@/lib/property/propertyProfile";
 import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
 import { compilePropertyComparisonEconomicAnalysis } from "@/lib/intelligence/propertyComparisonEconomicAnalysis";
+import { supportedReportChoices } from "@/lib/intelligence/storedEconomicEvidence";
 import type { EnterpriseEconomicEvidencePackage } from "@/lib/intelligence/economicEvidencePackage";
 import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
@@ -47,6 +48,7 @@ export function buildAutomatedPropertyReport(input: {
   requestedAddress: string;
   customerVision: string | null;
   generatedAt: Date;
+  selectedReportCandidateId?: string | null;
   economicEvidence?: { propertyId: string; comparisonItemId: string; packages: EnterpriseEconomicEvidencePackage[] } | null;
 }) {
   const { facts } = input;
@@ -100,8 +102,11 @@ export function buildAutomatedPropertyReport(input: {
     packages: economic.packages.map(p => ({ ...p, generatedAt: input.generatedAt.toISOString() })),
   }) : null;
   const identityMatches = Boolean(economic && economic.propertyId === facts.propertyId);
-  const selectedVisionMatches = !input.customerVision || Boolean(economic?.packages.some(p =>
-    p.candidate.candidateRole === "customer-vision" && p.candidate.title.trim().toLowerCase() === input.customerVision!.trim().toLowerCase()));
+  const selectedChoice = input.selectedReportCandidateId && economic
+    ? supportedReportChoices(economic.packages).find(c => c.id === input.selectedReportCandidateId) : null;
+  const selectedVisionMatches = input.selectedReportCandidateId
+    ? Boolean(selectedChoice && selectedChoice.title === input.customerVision)
+    : !input.customerVision;
   const saleReasons = !economics ? ["The property-specific use comparison does not yet have complete source-backed evidence."]
     : !economics.ok ? economics.missingEvidence : [];
   if (economic && !identityMatches) saleReasons.push("The economic evidence is for a different property identity.");
@@ -132,7 +137,7 @@ export function buildAutomatedPropertyReport(input: {
       explanation: "Review the sourced facts, compare the candidate uses, and resolve the listed evidence gaps before committing to a purchase or financing." },
     executiveSummary: `This report evaluates ${verification.normalizedAddress} as ${profile.label.toLowerCase()}. ` +
       `The parcel references are ${property.parcelRefs.join(", ")}. ` +
-      (input.customerVision ? `Your stated vision is: ${input.customerVision}. ` : "No customer vision was supplied; the third candidate is an alternative to investigate. ") +
+      (input.customerVision ? `Your stated vision is: ${input.customerVision}. ` : "No candidate preference was supplied. ") +
       "The comparison is preliminary. Physical suitability, legal use, market demand and operating cash flow require the specific evidence listed below.",
     propertySummary: [
       `Evidence frozen: ${input.generatedAt.toISOString()}`,
@@ -204,7 +209,19 @@ export function buildAutomatedPropertyReport(input: {
         ...projection.assumptions,
       ];
     });
+    // The completed packages supersede the free screen's generic missing-input
+    // text. Carry their actual findings and outstanding conditions into every
+    // report section, so an evidenced budget is not later described as absent.
+    const conditions = [...new Set(economic.packages.flatMap(p => Object.values(p.constraints)
+      .flatMap(finding => finding.conditions.map(condition => `${p.candidate.title}: ${condition}`))))];
+    const findings = economic.packages.flatMap(p => p.findings.map(finding =>
+      `${p.candidate.title} — ${finding.domain}: ${finding.summary}`));
+    model.laneAnswers = { title: "Evidence supporting the evaluated uses", lines: findings };
+    model.honestUnknowns = [...conditions, "Borrower-specific financial eligibility and lender approval have not been evaluated."];
+    model.keyQuestions = [...model.honestUnknowns];
+    model.nextMoves = conditions.length ? conditions : ["Reconfirm source dates and the stated project terms before committing to a purchase."];
     model.executiveSummary = `This report evaluates ${verification.normalizedAddress} as ${profile.label.toLowerCase()}. ` +
+      (selectedChoice ? `Your selected interest is ${selectedChoice.title}; all evaluated uses remain in the comparison. ` : "") +
       "Three preliminary scenarios have complete source-backed economic packages. Viable or conditional candidates appear before blocked uses; within each group, the order uses first-year net after debt and capital, then five-year cumulative net, DSCR and evidence confidence. Documented conditions still govern each use.";
     model.risks = [...warnings, ...economic.packages.flatMap(p => Object.values(p.constraints)
       .filter(finding => finding.status !== "clear").map(finding => `${p.candidate.title}: ${finding.summary} ${finding.conditions.join(" ")}`)),
@@ -215,7 +232,7 @@ export function buildAutomatedPropertyReport(input: {
   }
   return { model, evidenceDigest, modelDigest: reportSnapshotDigest(model), saleReadiness,
     quality: { identityMatched: true, parcelMatched: true, sourceAttributed: true,
-      preliminaryComparison: true, economicsStatus: saleReadiness.allowed ? "SOURCE_SUPPORTED" : "MISSING_VERIFIED_INPUTS", warnings, unresolvedEvidence: unknowns },
+      preliminaryComparison: true, economicsStatus: saleReadiness.allowed ? "SOURCE_SUPPORTED" : "MISSING_VERIFIED_INPUTS", warnings, unresolvedEvidence: saleReadiness.allowed ? model.honestUnknowns ?? [] : unknowns },
     scenarioPlan: scenarios, capitalPlan };
 }
 

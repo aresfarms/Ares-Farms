@@ -43,6 +43,16 @@ async function main() {
     economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });
   assert.equal(supported.saleReadiness.allowed, true, JSON.stringify(supported.saleReadiness));
   assert(supported.model.conceptSummary.some(line => line.includes("NOI")));
+  assert(!supported.model.honestUnknowns?.some(line => line.includes("Obtain a complete sourced operating budget")), "completed budget evidence must replace generic missing-budget text");
+  assert(supported.model.laneAnswers?.lines.some(line => line.includes("operating-costs")));
+  const chosen = buildAutomatedPropertyReport({ ...input, customerVision: packages[0].candidate.title,
+    selectedReportCandidateId: packages[0].candidate.id,
+    economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });
+  assert(chosen.saleReadiness.allowed, "a supported single use can be selected without creating a duplicate vision candidate");
+  assert(chosen.model.executiveSummary.includes(packages[0].candidate.title));
+  const unsupported = buildAutomatedPropertyReport({ ...input, customerVision: "Unrestricted custom idea", selectedReportCandidateId: "not-evaluated",
+    economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });
+  assert(!unsupported.saleReadiness.allowed);
   assert(!supported.model.conceptSummary.some(line => line.includes("withheld")));
   const constrainedPackages = structuredClone(packages);
   constrainedPackages[0].constraints.zoning.status = "blocked";

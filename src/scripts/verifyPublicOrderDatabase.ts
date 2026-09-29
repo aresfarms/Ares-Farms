@@ -72,6 +72,10 @@ async function main() {
     const paidAgain = await apply({...order.event, providerEventId: "evt_second_confirmation_" + randomUUID(),
       eventType: "checkout.session.async_payment_succeeded"});
     assert(paidAgain.handled && paidAgain.order.status === "FULFILLED", "a different payment confirmation must not reset fulfillment");
+    for (const eventType of ["checkout.session.completed", "checkout.session.expired", "payment_intent.payment_failed"]) {
+      const late = await apply({...order.event, providerEventId: "evt_out_of_order_" + randomUUID(), eventType, paymentStatus: "unpaid"});
+      assert(late.handled && late.order.status === "FULFILLED", `late ${eventType} must not undo payment`);
+    }
     const count = await migrations.query("SELECT COUNT(*)::int n FROM furlong_public_order_events WHERE event_type='public_order.automated_report_fulfilled'");
     assert.equal(count.rows[0].n, 1);
     process.env.DOCUMENT_STORAGE_BUCKET = "synthetic-private-bucket";
@@ -102,6 +106,8 @@ async function main() {
     await apply({ ...order.event, providerEventId: "evt_late_paid_" + randomUUID() });
     const afterLatePayment = await store.loadPublicOrder({ orderId: order.order.id, buyerActorId: null, accessToken: order.accessToken });
     assert.equal(afterLatePayment?.order.status, "REFUNDED");
+    const afterLateExpiry = await apply({...order.event, providerEventId: "evt_late_expiry_" + randomUUID(), eventType: "checkout.session.expired"});
+    assert(afterLateExpiry.handled && afterLateExpiry.order.status === "REFUNDED");
 
     const absent = await create(false);
     const held = await apply(absent.event);
@@ -160,8 +166,21 @@ async function main() {
     assert(upgraded.status === "fulfilled");
     assert.equal(upgraded.value.order.creditAmountCents, 4900);
     assert.equal(upgraded.value.order.amountTotalCents, 20000);
-    await apply({...creditSource.event, providerEventId: "evt_refund_" + randomUUID(),
-      eventType: "charge.refunded", amountRefundedCents: 4900});
+    const upgradeCheckout = "cs_test_upgrade_" + randomUUID();
+    await store.attachPublicOrderCheckout({orderId: upgraded.value.order.id, checkoutSessionId: upgradeCheckout, traceId: randomUUID()});
+    await apply({...supervised.event, providerEventId: "evt_upgrade_paid_" + randomUUID(),
+      orderId: upgraded.value.order.id, checkoutSessionId: upgradeCheckout,
+      paymentIntentId: "pi_test_upgrade_" + randomUUID(), amountCents: 20000});
+    await store.transitionPublicOrderFulfillment(action(upgraded.value.order.id, "START"));
+    await db.update(tables.furlongPublicOrders).set({metadata: { reportArtifact: { ...frozen,
+      status: "VERIFIED", objectKey: `public-orders/${upgraded.value.order.id}/${frozen.artifactId}.pdf` } }})
+      .where(eq(tables.furlongPublicOrders.id, upgraded.value.order.id));
+    const conflicting = await Promise.allSettled([
+      store.transitionPublicOrderFulfillment(action(upgraded.value.order.id, "COMPLETE", frozen.artifactId)),
+      apply({...creditSource.event, providerEventId: "evt_refund_" + randomUUID(),
+        eventType: "charge.refunded", amountRefundedCents: 4900}),
+    ]);
+    assert.equal(conflicting[1].status, "fulfilled");
     const heldUpgrade = await store.loadPublicOrder({orderId: upgraded.value.order.id,
       buyerActorId: null, accessToken: upgraded.value.accessToken});
     assert.equal(heldUpgrade?.order.status, "HELD");
@@ -169,7 +188,7 @@ async function main() {
 
     console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["concurrent webhook replay", "atomic automatic fulfillment",
       "missing artifact held", "cross-customer denial", "exact private PDF bytes", "changed object rejected",
-      "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit", "different-event payment confirmation preserves fulfillment", "payment during refund stays pending", "supervised completion replay", "supervised artifact required", "post-start cancellation denied", "single-use upgrade credit", "source-refund holds upgrade"] }));
+      "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit", "different-event payment confirmation preserves fulfillment", "out-of-order pre-payment notifications cannot undo payment or refund", "payment during refund stays pending", "supervised completion replay", "supervised artifact required", "post-start cancellation denied", "single-use upgrade credit", "concurrent source-refund holds upgrade"] }));
   } finally {
     globalThis.fetch = originalFetch;
     await migrations.end();

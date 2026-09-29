@@ -808,6 +808,14 @@ export async function applyPublicOrderProviderEvent(input: {
       decision = { ...decision, action: "RECORD_CHARGE_EVIDENCE", grantAccess: false,
         reasons: ["SIGNED_PAYMENT_ALREADY_RECORDED_FULFILLMENT_PRESERVED"] };
     }
+    // Pre-payment notifications can arrive after success, refund or dispute.
+    // They cannot undo a confirmed payment or its later financial resolution.
+    if (order.paidAt && order.amountPaidCents === order.amountTotalCents &&
+        ["MARK_PENDING", "MARK_FAILED", "CANCEL"].includes(decision.action)) {
+      decision = { ...decision, action: "RECORD_CHARGE_EVIDENCE", grantAccess: false,
+        revokeAccess: false, eventStatus: "IGNORED",
+        reasons: ["OBSOLETE_PREPAYMENT_EVENT_AFTER_CONFIRMED_PAYMENT"] };
+    }
     const insertedEvent = await tx
       .insert(furlongPublicOrderEvents)
       .values({
@@ -1580,6 +1588,13 @@ export async function transitionPublicOrderFulfillment(input: {
   }
 
   return db.transaction(async (tx) => {
+    // Credit-source revocation locks the source before updating its dependent.
+    // Use the same order so completion cannot race past a source refund.
+    const [lockTarget] = await tx.select({ creditSourceOrderId: furlongPublicOrders.creditSourceOrderId })
+      .from(furlongPublicOrders).where(eq(furlongPublicOrders.id, input.orderId)).limit(1);
+    if (lockTarget?.creditSourceOrderId) {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockTarget.creditSourceOrderId}))`);
+    }
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
     const [order] = await tx
       .select()

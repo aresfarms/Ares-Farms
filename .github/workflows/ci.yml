@@ -253,6 +253,8 @@ jobs:
 
       - name: Property report commerce and payment controls
         run: |
+          npm run verify:economic-evidence-package
+          npm run verify:property-comparison-ranking
           npm run verify:public-order-billing
           npm run verify:public-report-commerce
           npm run verify:progressive-intelligence

@@ -7,12 +7,13 @@ import { basePackage } from "./fixtures/economicEvidence";
 import { captureGeneratedEvidenceArtifactDurably } from "@/lib/property/durableEvidenceGenerationCapture";
 import { verifySignedReplayPacket } from "@/lib/property/officialEvidenceReplayPacketStore";
 import { automatedReportFixture } from "./fixtures/automatedReportFixture";
-import { buildAutomatedPropertyReport, renderAutomatedPropertyReport, AutomatedReportNotReadyError } from "@/lib/reports/automatedPropertyReport";
+import { buildAutomatedPropertyReport, renderAutomatedPropertyReport, AutomatedReportNotReadyError, reportSnapshotDigest } from "@/lib/reports/automatedPropertyReport";
 import { verifiedAutomatedReportForOrder, AUTOMATED_REPORT_BINDING_VERSION } from "@/lib/billing/publicAutomatedReportPolicy";
 import { POST as attest } from "@/app/api/public/property-report-token/route";
 import { POST as legacyPdf } from "@/app/api/public/property-report-pdf/route";
 
 async function main() {
+  assert.equal(reportSnapshotDigest({ b: 2, a: 1 }), reportSnapshotDigest({ a: 1, b: 2 }));
   const facts = automatedReportFixture();
   const input = { facts, requestedAddress: "123 Fixture Road, Testville, MD 00000", customerVision: "Diversified farm", generatedAt: new Date("2026-09-28T00:00:00Z") };
   const report = buildAutomatedPropertyReport(input);
@@ -43,6 +44,14 @@ async function main() {
   assert.equal(supported.saleReadiness.allowed, true, JSON.stringify(supported.saleReadiness));
   assert(supported.model.conceptSummary.some(line => line.includes("NOI")));
   assert(!supported.model.conceptSummary.some(line => line.includes("withheld")));
+  const constrainedPackages = structuredClone(packages);
+  constrainedPackages[0].constraints.zoning.status = "blocked";
+  constrainedPackages[0].operations.baseAnnualRevenue.value = 9_000_000;
+  const constrained = buildAutomatedPropertyReport({ ...input, customerVision: null,
+    economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages: constrainedPackages } });
+  assert.equal(constrained.saleReadiness.allowed, true);
+  assert(!constrained.model.scenarioComparison![0].includes("Synthetic candidate 0"), "a blocked use cannot rank ahead of viable uses on income");
+  assert(constrained.model.scenarioComparison!.some(line => line.includes("Cannot proceed")));
   const stale = buildAutomatedPropertyReport({ ...input, customerVision: null, generatedAt: new Date("2028-01-01T00:00:00Z"),
     economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });
   assert.equal(stale.saleReadiness.allowed, false, "source freshness must be evaluated at purchase time");
@@ -72,8 +81,8 @@ async function main() {
     metadata: { automatedReport: { version: AUTOMATED_REPORT_BINDING_VERSION, orderId: id, targetRef: "fixture-property",
       artifactId, evidenceSha256: evidence, modelSha256: "c".repeat(64) },
     reportArtifact: { artifactId, status: "VERIFIED", mimeType: "application/pdf", byteSize: pdf.length,
-      expectedSha256: sha, verifiedSha256: sha, storageGeneration: "123", objectKey: `public-orders/${id}/${artifactId}.pdf`,
-      verification: { evidenceSha256: evidence, malwareStatus: "clean", structuralSafety: true } } } };
+      expectedSha256: sha, verifiedSha256: sha, storageGeneration: "123", createdAt: input.generatedAt.toISOString(), verifiedAt: input.generatedAt.toISOString(), objectKey: `public-orders/${id}/${artifactId}.pdf`,
+      verification: { evidenceSha256: evidence, modelSha256: "c".repeat(64), malwareStatus: "clean", structuralSafety: true, storageReadbackVerified: true } } } };
   assert(verifiedAutomatedReportForOrder(order));
   for (const patch of [{ status: "AVAILABLE" }, { expectedSha256: "d".repeat(64) }, { storageGeneration: null },
     { objectKey: "another-customer/report.pdf" }, { byteSize: 0 }, { verification: { malwareStatus: "unavailable" } }]) {

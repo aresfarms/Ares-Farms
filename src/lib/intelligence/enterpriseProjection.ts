@@ -22,6 +22,7 @@ export type EnterpriseProjectionInput = {
   annualRevenueGrowthPct: number;
   annualDebtService: number;
   debtTermYears: number;
+  balloonPaymentAtMaturity?: number;
   periodicCapitalCosts: Array<{ year: number; amount: number; label: string }>;
 };
 
@@ -90,6 +91,11 @@ export function projectEnterpriseEconomics(
     return { status: "needs-evidence", version: ENTERPRISE_PROJECTION_VERSION, missingInputs };
   }
 
+  const balloon = input.balloonPaymentAtMaturity ?? 0;
+  if (!finiteNonnegative(balloon) || (balloon > 0 && input.debtTermYears < 1)) {
+    return { status: "needs-evidence", version: ENTERPRISE_PROJECTION_VERSION,
+      missingInputs: ["valid outstanding principal payoff at debt maturity"] };
+  }
   const years: EnterpriseProjectionYear[] = [];
   let cumulativeNet = 0;
   for (let year = 1; year <= 30; year += 1) {
@@ -98,7 +104,8 @@ export function projectEnterpriseEconomics(
       total + input.annualExpenses[category] *
         (1 + input.annualExpenseInflationPct[category] / 100) ** (year - 1), 0);
     const noi = revenue - operatingExpenses;
-    const debtService = year <= input.debtTermYears ? input.annualDebtService : 0;
+    const debtService = (year <= input.debtTermYears ? input.annualDebtService : 0) +
+      (year === input.debtTermYears ? balloon : 0);
     const periodicCapitalCosts = input.periodicCapitalCosts
       .filter((cost) => cost.year === year)
       .reduce((total, cost) => total + cost.amount, 0);
@@ -130,7 +137,8 @@ export function projectEnterpriseEconomics(
     years,
     assumptions: [
       "Revenue growth and every expense inflation rate are explicit inputs; none are invented by the projection.",
-      "Debt service ends after the stated debt term. Periodic capital costs are deducted in their scheduled year.",
+      "Scheduled debt service ends at payoff. Any remaining principal is deducted at maturity; refinancing is not assumed. Periodic capital costs are deducted in their scheduled year.",
+      ...(balloon > 0 ? [`Year ${input.debtTermYears} includes an outstanding-principal payoff of $${Math.round(balloon).toLocaleString("en-US")}.`] : []),
       "Outside-income requirement is the annual shortfall below zero, not borrower underwriting.",
     ],
   };

@@ -16,6 +16,7 @@ export function verifiedAutomatedReportForOrder(order: {
     binding.version === AUTOMATED_REPORT_BINDING_VERSION && binding.orderId === order.id &&
     binding.targetRef === order.targetRef && binding.artifactId === artifact.artifactId &&
     binding.evidenceSha256 === record(artifact.verification).evidenceSha256 &&
+    binding.modelSha256 === record(artifact.verification).modelSha256 &&
     SHA256.test(String(binding.evidenceSha256 ?? "")) && SHA256.test(String(binding.modelSha256 ?? "")) &&
     artifact.status === "VERIFIED" && artifact.expectedSha256 === artifact.verifiedSha256 &&
     SHA256.test(String(artifact.verifiedSha256 ?? "")) &&
@@ -25,6 +26,9 @@ export function verifiedAutomatedReportForOrder(order: {
     String(artifact.objectKey ?? "").startsWith(`public-orders/${order.id}/`) &&
     record(artifact.verification).malwareStatus === "clean" &&
     record(artifact.verification).structuralSafety === true &&
+    record(artifact.verification).storageReadbackVerified === true &&
+    typeof artifact.verifiedAt === "string" && Number.isFinite(Date.parse(artifact.verifiedAt)) &&
     snapshot.reference === artifact.artifactId && snapshot.digest === `sha256:${artifact.verifiedSha256}` &&
+    snapshot.generatedAt === artifact.createdAt &&
     typeof snapshot.generatedAt === "string" && Number.isFinite(Date.parse(snapshot.generatedAt));
 }

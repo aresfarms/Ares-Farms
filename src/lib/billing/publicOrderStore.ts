@@ -1288,7 +1288,7 @@ export async function reservePublicOrderFullRefund(input: {
       .where(
         and(
           eq(furlongPublicOrders.id, order.id),
-          eq(furlongPublicOrders.status, "FULFILLMENT_PENDING"),
+          eq(furlongPublicOrders.status, order.status),
           isNull(furlongPublicOrders.fulfillmentStartedAt),
         ),
       )

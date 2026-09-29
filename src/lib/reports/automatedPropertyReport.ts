@@ -21,7 +21,15 @@ export class AutomatedReportNotReadyError extends Error {
   }
 }
 export function reportSnapshotDigest(value: unknown): string {
-  return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+  // JSONB may reorder keys. Canonicalize JSON-compatible values so the stored
+  // source/model can be verified after a database round trip.
+  const canonical = (item: unknown): string => {
+    if (item === null || typeof item !== "object") return JSON.stringify(item);
+    if (Array.isArray(item)) return `[${item.map(canonical).join(",")}]`;
+    const object = item as Record<string, unknown>;
+    return `{${Object.keys(object).sort().map(key => `${JSON.stringify(key)}:${canonical(object[key])}`).join(",")}}`;
+  };
+  return createHash("sha256").update(canonical(JSON.parse(JSON.stringify(value)))).digest("hex");
 }
 const money = (n: number | null) => n === null ? "Not established" :
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -167,13 +175,17 @@ export function buildAutomatedPropertyReport(input: {
   };
   if (saleReadiness.allowed && economics?.ok && economic) {
     const candidates = [...economics.analysis.candidates].sort((a, b) => {
+      const blocked = (c: typeof a) => Object.values(c.constraints).some(status => status === "blocked");
+      if (blocked(a) !== blocked(b)) return blocked(a) ? 1 : -1;
       if (a.projection.status !== "complete" || b.projection.status !== "complete") return 0;
       return b.projection.annualYearOneNet - a.projection.annualYearOneNet ||
         b.projection.cumulativeNet.year5 - a.projection.cumulativeNet.year5 ||
         (b.dscr ?? 0) - (a.dscr ?? 0) || b.confidenceScore - a.confidenceScore || a.id.localeCompare(b.id);
     });
     model.scenarioComparison = candidates.flatMap((candidate, index) => [
-      `${index + 1}. ${candidate.title} (${candidate.candidateRole}). Evidence: ${candidate.evidenceStatus}.`,
+      `${index + 1}. ${candidate.title}. ${Object.values(candidate.constraints).includes("blocked") ? "Cannot proceed under the documented constraints." : "Subject to the conditions below."}`,
+      ...Object.entries(economic.packages.find(p => p.candidate.id === candidate.id)!.constraints)
+        .map(([domain, finding]) => `${domain}: ${finding.summary} ${finding.conditions.join(" ")}`),
       `Total project cost: ${money(candidate.totalProjectCost)}. Property/project DSCR: ${candidate.dscr?.toFixed(2) ?? "not established"}.`,
       `Constraints: ${Object.entries(candidate.constraints).map(([domain, status]) => `${domain}: ${status}`).join("; ")}.`,
       `Sources: ${candidate.sourceRefs.join("; ")}`,
@@ -188,7 +200,12 @@ export function buildAutomatedPropertyReport(input: {
         ...projection.assumptions,
       ];
     });
-    model.executiveSummary += " The following three scenarios have complete source-backed economic packages. They are ordered by first-year net after debt and capital, then five-year cumulative net, DSCR and evidence confidence. Feasibility conditions still govern each use.";
+    model.executiveSummary = `This report evaluates ${verification.normalizedAddress} as ${profile.label.toLowerCase()}. ` +
+      "Three preliminary scenarios have complete source-backed economic packages. Viable or conditional candidates appear before blocked uses; within each group, the order uses first-year net after debt and capital, then five-year cumulative net, DSCR and evidence confidence. Documented conditions still govern each use.";
+    model.risks = [...warnings, ...economic.packages.flatMap(p => Object.values(p.constraints)
+      .filter(finding => finding.status !== "clear").map(finding => `${p.candidate.title}: ${finding.summary} ${finding.conditions.join(" ")}`)),
+      "Source-supported projections depend on the stated assumptions. They are not guaranteed outcomes or borrower underwriting."];
+    model.explainabilityNotes = model.explainabilityNotes.filter(line => line !== scenarios.rankingRule);
     model.explainabilityNotes.push(...economic.packages.flatMap(p => p.sources.map(source =>
       `${source.title}: ${source.reference}; source date ${source.asOf}; captured ${source.capturedAt}; ${source.contentHash}`)));
   }

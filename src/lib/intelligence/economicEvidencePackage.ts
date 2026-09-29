@@ -1,4 +1,4 @@
-import { annualLevelDebtService } from "@/lib/property/calculationMath";
+import { annualLevelDebtService, remainingLoanBalance } from "@/lib/property/calculationMath";
 import {
   projectEnterpriseEconomics,
   type EnterpriseProjection,
@@ -642,7 +642,14 @@ function projectionInput(
     annualRevenueGrowthPct:
       metricValue(input.operations.annualRevenueGrowthPct) ?? Number.NaN,
     annualDebtService: annualDebtService ?? Number.NaN,
-    debtTermYears: metricValue(input.financing.termYears) ?? Number.NaN,
+    debtTermYears: Math.min(metricValue(input.financing.termYears) ?? Number.NaN,
+      metricValue(input.financing.amortizationYears) ?? Number.NaN),
+    balloonPaymentAtMaturity: remainingLoanBalance(
+      metricValue(input.financing.loanAmount) ?? Number.NaN,
+      metricValue(input.financing.annualRatePct) ?? Number.NaN,
+      metricValue(input.financing.amortizationYears) ?? Number.NaN,
+      (metricValue(input.financing.termYears) ?? Number.NaN) * 12, 12,
+    ) ?? Number.NaN,
     periodicCapitalCosts: input.operations.periodicCapitalCosts.map((cost) => ({
       year: cost.year,
       label: cost.label,

@@ -44,7 +44,7 @@ async function main() {
           byteSize: bytes.length, expectedSha256: digest, verifiedSha256: digest,
           objectKey: `public-orders/${result.order.id}/${artifactId}.pdf`, storageProvider: "gcs-resumable-v1",
           storageGeneration: "123", createdAt: now, verifiedAt: now, availableAt: null,
-          downloadCount: 0, verification: { evidenceSha256: sourceDigest, malwareStatus: "clean", structuralSafety: true } };
+          downloadCount: 0, verification: { evidenceSha256: sourceDigest, modelSha256: "c".repeat(64), malwareStatus: "clean", structuralSafety: true, storageReadbackVerified: true } };
         await db.update(tables.furlongPublicOrders).set({ targetSnapshot: { reportArtifact: {
           reference: artifactId, digest: `sha256:${digest}`, generatedAt: now } },
           metadata: { reportArtifact: artifact, automatedReport: { version: AUTOMATED_REPORT_BINDING_VERSION,

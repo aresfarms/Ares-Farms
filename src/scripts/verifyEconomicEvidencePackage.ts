@@ -19,6 +19,21 @@ assert.ok((complete.annualDebtService ?? 0) > 0);
 assert.ok((complete.dscr ?? 0) > 1.25);
 assert.equal(complete.projection.status, "complete");
 
+// A short term must not erase outstanding principal from long-range returns.
+const balloonPackage = structuredClone(basePackage);
+balloonPackage.financing.annualRatePct.value = 0;
+balloonPackage.financing.amortizationYears.value = 30;
+balloonPackage.financing.termYears.value = 5;
+const balloon = assessEnterpriseEconomicEvidencePackage(balloonPackage);
+assert.equal(balloon.status, "complete");
+assert.equal(balloon.projection.status, "complete");
+if (balloon.projection.status === "complete") {
+  const principal = balloonPackage.financing.loanAmount.value!;
+  assert.equal(balloon.projection.years[4].debtService, Math.round(principal / 30 + principal * 25 / 30));
+  assert.equal(balloon.projection.years[5].debtService, 0);
+  assert(balloon.projection.assumptions.some(line => line.includes("outstanding-principal payoff")));
+}
+
 const candidate = buildComparableCandidateFromEconomicEvidence(basePackage);
 assert.equal(candidate.evidenceStatus, "source-supported");
 assert.equal(candidate.totalProjectCost, 900_000);

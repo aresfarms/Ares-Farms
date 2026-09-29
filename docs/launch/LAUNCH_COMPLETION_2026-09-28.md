@@ -12,12 +12,13 @@ No public deployment, sales activation or DNS cutover is authorized by this reco
 - Main received a consolidated September 18 promotion. The 1,138-commit ancestry difference exaggerated the code difference; the original trees differ in eleven files.
 - PR #87 repairs Google-managed IAP authentication using a keyless, service-account-signed JWT and existing signer/IAP permissions. It merged at `75c4b569d8e9e4badeb3a64a00092de8ac303fee`.
 - Authenticated passive scan run `36502347375` reached staging and completed: 55 passing rules, zero failing rules, twelve new warning-rule groups. This is not a clean security acceptance. Detailed warnings and the discovered application error require disposition.
-- PR #88 merged at `81911d9f6f9f9f806a6e303437d2eed591469d64`. Release push/PR verification, PR security and PR CodeQL coverage are restored. The release branch now requires the ten existing main-branch checks, strict base freshness, conversation resolution and linear history; administrator enforcement is enabled, force-push/deletion disabled. Review-count policy was preserved, not replaced with a invented approval.
+- PR #88 merged at `81911d9f6f9f9f806a6e303437d2eed591469d64`. Release push/PR verification, PR security and PR CodeQL coverage are restored. The release branch now requires the ten existing main-branch checks, strict base freshness, conversation resolution and linear history; administrator enforcement is enabled, force-push/deletion disabled. Review-count policy was preserved, not replaced with an invented approval.
 - Staging sales/delivery flags remain off, order capacities zero, and `furlongpathways.com` remains reserved. No application revision or DNS was changed for these workflow repairs.
 
 ## Report and runtime implementation
 
 - The portal and report preparation share one server-owned property-facts resolver. Parcel classification precedes lane-specific narratives; a farm must not inherit homebuyer answers or financing copy.
+- Long-range economics now deduct any remaining loan principal at maturity and stop scheduled payments at actual payoff. Blocked uses cannot outrank viable/conditioned uses on income alone. Regression tests cover both.
 - Browser report models, object references, prices and digests cannot authorize payment. Only an owner-authorized, completed property-comparison evidence package can supply economic inputs. Three packages are revalidated against property identity, exact address, source freshness at report generation, distinct candidate roles and supported calculations.
 - A preliminary investigation outline remains an internal review output. It cannot authorize payment. Missing economic evidence is not replaced with zeros or generic planning scores.
 - The report is rendered, safety scanned, structurally checked, written once to private storage, read back and hashed before Stripe checkout is created. Order, artifact, source snapshot, report model and digests are retained together.

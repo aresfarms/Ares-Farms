@@ -18,29 +18,66 @@ concurrency:
 
 jobs:
   zap-baseline:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       TARGET_URL: https://furlong-core-mwei3cj3jq-uc.a.run.app
       TARGET_HOST: furlong-core-mwei3cj3jq-uc.a.run.app
+      DAST_SERVICE_ACCOUNT: furlong-dast@furlong-staging-499102.iam.gserviceaccount.com
 
     steps:
-      - name: Mint short-lived staging invocation identity
-        id: auth
+      - name: Checkout workflow source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      # Direct federation preserves the existing external principal's narrowly
+      # scoped signJwt grant. Impersonating the DAST account here would require
+      # a new self-signing grant. WIF remains restricted to protected main.
+      - name: Authenticate the existing GitHub workload identity
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
-          token_format: id_token
           workload_identity_provider: projects/859763772114/locations/global/workloadIdentityPools/github-actions/providers/ares-farms
-          service_account: furlong-dast@furlong-staging-499102.iam.gserviceaccount.com
-          id_token_audience: https://furlong-core-mwei3cj3jq-uc.a.run.app
-          id_token_include_email: true
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+
+      # Google-managed IAP OAuth clients require a service-account signed JWT
+      # for programmatic access, not a Cloud Run audience ID token.
+      # https://docs.cloud.google.com/iap/docs/authentication-howto
+      - name: Sign a short-lived IAP invocation token
+        id: auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 - <<'PYTHON'
+          import json, os, time
+          now = int(time.time())
+          claims = {
+              "iss": os.environ["DAST_SERVICE_ACCOUNT"],
+              "sub": os.environ["DAST_SERVICE_ACCOUNT"],
+              "aud": os.environ["TARGET_URL"].rstrip("/") + "/*",
+              "iat": now,
+              "exp": now + 1200,
+          }
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "iap-claims.json"), "w") as f:
+              json.dump(claims, f)
+          PYTHON
+          gcloud iam service-accounts sign-jwt \
+            --iam-account="${DAST_SERVICE_ACCOUNT}" \
+            "${RUNNER_TEMP}/iap-claims.json" "${RUNNER_TEMP}/iap.jwt"
+          iap_jwt="$(cat "${RUNNER_TEMP}/iap.jwt")"
+          test -n "${iap_jwt}"
+          echo "::add-mask::${iap_jwt}"
+          echo "id_token=${iap_jwt}" >> "${GITHUB_OUTPUT}"
+          rm "${RUNNER_TEMP}/iap-claims.json" "${RUNNER_TEMP}/iap.jwt"
 
       - name: Verify authenticated target reachability
         env:
           DAST_ID_TOKEN: ${{ steps.auth.outputs.id_token }}
         run: |
           curl --fail --silent --show-error --output /dev/null \
-            --header "Authorization: Bearer ${DAST_ID_TOKEN}" \
+            --header "Proxy-Authorization: Bearer ${DAST_ID_TOKEN}" \
             "${TARGET_URL}/"
 
       - name: Run bounded OWASP ZAP baseline
@@ -50,7 +87,7 @@ jobs:
           mkdir -p "${RUNNER_TEMP}/zap"
           chmod 0777 "${RUNNER_TEMP}/zap"
           timeout 9m docker run --rm \
-            --env ZAP_AUTH_HEADER=Authorization \
+            --env ZAP_AUTH_HEADER=Proxy-Authorization \
             --env "ZAP_AUTH_HEADER_VALUE=Bearer ${DAST_ID_TOKEN}" \
             --env "ZAP_AUTH_HEADER_SITE=${TARGET_HOST}" \
             --volume "${RUNNER_TEMP}/zap:/zap/wrk:rw" \

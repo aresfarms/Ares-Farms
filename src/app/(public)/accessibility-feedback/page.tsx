@@ -133,7 +133,7 @@ export default function AccessibilityFeedbackPage() {
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 20 }} noValidate>
+        <form method="post" onSubmit={handleSubmit} style={{ display: "grid", gap: 20 }} noValidate>
           <label style={labelStyle} htmlFor="page">
             What page or feature had the problem?
             <input

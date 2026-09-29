@@ -44,7 +44,9 @@ async function main() {
   assert.equal(supported.saleReadiness.allowed, true, JSON.stringify(supported.saleReadiness));
   assert(supported.model.conceptSummary.some(line => line.includes("NOI")));
   assert(!supported.model.honestUnknowns?.some(line => line.includes("Obtain a complete sourced operating budget")), "completed budget evidence must replace generic missing-budget text");
-  assert(supported.model.laneAnswers?.lines.some(line => line.includes("operating-costs")));
+  assert(supported.model.scenarioEvidence?.some(line => line.includes("operating-costs")));
+  assert.equal(supported.model.verifiedCriteria.length, 0, "parcel size is not a statutory tax lever");
+  assert.equal(supported.model.laneAnswers, null, "detailed evidence must not bury the use comparison");
   const chosen = buildAutomatedPropertyReport({ ...input, customerVision: packages[0].candidate.title,
     selectedReportCandidateId: packages[0].candidate.id,
     economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });

@@ -56,6 +56,8 @@ type PropertyEvaluationPdfInput = {
   };
   conceptSummary: string[];
   scenarioComparison?: string[];
+  /** Source-supported use findings, displayed with the evidence after the comparison. */
+  scenarioEvidence?: string[];
   strengths: string[];
   risks: string[];
   pathwayAnalysis: string[];
@@ -899,6 +901,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   } else if (input.propertyVerificationSummary.length > 0) {
     chapter("II", "The Charted Place", "What the record confirms for this ground.");
     bullets(input.propertyVerificationSummary);
+  }
+
+  if (input.scenarioEvidence?.length) {
+    heading("Evidence Behind the Use Comparison");
+    bullets(input.scenarioEvidence);
   }
 
   // Financing lanes — a guide to how ground like this is paid for (not a

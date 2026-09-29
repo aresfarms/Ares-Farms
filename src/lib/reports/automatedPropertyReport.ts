@@ -162,7 +162,9 @@ export function buildAutomatedPropertyReport(input: {
     risks: [...warnings, "The candidate order uses the published preliminary planning rules; it is not a measured probability, appraisal, or purchase recommendation."],
     pathwayAnalysis: programs.map(p => `${p.name} (${p.administering_body}): ${p.verifiedStatement} ${p.personSideCaveat} Source: ${p.source_citation}; as of ${p.asOf}.`),
     propertyVerificationSummary: [`Identity status: ${verification.status}.`, ...verification.warnings],
-    verifiedCriteria: brief.verifiedFacts.map(f => `${f.label}: ${f.value}. ${sourceLabel(f.provenance)}`),
+    // Parcel facts belong in the place chapter, not the statutory tax-lever chapter.
+    // Verified program facts remain in pathwayAnalysis with their citations.
+    verifiedCriteria: [],
     readinessSectionNotes: ["Borrower financial eligibility and lender approval have not been evaluated."],
     keyQuestions: unknowns.slice(0, 8),
     nextMoves: unknowns.slice(0, 5),
@@ -216,7 +218,11 @@ export function buildAutomatedPropertyReport(input: {
       .flatMap(finding => finding.conditions.map(condition => `${p.candidate.title}: ${condition}`))))];
     const findings = economic.packages.flatMap(p => p.findings.map(finding =>
       `${p.candidate.title} — ${finding.domain}: ${finding.summary}`));
-    model.laneAnswers = { title: "Evidence supporting the evaluated uses", lines: findings };
+    // Keep the use comparison and costs ahead of the detailed source findings.
+    // The latter belong in the report's evidence chapter, not three pages of
+    // repeated domain text before the customer reaches the actual comparison.
+    model.laneAnswers = null;
+    model.scenarioEvidence = findings;
     model.honestUnknowns = [...conditions, "Borrower-specific financial eligibility and lender approval have not been evaluated."];
     model.keyQuestions = [...model.honestUnknowns];
     model.nextMoves = conditions.length ? conditions : ["Reconfirm source dates and the stated project terms before committing to a purchase."];

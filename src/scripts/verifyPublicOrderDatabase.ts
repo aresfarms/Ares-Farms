@@ -68,6 +68,8 @@ async function main() {
     const loaded = await store.loadPublicOrder({ orderId: order.order.id, buyerActorId: null, accessToken: order.accessToken });
     assert.equal(loaded?.order.status, "FULFILLED");
     assert.equal(artifactStore.readPublicOrderReportArtifact(loaded?.order.metadata)?.status, "AVAILABLE");
+    assert.equal(loaded?.grants[0].active, false);
+    assert.equal(loaded?.grants[0].unitsRemaining, 0);
     assert.equal(await store.loadPublicOrder({ orderId: order.order.id, buyerActorId: null, accessToken: "another-customer" }), null);
     const paidAgain = await apply({...order.event, providerEventId: "evt_second_confirmation_" + randomUUID(),
       eventType: "checkout.session.async_payment_succeeded"});

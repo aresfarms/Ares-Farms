@@ -55,6 +55,9 @@ type PropertyEvaluationPdfInput = {
     requiredInputs: string[];
   };
   conceptSummary: string[];
+  scenarioComparison?: string[];
+  /** Source-supported use findings, displayed with the evidence after the comparison. */
+  scenarioEvidence?: string[];
   strengths: string[];
   risks: string[];
   pathwayAnalysis: string[];
@@ -412,7 +415,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       if (colon > 0 && colon < 60) {
         setFont("serifBold", 10.5, COLORS.deep);
         const lead = item.slice(0, colon + 1);
-        doc.text(lead, textX, rowTop, { continued: true });
+        doc.text(lead, textX, rowTop, { width, lineGap: 3, continued: true });
         setFont("regular", 10.5, COLORS.text);
         doc.text(` ${item.slice(colon + 1).trim()}`, { width, lineGap: 3 });
       } else {
@@ -726,6 +729,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     bullets(input.laneAnswers.lines);
   }
 
+  if (input.scenarioComparison?.length) {
+    heading("Preliminary Use Comparison");
+    bullets(input.scenarioComparison);
+  }
+
   // ── COST POSTURE ───────────────────────────────────────────────────────────
 
   heading("What This Is Likely to Cost You");
@@ -895,6 +903,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     bullets(input.propertyVerificationSummary);
   }
 
+  if (input.scenarioEvidence?.length) {
+    heading("Evidence Behind the Use Comparison");
+    bullets(input.scenarioEvidence);
+  }
+
   // Financing lanes — a guide to how ground like this is paid for (not a
   // chapter of the record). Partner coordination stays informational, inside
   // the platform boundary: Furlong informs; licensed lenders decide.
@@ -995,7 +1008,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   chapter("X", "The Covenant & Next Coordinates", "Disclosures, the covenant, and where this file may go next.", "SCHEDULE");
 
   setFont("serifBold", 11, COLORS.deep);
-  doc.text("Why we lay it all out.", PAGE.marginX, y, { continued: true });
+  doc.text("Why we lay it all out.", PAGE.marginX, y, { width: CONTENT_W, lineGap: 3, continued: true });
   setFont("regular", 11, COLORS.text);
   doc.text(
     " We open every figure with its source and date because this is your ground, not ours to gate. The open property analysis can remain anonymous. If you save a case, add financing-readiness information, nominate a provider, open a deal room, request an optional professional service, or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection. Furlong never sells borrower leads, auctions borrower files, charges a success percentage, or lets compensation improve provider ranking. Read it, check it, and carry it wherever you like.",

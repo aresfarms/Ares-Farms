@@ -978,10 +978,11 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   // Run on application routes (API + pages); exclude Next internals and public
-  // static asset directories/files (anything with a file extension). The proxy
+  // static asset directories and the favicon. Dots in an application path must
+  // not bypass the authentication perimeter or CSP. The proxy
   // body decides per-path: /api/* → API perimeter, internal pages → page
   // perimeter, everything else → next().
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|maps/|brand/|journey/|.*\\..*).*)",
+    "/((?!_next/static|_next/image|favicon.ico|maps/|brand/|journey/).*)",
   ],
 };

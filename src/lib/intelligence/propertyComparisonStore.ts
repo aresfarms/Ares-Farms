@@ -375,6 +375,7 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       propertyId: furlongPropertyComparisonItems.propertyId,
       normalizedAddress: furlongPropertyComparisonItems.normalizedAddress,
       submittedAddress: furlongPropertyComparisonItems.submittedAddress,
+      resultSnapshot: furlongPropertyComparisonItems.resultSnapshot,
     }).from(furlongPropertyComparisonItems).where(and(
       eq(furlongPropertyComparisonItems.id, input.itemId),
       eq(furlongPropertyComparisonItems.comparisonId, input.comparisonId),
@@ -392,6 +393,8 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
         compilation.missingEvidence,
       );
     }
+    const priorSnapshot = sourceItem.resultSnapshot && typeof sourceItem.resultSnapshot === "object" && !Array.isArray(sourceItem.resultSnapshot)
+      ? sourceItem.resultSnapshot as Record<string, unknown> : {};
     const analysis = compilation.analysis;
     const evidenceRefs = compilation.evidenceRefs;
     const packageSnapshots = input.evidencePackages.map(
@@ -439,6 +442,7 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       caseStatus: "OPEN",
       outcomeStatus: "NOT_STARTED",
       propertySnapshot: {
+        evidenceCapture: priorSnapshot.evidenceCapture ?? null,
         comparisonId: input.comparisonId,
         analysis,
         economicEvidencePackages: packageSnapshots,
@@ -489,6 +493,9 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       status: "COMPLETED",
       childCaseId,
       resultSnapshot: {
+        ...priorSnapshot,
+        missingEvidence: [],
+        rankingEligible: true,
         schemaVersion: "comparable-property-analysis-v1",
         economicAnalysisVersion:
           PROPERTY_COMPARISON_ECONOMIC_ANALYSIS_VERSION,

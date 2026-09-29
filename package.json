@@ -625,7 +625,9 @@
     "verify:farm-best-use-evidence-discipline": "tsx src/scripts/verifyFarmBestUseEvidenceDiscipline.ts",
     "verify:property-comparison-analysis-worker": "tsx src/scripts/verifyPropertyComparisonAnalysisWorker.ts",
     "verify:property-decision-front-page": "tsx src/scripts/verifyPropertyDecisionFrontPage.ts",
-    "verify:progressive-intelligence": "tsx src/scripts/verifyProgressiveIntelligence.ts"
+    "verify:progressive-intelligence": "tsx src/scripts/verifyProgressiveIntelligence.ts",
+    "verify:automated-property-report": "tsx src/scripts/verifyAutomatedPropertyReport.ts",
+    "verify:public-order-database": "tsx src/scripts/verifyPublicOrderDatabase.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

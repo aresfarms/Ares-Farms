@@ -28,7 +28,7 @@ import {
 } from "@/lib/testing/syntheticFixtureLineage";
 import { persistSyntheticFixtureLineage } from "@/lib/testing/syntheticFixtureLineageStore";
 import { syntheticPersonaByHumanVisibleName } from "@/lib/testing/syntheticPersonaRegistry";
-import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
+import { captureGeneratedEvidenceArtifactDurably } from "@/lib/property/durableEvidenceGenerationCapture";
 
 /**
  * Financing Deal Intake API (customer submits a deal → Furlong Capital Desk)
@@ -287,7 +287,7 @@ export async function POST(req: NextRequest) {
       body.applicationId?.trim() ||
       body.propertyDescriptor?.trim() ||
       `financing-intake:${traceId}`;
-    captureGeneratedEvidenceArtifact({
+    await captureGeneratedEvidenceArtifactDurably({
       kind: "qualification-result",
       propertyId: lineagePropertyId,
       artifactId: `qualification-result:${lineagePropertyId}`,

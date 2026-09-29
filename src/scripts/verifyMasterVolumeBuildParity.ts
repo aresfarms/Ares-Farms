@@ -160,7 +160,7 @@ const farmUseEngine = fs.readFileSync(
   "utf8",
 );
 const propertyFactsRoute = fs.readFileSync(
-  path.join(root, "src/app/api/public/property-facts/route.ts"),
+  path.join(root, "src/lib/property/propertyFactsService.ts"),
   "utf8",
 );
 const farmAgricultureTab = fs.readFileSync(

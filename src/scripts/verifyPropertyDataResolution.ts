@@ -4,7 +4,7 @@ import { COUNTY_COLLEGE_BRANCHES } from "@/lib/property/countyCollegeBranchesCur
 
 const root = process.cwd();
 const commandCenter = fs.readFileSync(path.join(root, "src/components/property/lanes/GovernedLaneChassis.tsx"), "utf8");
-const propertyRoute = fs.readFileSync(path.join(root, "src/app/api/public/property-facts/route.ts"), "utf8");
+const propertyRoute = fs.readFileSync(path.join(root, "src/lib/property/propertyFactsService.ts"), "utf8");
 const failures: string[] = [];
 if (!COUNTY_COLLEGE_BRANCHES["10005"]?.some((item) => /Owens Campus/.test(item.name))) failures.push("Sussex County branch-campus correction is missing.");
 if (!commandCenter.includes("suppressResolvedUnknowns")) failures.push("Verified facts do not suppress duplicate unresolved guidance.");

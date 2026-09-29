@@ -1,7 +1,8 @@
-import { isEnterpriseEconomicEvidencePackage, type EnterpriseEconomicEvidencePackage } from "@/lib/intelligence/economicEvidencePackage";
-import { findCanonicalPropertyByExactAddress } from "@/lib/property/propertyData";
-import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnapshot";
-import { resolveJurisdictionParcel } from "@/lib/property/jurisdictionParcelResolver";
+import type { EnterpriseEconomicEvidencePackage } from "./economicEvidencePackage";
+import { REQUIRED_ECONOMIC_EVIDENCE_DOMAINS } from "./economicEvidencePackage";
+import { assessStoredEconomicEvidence, storedEconomicPackages } from "./storedEconomicEvidence";
+import { resolvePropertyFacts, type PropertyFactsSnapshot } from "@/lib/property/propertyFactsService";
+import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
 import { classifyPropertyProfile } from "@/lib/property/propertyProfile";
 
 export interface PropertyComparisonAnalysisItem {
@@ -12,7 +13,6 @@ export interface PropertyComparisonAnalysisItem {
   propertyId: string | null;
   resultSnapshot: unknown;
 }
-
 export interface PropertyComparisonAnalysisContext {
   version: "property-comparison-analysis-context-v1.0.0";
   propertyId: string;
@@ -30,126 +30,90 @@ export interface PropertyComparisonAnalysisContext {
   parcelAccountId: string | null;
   sourceRefs: string[];
 }
-
 export interface PropertyComparisonAnalysisReadiness {
   context: PropertyComparisonAnalysisContext;
   evidencePackages: EnterpriseEconomicEvidencePackage[] | null;
   missingEvidence: string[];
+  evidenceCapture?: {
+    version: "property-evidence-capture-v1";
+    capturedAt: string;
+    classification: "CONFIDENTIAL";
+    facts: PropertyFactsSnapshot;
+    checklist: Array<{ domain: string; status: "captured" | "needed"; action: string }>;
+  };
 }
 
-function record(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : null;
-}
+const ACTIONS: Record<(typeof REQUIRED_ECONOMIC_EVIDENCE_DOMAINS)[number], string> = {
+  "property-identity": "Match the address and every parcel included in the property with official records.",
+  "current-and-advertised-use": "Confirm recorded use, actual operating use and the current offering; a property type alone does not establish all three.",
+  "acquisition-price": "Obtain a current permitted listing or a supported proposed purchase price; an assessment is not a purchase price.",
+  "physical-suitability": "Confirm usable acreage, building condition, utilities and capacity for each candidate use.",
+  "legal-use": "Check the local zoning ordinance, overlays, easements and required approvals for each candidate use.",
+  environmental: "Resolve parcel-specific environmental limitations and any investigation required for each use.",
+  engineering: "Verify access, structures, water, wastewater and code capacity for each use.",
+  "market-demand": "Obtain current local demand evidence for the proposed products or services.",
+  competition: "Identify relevant competitors, capacity, pricing and comparable operations.",
+  revenue: "Support sales volumes and prices with applicable records; regional averages alone are not a property forecast.",
+  labor: "Support staffing, wages and owner hours for each use.",
+  "employee-benefits": "Support benefit, health insurance and retirement costs without double counting.",
+  "operating-costs": "Support all operating costs, maintenance and reserves for each use.",
+  insurance: "Obtain coverage and cost evidence applicable to the property and each use.",
+  "property-tax": "Establish applicable tax treatment and recurring tax expense; assessed value alone is insufficient.",
+  "capital-costs": "Support conversion, equipment, closing costs, working capital and replacement schedules.",
+  financing: "Support project loan terms and capital contributions before calculating debt service or DSCR.",
+  "grants-incentives": "Document applicable programs and eligibility; do not count unawarded assistance as committed funds.",
+  inflation: "Support revenue growth and cost escalation separately over the projection period.",
+};
 
-function finite(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0
-    ? value
-    : null;
-}
-
-function string(value: unknown): string | null {
-  return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
-function embeddedPackages(snapshot: unknown): EnterpriseEconomicEvidencePackage[] | null {
-  const root = record(snapshot);
-  const candidates = root?.economicEvidencePackages;
-  if (!Array.isArray(candidates) || candidates.length !== 3) return null;
-  return candidates.every(isEnterpriseEconomicEvidencePackage)
-    ? candidates as EnterpriseEconomicEvidencePackage[]
-    : null;
-}
-
+/** Vol III TECH-PROV-001 / III-B replay / V CANON-EXPL-001. Capture the same
+ * governed resolver used by the report. Captured facts are research inputs;
+ * only reviewed economic packages may authorize comparative conclusions.
+ * The worker persists this snapshot with its runtime trace and replay reference.
+ */
 export async function buildPropertyComparisonAnalysisReadiness(
   item: PropertyComparisonAnalysisItem,
+  dependencies = { resolveFacts: resolvePropertyFacts, now: () => new Date() },
 ): Promise<PropertyComparisonAnalysisReadiness> {
   const address = item.normalizedAddress?.trim() || item.submittedAddress.trim();
-  const snapshot = record(item.resultSnapshot);
-  const parsed = record(snapshot?.parsedAddress);
-  const geocode = record(snapshot?.geocode);
-  const canonical = findCanonicalPropertyByExactAddress(address);
-  const source = canonical?.source_records?.[0] ?? null;
-  const listing = findGovernedListingSnapshot(address);
-
-  const parsedStreet = string(parsed?.street);
-  const parsedCity = string(parsed?.city);
-  const parsedState = string(parsed?.state);
-  const parcel = parsedStreet && parsedCity && parsedState
-    ? await resolveJurisdictionParcel({
-        street: parsedStreet,
-        city: parsedCity,
-        state: parsedState,
-        zip: string(parsed?.zip),
-        parcelId: listing?.parcelId ?? null,
-        lat: geocode?.lat as string | number | null | undefined,
-        lon: geocode?.lon as string | number | null | undefined,
-      }).catch(() => null)
-    : null;
-
-  const propertyType =
-    source?.rawPropertyStyle ??
-    listing?.propertyType ??
-    parcel?.buildingType ??
-    parcel?.landUse ??
-    null;
-  const acreageText =
-    listing?.offeredAcreage != null
-      ? `${listing.offeredAcreage} acres`
-      : source?.acreageText ?? parcel?.acreageText ?? null;
-  const profile = classifyPropertyProfile({
-    propertyType,
-    description: source?.description ?? listing?.description ?? parcel?.legalDescription ?? null,
-    acreageText,
-  });
-  const askingPrice =
-    finite(listing?.askingPrice) ?? finite(source?.price) ?? null;
-  const squareFeet =
-    finite(listing?.squareFeet) ?? finite(source?.squareFeet) ?? finite(parcel?.squareFeet) ?? null;
-  const sourceRefs = [
-    canonical?.source_url ? `canonical:${canonical.source_url}` : null,
-    listing?.sourceUrl ? `listing:${listing.sourceUrl}` : null,
-    parcel?.sourceUrl ? `parcel:${parcel.sourceUrl}` : null,
-  ].filter((value): value is string => Boolean(value));
-
+  const facts = await dependencies.resolveFacts({ exactAddress: address, propertyId: item.propertyId }, { fresh: true });
+  if (!facts.ok || !("verification" in facts) || !facts.verification || !facts.propertyRecord ||
+      !("recordBasis" in facts.propertyRecord) ||
+      !["verified", "partial"].includes(facts.verification.status) ||
+      normalizedListingAddress(facts.verification.normalizedAddress ?? "") !== normalizedListingAddress(address) ||
+      facts.verification.restrictions.length) {
+    throw new Error("Property evidence did not resolve to the verified address.");
+  }
+  const property = facts.propertyRecord;
+  const profile = classifyPropertyProfile({ propertyType: property.propertyType ?? property.rawPropertyStyle,
+    description: property.description, acreageText: property.acreageText });
+  const askingPrice = "priceEvidence" in property && property.priceEvidence?.status === "current-asking-price"
+    ? property.priceEvidence.amountUsd : null;
   const context: PropertyComparisonAnalysisContext = {
     version: "property-comparison-analysis-context-v1.0.0",
-    propertyId: item.propertyId ?? canonical?.canonical_property_id ?? `unresolved:${item.id}`,
-    address,
-    profileId: profile.id,
-    profileLabel: profile.label,
-    propertyType,
-    currentUse: parcel?.landUse ?? source?.rawPropertyStyle ?? listing?.propertyType ?? null,
-    askingPrice,
-    squareFeet,
-    acreageText,
-    zoning: parcel?.zoning ?? null,
-    county: source?.county ?? null,
-    state: source?.state ?? parsedState ?? null,
-    parcelAccountId: parcel?.accountId ?? listing?.parcelId ?? null,
-    sourceRefs: [...new Set(sourceRefs)],
+    propertyId: item.propertyId ?? facts.propertyId ?? `unresolved:${item.id}`, address,
+    profileId: profile.id, profileLabel: profile.label,
+    propertyType: property.propertyType, currentUse: property.landUse,
+    askingPrice, squareFeet: property.squareFeet, acreageText: property.acreageText,
+    zoning: property.zoning, county: property.county, state: property.state,
+    parcelAccountId: property.parcelRefs[0] ?? null,
+    sourceRefs: [...new Set([property.parcelSourceUrl,
+      "listingSourceUrl" in property ? property.listingSourceUrl : null].filter((s): s is string => Boolean(s)))],
   };
-
-  const packages = embeddedPackages(item.resultSnapshot);
-  if (packages) return { context, evidencePackages: packages, missingEvidence: [] };
-
-  const missing = new Set<string>();
-  if (!item.propertyId || !address) missing.add("Verified property identity and normalized address are required.");
-  if (!propertyType) missing.add("Current or advertised property use is not source-supported.");
-  if (askingPrice == null || askingPrice <= 0) missing.add("A current acquisition price or supported proposed purchase price is required.");
-  if (squareFeet == null && !acreageText) missing.add("Physical suitability evidence requires building area, parcel acreage, or both as applicable.");
-  if (!context.zoning) missing.add("Source-cited zoning and proposed-use permissibility are required.");
-  missing.add("Environmental feasibility evidence is required for each proposed enterprise.");
-  missing.add("Engineering/code/capacity evidence is required for each proposed enterprise.");
-  missing.add("Verified market demand and competition evidence is required for each proposed enterprise.");
-  missing.add("Source-supported revenue, labor, employee-benefit, operating-cost, insurance, tax, capital-cost, and inflation evidence is required.");
-  missing.add("A source-supported property/project financing scenario is required for DSCR comparison.");
-  missing.add("Three distinct governed enterprise evidence packages are required: best single enterprise, best mixed use, and customer vision or distinct alternative.");
-
-  return {
-    context,
-    evidencePackages: null,
-    missingEvidence: [...missing],
-  };
+  const capturedDomains = new Set<string>();
+  if (property.recordBasis !== "verified-address-only" && property.parcelRefs.length) capturedDomains.add("property-identity");
+  if (property.landUse) capturedDomains.add("current-and-advertised-use");
+  if (askingPrice != null) capturedDomains.add("acquisition-price");
+  if (property.squareFeet || property.acreageText) capturedDomains.add("physical-suitability");
+  if (property.zoning) capturedDomains.add("legal-use");
+  const checklist = REQUIRED_ECONOMIC_EVIDENCE_DOMAINS.map(domain => ({ domain,
+    status: capturedDomains.has(domain) ? "captured" as const : "needed" as const, action: ACTIONS[domain] }));
+  const evidenceCapture = { version: "property-evidence-capture-v1" as const,
+    capturedAt: dependencies.now().toISOString(), classification: "CONFIDENTIAL" as const, facts, checklist };
+  const packages = storedEconomicPackages(item.resultSnapshot);
+  const assessment = packages ? assessStoredEconomicEvidence(item, dependencies.now()) : null;
+  return { context, evidenceCapture, evidencePackages: assessment?.ok ? packages : null,
+    missingEvidence: assessment ? (assessment.ok ? [] : assessment.missingEvidence) : [
+      ...checklist.map(item => (item.status === "captured" ? "Evidence found; review still required. " : "Evidence needed. ") + item.action),
+      "Complete property-specific evidence packages are needed before the automated report can be offered for payment.",
+    ] };
 }

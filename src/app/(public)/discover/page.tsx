@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Disclosures } from "@/components/public/Disclosures";
 import { DiscoveryEngine } from "@/components/discovery/DiscoveryEngine";
@@ -6,7 +7,7 @@ import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { PropertyEvaluationWorkspace } from "@/components/property/PropertyEvaluationWorkspace";
 import { PropertyPlaceIntelligence } from "@/components/property/PropertyPlaceIntelligence";
 import { buildPropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
-import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
+import { captureGeneratedEvidenceArtifactDurably } from "@/lib/property/durableEvidenceGenerationCapture";
 import type { ChartVariant } from "@/lib/property/chartThemes";
 import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
 import { resolveOwnershipCostContext } from "@/lib/property/ownershipCostContext";
@@ -203,7 +204,7 @@ function addressFirstAnalysisContext(flow: ReturnType<typeof resolveDiscoveryFlo
 }
 
 /** Render the journey chosen by the resolver. Exported for the path entrypoints. */
-export function DiscoverSurface({ route, query }: { route: string; query: SP }) {
+export async function DiscoverSurface({ route, query }: { route: string; query: SP }) {
   const flow = resolveDiscoveryFlow({ route, query });
   const navigatorCaseId = one(query.caseId);
   const navigatorCaseContext = navigatorCaseId ? {
@@ -292,7 +293,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
       })
     : null;
   if (briefIntelligence && propertyContext?.propertyId) {
-    captureGeneratedEvidenceArtifact({
+    await captureGeneratedEvidenceArtifactDurably({
       kind: "property-report",
       propertyId: propertyContext.propertyId,
       artifactId: `property-report:${propertyContext.propertyId}`,
@@ -329,6 +330,9 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       {propertyContext ? (
         <>
+          {propertyContext.exactAddress ? <p>
+            <Link href={`/property-evidence?${new URLSearchParams({ address: propertyContext.exactAddress })}`}>Save this property and prepare its report</Link>
+          </p> : null}
           {/* The Chart Table renders the full Place Brief (chart concept,
               founder-selected 2026-07-16) — no separate intelligence section. */}
           <PropertyEvaluationWorkspace

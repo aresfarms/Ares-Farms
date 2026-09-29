@@ -2,6 +2,11 @@ import { createHash, randomUUID } from "node:crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
+import { storedEconomicPackages, supportedReportChoices, assessStoredEconomicEvidence } from "@/lib/intelligence/storedEconomicEvidence";
+import { preparePublicAutomatedReport } from "@/lib/billing/preparePublicAutomatedReport";
+import { verifiedAutomatedReportForOrder } from "@/lib/billing/publicAutomatedReportPolicy";
+import { AutomatedReportNotReadyError } from "@/lib/reports/automatedPropertyReport";
 import { sessionAuthority } from "@/lib/auth/sessionAuthority";
 import {
   PUBLIC_PRODUCT_CATALOG_VERSION,
@@ -22,6 +27,8 @@ import {
   markPublicOrderCheckoutFailed,
   PublicOrderConflictError,
   recordPublicOrderAgreementAcceptance,
+  recordPublicOrderCheckoutIntent,
+  recoverPublicOrderCheckout,
 } from "@/lib/billing/publicOrderStore";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { loadPropertyComparison } from "@/lib/intelligence/propertyComparisonStore";
@@ -32,6 +39,7 @@ import {
   assertStripeCheckoutAvailable,
   stripe,
   stripeConfiguredForLivePayments,
+  type StripeCheckoutSessionCreateParams,
 } from "@/lib/stripe/client";
 
 type CheckoutBody = {
@@ -103,6 +111,8 @@ function propertyTarget(value: Record<string, unknown>): CheckoutTarget | null {
     snapshot: {
       exactAddress,
       propertyId,
+      customerVision: null,
+      selectedReportCandidateId: null,
       source: "customer-selected-public-property",
     },
   };
@@ -115,7 +125,29 @@ async function resolveTarget(input: {
 }): Promise<CheckoutTarget | null> {
   const value = record(input.raw);
   const type = textValue(value.type, 40);
-  if (type === "PROPERTY") return propertyTarget(value);
+  if (type === "PROPERTY") {
+    const target = propertyTarget(value);
+    const comparisonId = textValue(value.analysisComparisonId, 64);
+    // Free-form visions cannot enter automated ranking. Resolve a supported
+    // candidate selector against this customer's saved, current evidence.
+    if (textValue(value.customerVision, 1000)) return null;
+    const selectedCandidateId = textValue(value.selectedReportCandidateId, 200);
+    if (!target || !comparisonId) return selectedCandidateId ? null : target;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(comparisonId)) return null;
+    const bundle = await loadPropertyComparison({ comparisonId, ownerActorId: input.actorId, accessToken: bearer(input.req) });
+    const item = bundle?.items.find(item => item.status === "COMPLETED" && item.propertyId === target.snapshot.propertyId &&
+      normalizedListingAddress(item.normalizedAddress ?? item.submittedAddress) === normalizedListingAddress(String(target.snapshot.exactAddress)));
+    if (!item) return null;
+    const packages = storedEconomicPackages(item.resultSnapshot);
+    if (!packages || !assessStoredEconomicEvidence(item, new Date())?.ok) return null;
+    const choice = selectedCandidateId ? supportedReportChoices(packages).find(c => c.id === selectedCandidateId) : null;
+    if (selectedCandidateId && !choice) return null;
+    target.snapshot.selectedReportCandidateId = choice?.id ?? null;
+    target.snapshot.customerVision = choice?.title ?? null;
+    target.snapshot.economicEvidence = { propertyId: item.propertyId, comparisonItemId: item.id, packages };
+    target.snapshot.analysisComparisonId = comparisonId;
+    return target;
+  }
   if (type !== "PROPERTY_COMPARISON") return null;
 
   const comparisonId = textValue(value.comparisonId, 64);
@@ -145,22 +177,6 @@ async function resolveTarget(input: {
       source: "authorized-public-property-comparison",
     },
   };
-}
-
-function verifiedAutomatedReportArtifact(
-  snapshot: Record<string, unknown>,
-): boolean {
-  const artifact = record(snapshot.reportArtifact);
-  const reference = textValue(artifact.reference, 500);
-  const digest = textValue(artifact.digest, 80);
-  const generatedAt = textValue(artifact.generatedAt, 80);
-  return Boolean(
-    reference &&
-    digest &&
-    /^sha256:[0-9a-f]{64}$/i.test(digest) &&
-    generatedAt &&
-    !Number.isNaN(Date.parse(generatedAt)),
-  );
 }
 
 function privateResponse(
@@ -287,22 +303,6 @@ export async function POST(req: NextRequest) {
       400,
     );
   }
-  if (
-    product.fulfillmentMode === "AUTOMATED" &&
-    !verifiedAutomatedReportArtifact(target.snapshot)
-  ) {
-    return privateResponse(
-      {
-        ok: false,
-        error:
-          "The version-frozen Property Report artifact is not ready. No payment has been taken.",
-        reason: "AUTOMATED_ARTIFACT_NOT_READY",
-        traceId,
-      },
-      409,
-    );
-  }
-
   const rawUpgrade = record(parsed.body.upgrade);
   const upgradeOrderId = textValue(rawUpgrade.sourceOrderId, 100);
   const upgradeAccessToken = textValue(rawUpgrade.sourceAccessToken, 300);
@@ -365,11 +365,58 @@ export async function POST(req: NextRequest) {
   }
 
   const requestId = checkoutRequestId(req);
+  const recoveryToken = req.headers.get("x-checkout-recovery")?.trim() ?? null;
+  if (recoveryToken && !/^furlong-order-[A-Za-z0-9_-]{43}$/.test(recoveryToken)) {
+    return privateResponse({ ok: false, error: "Invalid checkout recovery token.", traceId }, 400);
+  }
+  if (recoveryToken) {
+    const prior = await recoverPublicOrderCheckout({ checkoutRequestId: requestId, recoveryToken });
+    if (prior) {
+      const snapshot = record(prior.targetSnapshot);
+      if (prior.productCode !== product.code || prior.targetRef !== target.targetRef ||
+          snapshot.customerVision !== target.snapshot.customerVision) {
+        return privateResponse({ ok: false, error: "This checkout belongs to a different request.", traceId }, 409);
+      }
+      const priorMetadata = record(prior.metadata);
+      if (prior.status === "CREATED" && priorMetadata.checkoutIntent) {
+        if (Date.now() - prior.createdAt.getTime() > 23 * 60 * 60 * 1000) {
+          return privateResponse({ ok: false, error: "This checkout needs an order-status review before another payment session can be opened.", traceId }, 409);
+        }
+        try {
+          const providerRequest = record(priorMetadata.checkoutIntent) as StripeCheckoutSessionCreateParams;
+          const session = await stripe.checkout.sessions.create(providerRequest);
+          if (session.amount_total !== prior.amountTotalCents || session.currency !== prior.currency) {
+            throw new Error("Provider amount mismatch.");
+          }
+          await attachPublicOrderCheckout({ orderId: prior.id, checkoutSessionId: session.id, checkoutUrl: session.url, traceId });
+          return privateResponse({ ok: true, orderId: prior.id, orderAccessToken: recoveryToken,
+            checkoutSessionId: session.id, checkoutUrl: session.url, traceId }, 200);
+        } catch {
+          return privateResponse({ ok: false, error: "Checkout confirmation is pending. Retry this same request; a second payment session will not be created.", traceId }, 503);
+        }
+      }
+      if (prior.status === "CHECKOUT_CREATED" && typeof priorMetadata.checkoutUrl === "string") {
+        return privateResponse({ ok: true, orderId: prior.id, orderAccessToken: recoveryToken,
+          checkoutSessionId: prior.checkoutSessionId, checkoutUrl: priorMetadata.checkoutUrl, traceId }, 200);
+      }
+      if (["FULFILLED", "FULFILLMENT_PENDING", "IN_FULFILLMENT", "PAID"].includes(prior.status)) {
+        return privateResponse({ ok: true, orderId: prior.id, orderAccessToken: recoveryToken,
+          checkoutUrl: `/purchase/success?order=${prior.id}`, traceId }, 200);
+      }
+      return privateResponse({ ok: false, error: prior.status === "FAILED"
+        ? "This report preparation failed without opening checkout. You can try again."
+        : "This order is still being prepared or is no longer payable. Check its status before starting another.",
+        retryWithNewRequest: prior.status === "FAILED" && !priorMetadata.checkoutIntent,
+        traceId }, 409);
+    }
+  }
+  let paymentAttempted = false;
   let orderId: string | null = null;
   try {
     assertStripeCheckoutAvailable();
     const created = await createPublicOrder({
       checkoutRequestId: requestId,
+      recoveryToken,
       buyerActorId: authority.actorId,
       product,
       targetType: target.type,
@@ -381,6 +428,12 @@ export async function POST(req: NextRequest) {
       traceId,
     });
     orderId = created.order.id;
+    if (product.fulfillmentMode === "AUTOMATED") {
+      created.order = await preparePublicAutomatedReport({ order: created.order, traceId });
+      if (!verifiedAutomatedReportForOrder(created.order)) {
+        throw new AutomatedReportNotReadyError(["The frozen report could not be verified for this order."]);
+      }
+    }
 
     const recordedAgreement = await recordPublicOrderAgreementAcceptance({
       orderId: created.order.id,
@@ -414,7 +467,7 @@ export async function POST(req: NextRequest) {
       traceId,
     };
     const root = baseUrl();
-    const checkout = await stripe.checkout.sessions.create({
+    const providerRequest: StripeCheckoutSessionCreateParams = {
       mode: "payment",
       line_items: [
         {
@@ -448,7 +501,10 @@ export async function POST(req: NextRequest) {
         "&session_id={CHECKOUT_SESSION_ID}",
       cancel_url: root + "/purchase/canceled?order=" + created.order.id,
       idempotencyKey: "furlong-public-order:" + requestId,
-    });
+    };
+    await recordPublicOrderCheckoutIntent({ orderId: created.order.id, providerRequest });
+    paymentAttempted = true;
+    const checkout = await stripe.checkout.sessions.create(providerRequest);
 
     if (
       checkout.amount_total !== created.order.amountTotalCents ||
@@ -472,6 +528,7 @@ export async function POST(req: NextRequest) {
     const order = await attachPublicOrderCheckout({
       orderId: created.order.id,
       checkoutSessionId: checkout.id,
+      checkoutUrl: checkout.url,
       traceId,
     });
     const observability = createObservabilityEvent({
@@ -535,7 +592,7 @@ export async function POST(req: NextRequest) {
       201,
     );
   } catch (error) {
-    if (orderId) {
+    if (orderId && !paymentAttempted) {
       await markPublicOrderCheckoutFailed({
         orderId,
         traceId,
@@ -546,13 +603,15 @@ export async function POST(req: NextRequest) {
     return privateResponse(
       {
         ok: false,
+        reason: error instanceof AutomatedReportNotReadyError ? "AUTOMATED_ARTIFACT_NOT_READY" : "CHECKOUT_UNAVAILABLE",
+        retryWithNewRequest: Boolean(orderId && !paymentAttempted),
         error:
-          error instanceof PublicOrderConflictError
-            ? error.message
-            : "Checkout could not be created.",
+          error instanceof PublicOrderConflictError || error instanceof AutomatedReportNotReadyError
+            ? error.message + (error instanceof AutomatedReportNotReadyError ? " No payment has been taken." : "")
+            : "Checkout confirmation is pending. Retry the same request to recover it safely.",
         traceId,
       },
-      error instanceof PublicOrderConflictError ? 409 : 503,
+      error instanceof PublicOrderConflictError || error instanceof AutomatedReportNotReadyError ? 409 : 503,
     );
   }
 }

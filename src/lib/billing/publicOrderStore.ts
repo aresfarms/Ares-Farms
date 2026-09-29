@@ -38,6 +38,7 @@ import {
   type PublicOrderStripeEventInput,
 } from "@/lib/billing/publicOrderPaymentPolicy";
 import { evaluatePublicOrderFullRefund } from "@/lib/billing/publicOrderRefundPolicy";
+import { verifiedAutomatedReportForOrder } from "@/lib/billing/publicAutomatedReportPolicy";
 import { readPublicOrderReportArtifact } from "@/lib/billing/publicOrderReportArtifact";
 
 export const PUBLIC_ORDER_GOVERNANCE_VERSION = "furlong-public-order-v1.0.0";
@@ -85,6 +86,7 @@ function safeMetadata(value: Record<string, unknown> | undefined) {
 
 export async function createPublicOrder(input: {
   checkoutRequestId: string;
+  recoveryToken?: string | null;
   buyerActorId: string | null;
   product: PublicProduct;
   targetType: PublicProductTargetType;
@@ -117,7 +119,10 @@ export async function createPublicOrder(input: {
   }
 
   const orderId = randomUUID();
-  const accessToken = newAccessToken();
+  if (input.recoveryToken && !/^furlong-order-[A-Za-z0-9_-]{43}$/.test(input.recoveryToken)) {
+    throw new Error("A valid checkout recovery token is required.");
+  }
+  const accessToken = input.recoveryToken || newAccessToken();
   const now = new Date();
   const expiresAt = new Date(
     now.getTime() + ORDER_RECOVERY_DAYS * 24 * 60 * 60 * 1000,
@@ -274,6 +279,32 @@ export async function createPublicOrder(input: {
   return { order: created[0], accessToken };
 }
 
+/** Request IDs are deduplication keys, never authorization. */
+export async function recoverPublicOrderCheckout(input: { checkoutRequestId: string; recoveryToken: string }) {
+  const [order] = await db.select().from(furlongPublicOrders).where(and(
+    eq(furlongPublicOrders.checkoutRequestId, input.checkoutRequestId),
+    eq(furlongPublicOrders.accessTokenHash, hashToken(input.recoveryToken)),
+    gt(furlongPublicOrders.expiresAt, new Date()),
+  )).limit(1);
+  return order ?? null;
+}
+
+/** Freeze the exact provider request before making the network call. A lost
+ * response can be replayed with the same Stripe idempotency key and parameters. */
+export async function recordPublicOrderCheckoutIntent(input: {
+  orderId: string; providerRequest: Record<string, unknown>;
+}) {
+  return db.transaction(async tx => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
+    const [order] = await tx.select().from(furlongPublicOrders).where(eq(furlongPublicOrders.id, input.orderId)).limit(1);
+    if (!order || order.status !== "CREATED") throw new PublicOrderConflictError("Checkout is no longer awaiting submission.");
+    const metadata = safeMetadata(order.metadata as Record<string, unknown> | undefined);
+    if (metadata.checkoutIntent) throw new PublicOrderConflictError("Checkout submission is already recorded.");
+    await tx.update(furlongPublicOrders).set({ metadata: { ...metadata, checkoutIntent: input.providerRequest }, updatedAt: new Date() })
+      .where(eq(furlongPublicOrders.id, order.id));
+  });
+}
+
 export async function recordPublicOrderAgreementAcceptance(input: {
   orderId: string;
   productName: string;
@@ -297,6 +328,7 @@ export async function recordPublicOrderAgreementAcceptance(input: {
   const userAgent = input.userAgent?.trim().slice(0, 1_000) || null;
 
   return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
     const [order] = await tx
       .select()
       .from(furlongPublicOrders)
@@ -441,6 +473,7 @@ export async function recordPublicOrderAgreementAcceptance(input: {
 export async function attachPublicOrderCheckout(input: {
   orderId: string;
   checkoutSessionId: string;
+  checkoutUrl?: string;
   traceId: string;
 }) {
   const now = new Date();
@@ -452,6 +485,7 @@ export async function attachPublicOrderCheckout(input: {
         "checkoutSessionId",
       ),
       status: "CHECKOUT_CREATED",
+      ...(input.checkoutUrl ? { metadata: sql`jsonb_set(coalesce(${furlongPublicOrders.metadata}, '{}'::jsonb), '{checkoutUrl}', ${JSON.stringify(input.checkoutUrl)}::jsonb)` } : {}),
       checkoutCreatedAt: now,
       traceId: input.traceId,
       replayRef: input.traceId,
@@ -756,11 +790,32 @@ export async function applyPublicOrderProviderEvent(input: {
         .limit(1);
     }
     if (!order) return { handled: false as const };
+    // Lookup may precede another event's commit. Re-read after the common lock.
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${order.id}))`);
+    [order] = await tx.select().from(furlongPublicOrders)
+      .where(eq(furlongPublicOrders.id, order.id)).limit(1);
+    if (!order) return { handled: false as const };
 
-    const decision = evaluatePublicOrderPaymentEvent(
+    let decision = evaluatePublicOrderPaymentEvent(
       paymentSnapshot(order),
       input.event,
     );
+    // Stripe can confirm one payment with different event IDs/types. Preserve
+    // processing/completion and consumed grants once this payment is recorded.
+    if (decision.action === "CONFIRM_PAID" && order.paidAt &&
+        order.amountPaidCents === order.amountTotalCents && order.amountRefundedCents === 0 &&
+        ["FULFILLMENT_PENDING", "IN_FULFILLMENT", "FULFILLED"].includes(order.status)) {
+      decision = { ...decision, action: "RECORD_CHARGE_EVIDENCE", grantAccess: false,
+        reasons: ["SIGNED_PAYMENT_ALREADY_RECORDED_FULFILLMENT_PRESERVED"] };
+    }
+    // Pre-payment notifications can arrive after success, refund or dispute.
+    // They cannot undo a confirmed payment or its later financial resolution.
+    if (order.paidAt && order.amountPaidCents === order.amountTotalCents &&
+        ["MARK_PENDING", "MARK_FAILED", "CANCEL"].includes(decision.action)) {
+      decision = { ...decision, action: "RECORD_CHARGE_EVIDENCE", grantAccess: false,
+        revokeAccess: false, eventStatus: "IGNORED",
+        reasons: ["OBSOLETE_PREPAYMENT_EVENT_AFTER_CONFIRMED_PAYMENT"] };
+    }
     const insertedEvent = await tx
       .insert(furlongPublicOrderEvents)
       .values({
@@ -840,6 +895,37 @@ export async function applyPublicOrderProviderEvent(input: {
     }
     if (input.event.paymentIntentId && !order.paymentIntentId) {
       update.paymentIntentId = input.event.paymentIntentId;
+    }
+    let automatedFulfilled = false;
+    let automatedHeld = false;
+    if (decision.action === "CONFIRM_PAID" && order.fulfillmentMode === "AUTOMATED") {
+      const priorMetadata = safeMetadata(order.metadata as Record<string, unknown> | undefined);
+      const artifact = readPublicOrderReportArtifact(priorMetadata);
+      if (verifiedAutomatedReportForOrder(order) && artifact) {
+        automatedFulfilled = true;
+        update.status = "FULFILLED";
+        update.fulfillmentStartedAt = now;
+        update.fulfilledAt = now;
+        const fulfillment = { action: "COMPLETE", mode: "AUTOMATED", reportRef: artifact.artifactId,
+          sha256: artifact.verifiedSha256, providerEventId: input.event.providerEventId,
+          recordedAt: now.toISOString(), evidenceRefs: ["artifact:" + artifact.artifactId, "sha256:" + artifact.verifiedSha256] };
+        update.metadata = { ...priorMetadata,
+          reportArtifact: { ...artifact, status: "AVAILABLE", availableAt: now.toISOString() }, fulfillment };
+        await tx.insert(furlongPublicOrderEvents).values({
+          orderId: order.id, provider: "furlong-automated-report", providerEventId: `report-fulfilled:${order.id}`,
+          eventType: "public_order.automated_report_fulfilled", eventStatus: "FULFILLED",
+          payloadDigest: createHash("sha256").update(JSON.stringify(fulfillment)).digest("hex"),
+          governanceVersion: PUBLIC_ORDER_GOVERNANCE_VERSION, classification: "CONFIDENTIAL",
+          replayRef: input.traceId, traceId: input.traceId, source: PUBLIC_ORDER_SOURCE,
+          metadata: fulfillment, occurredAt: now,
+        });
+      } else {
+        automatedHeld = true;
+        update.status = "HELD";
+        update.metadata = { ...priorMetadata, fulfillment: { action: "HOLD",
+          reason: "AUTOMATED_ARTIFACT_NOT_READY", providerEventId: input.event.providerEventId,
+          recordedAt: now.toISOString() } };
+      }
     }
     if (decision.action === "CONFIRM_PAID") {
       update.amountPaidCents = order.amountTotalCents;
@@ -1016,7 +1102,7 @@ export async function applyPublicOrderProviderEvent(input: {
     }
 
     let grant: typeof furlongPublicAccessGrants.$inferSelect | null = null;
-    if (decision.grantAccess) {
+    if (decision.grantAccess && !automatedHeld) {
       const units = Math.max(order.reportCredits, 1);
       const rows = await tx
         .insert(furlongPublicAccessGrants)
@@ -1026,9 +1112,9 @@ export async function applyPublicOrderProviderEvent(input: {
           accessType: "PAID_ANALYSIS_FULFILLMENT",
           resourceType: order.targetType,
           resourceRef: order.targetRef,
-          active: true,
+          active: !automatedFulfilled,
           unitsGranted: units,
-          unitsRemaining: units,
+          unitsRemaining: automatedFulfilled ? 0 : units,
           governanceVersion: PUBLIC_ORDER_GOVERNANCE_VERSION,
           classification: "CONFIDENTIAL",
           replayRef: input.traceId,
@@ -1037,7 +1123,7 @@ export async function applyPublicOrderProviderEvent(input: {
           metadata: {
             productCode: order.productCode,
             providerEventId: input.event.providerEventId,
-            reportCompleted: false,
+            reportCompleted: automatedFulfilled,
           },
           startsAt: now,
           expiresAt: order.expiresAt,
@@ -1051,8 +1137,8 @@ export async function applyPublicOrderProviderEvent(input: {
             furlongPublicAccessGrants.resourceRef,
           ],
           set: {
-            active: true,
-            unitsRemaining: units,
+            active: !automatedFulfilled,
+            unitsRemaining: automatedFulfilled ? 0 : units,
             revokedAt: null,
             revocationReason: null,
             traceId: input.traceId,
@@ -1098,6 +1184,7 @@ export async function reservePublicOrderFullRefund(input: {
   const idempotencyKey = "public-order:full-refund:" + input.orderId;
 
   return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
     const [order] = await tx
       .select()
       .from(furlongPublicOrders)
@@ -1217,7 +1304,7 @@ export async function reservePublicOrderFullRefund(input: {
       .where(
         and(
           eq(furlongPublicOrders.id, order.id),
-          eq(furlongPublicOrders.status, "FULFILLMENT_PENDING"),
+          eq(furlongPublicOrders.status, order.status),
           isNull(furlongPublicOrders.fulfillmentStartedAt),
         ),
       )
@@ -1252,6 +1339,7 @@ export async function recordPublicOrderRefundSubmission(input: {
   const providerStatus = requiredText(input.providerStatus, "providerStatus");
 
   return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
     const [order] = await tx
       .select()
       .from(furlongPublicOrders)
@@ -1351,6 +1439,7 @@ export async function recordPublicOrderRefundAttemptFailure(input: {
   const reason = requiredText(input.reason, "reason").slice(0, 240);
 
   return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
     const [order] = await tx
       .select()
       .from(furlongPublicOrders)
@@ -1499,6 +1588,14 @@ export async function transitionPublicOrderFulfillment(input: {
   }
 
   return db.transaction(async (tx) => {
+    // Credit-source revocation locks the source before updating its dependent.
+    // Use the same order so completion cannot race past a source refund.
+    const [lockTarget] = await tx.select({ creditSourceOrderId: furlongPublicOrders.creditSourceOrderId })
+      .from(furlongPublicOrders).where(eq(furlongPublicOrders.id, input.orderId)).limit(1);
+    if (lockTarget?.creditSourceOrderId) {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockTarget.creditSourceOrderId}))`);
+    }
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.orderId}))`);
     const [order] = await tx
       .select()
       .from(furlongPublicOrders)
@@ -1531,11 +1628,15 @@ export async function transitionPublicOrderFulfillment(input: {
       order.metadata as Record<string, unknown> | undefined,
     );
     const reportArtifact = readPublicOrderReportArtifact(priorMetadata);
+    if (order.fulfillmentMode !== "SUPERVISED") {
+      throw new PublicOrderConflictError("Automated reports cannot be released through manual fulfillment.");
+    }
     if (input.action === "COMPLETE" && order.fulfillmentMode === "SUPERVISED") {
       if (
         !reportArtifact ||
         reportArtifact.artifactId !== reportRef ||
-        reportArtifact.status !== "VERIFIED" ||
+        !(reportArtifact.status === "VERIFIED" ||
+          (order.status === "FULFILLED" && reportArtifact.status === "AVAILABLE")) ||
         !reportArtifact.verifiedSha256
       ) {
         throw new PublicOrderConflictError(

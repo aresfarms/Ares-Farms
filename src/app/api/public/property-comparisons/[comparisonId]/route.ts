@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { sessionAuthority } from "@/lib/auth/sessionAuthority";
+import { propertyReportPreparation } from "@/lib/intelligence/propertyReportPreparation";
 import { loadPropertyComparison } from "@/lib/intelligence/propertyComparisonStore";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 
@@ -48,6 +49,7 @@ export async function GET(
     return NextResponse.json({
       ok: true,
       ...bundle,
+      items: bundle.items.map(item => ({ ...item, reportPreparation: propertyReportPreparation(item) })),
       governance: {
         traceId,
         rankingAvailableOnlyAfterComparableChildResults: true,

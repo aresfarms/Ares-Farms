@@ -45,7 +45,7 @@ export async function processPropertyComparisonAnalysisBatch(input: {
           itemId: item.id,
           comparisonId: item.comparisonId,
           missingEvidence: readiness.missingEvidence,
-          analysisSnapshot: { analysisContext: readiness.context },
+          analysisSnapshot: { analysisContext: readiness.context, evidenceCapture: readiness.evidenceCapture ?? null },
           traceId: input.traceId,
         });
         results.push({
@@ -81,7 +81,7 @@ export async function processPropertyComparisonAnalysisBatch(input: {
           itemId: item.id,
           comparisonId: item.comparisonId,
           missingEvidence,
-          analysisSnapshot: { analysisContext: readiness.context },
+          analysisSnapshot: { analysisContext: readiness.context, evidenceCapture: readiness.evidenceCapture ?? null },
           traceId: input.traceId,
         });
         results.push({

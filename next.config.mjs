@@ -1,4 +1,5 @@
 const nextConfig = {
+  poweredByHeader: false,
   allowedDevOrigins: ["127.0.0.1"],
   // Vol III (Technical Infrastructure) / Vol IV (Operational Runbooks):
   // STAGING-DEPLOY P0.3 — deterministic container. `output: "standalone"`

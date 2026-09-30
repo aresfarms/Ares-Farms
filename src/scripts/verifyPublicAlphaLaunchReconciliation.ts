@@ -174,8 +174,9 @@ const operationalBlockers = operational.conditions
     nextAction: x.nextAction,
   }));
 
+const ceremonyStatus: string = ceremony.publicAlphaStatus;
 const ceremonyBlocker =
-  ceremony.publicAlphaStatus === "PASS"
+  ceremonyStatus === "PASS"
     ? []
     : [
         {

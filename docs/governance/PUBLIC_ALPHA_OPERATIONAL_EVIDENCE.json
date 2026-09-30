@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "public-alpha-operational-evidence-v1",
+  "updatedAt": "2026-09-30T18:47:00-04:00",
+  "purpose": "Human/external evidence required before invitation-only Public Alpha admission. This file does not authorize production, payments, public DNS cutover, live regulated actions, or official reliance.",
+  "conditions": [
+    {
+      "conditionId": "internal_acceptance",
+      "status": "PENDING",
+      "owner": "Named staging tester",
+      "evidenceRef": null,
+      "nextAction": "Run the current private staging build end to end and record the verdict through /named-tester-acceptance after the acceptance target is bound to the current revision and image digest."
+    },
+    {
+      "conditionId": "participant_terms",
+      "status": "PENDING",
+      "owner": "Governance authority",
+      "evidenceRef": null,
+      "nextAction": "Approve the Alpha participation terms and obtain signed terms for each invited external participant before admission."
+    },
+    {
+      "conditionId": "environmental_independent_reviewer",
+      "status": "PENDING",
+      "owner": "Founder governance",
+      "evidenceRef": null,
+      "nextAction": "Assign a qualified environmental reviewer who is independent of the deciding founder/builder before the FEATURED Module 21 workflow is exercised."
+    },
+    {
+      "conditionId": "environmental_founder_quorum",
+      "status": "PENDING",
+      "owner": "Founder governance",
+      "evidenceRef": null,
+      "nextAction": "Record the required 2-of-3 founder sign-off for FEATURED Module 21 activation."
+    },
+    {
+      "conditionId": "security_human_review",
+      "status": "PENDING",
+      "owner": "Human security reviewer",
+      "evidenceRef": null,
+      "nextAction": "Review the current Alpha-blocking security control results and record the human attestation required by the security hardening manifest."
+    }
+  ],
+  "alphaOnlyGuardrails": {
+    "invitationOnly": true,
+    "maximumExternalTesterCohort": 15,
+    "paymentsRemainOff": true,
+    "liveExternalRegulatedActionsRemainOff": true,
+    "officialDeterminationsRemainOff": true,
+    "publicDnsCutoverRemainOff": true,
+    "openSignupRemainOff": true,
+    "productionAuthorization": false
+  }
+}

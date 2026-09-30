@@ -242,6 +242,11 @@ jobs:
       - name: Public Alpha Profile v1 — Customer Journey live-state check
         run: npm run verify:customer-journey:ci
 
+      - name: Public Alpha launch reconciliation
+        run: |
+          npm run verify:public-alpha-signoff-ceremony-packet
+          npm run verify:public-alpha-launch-reconciliation
+
       # Proves the live-state :ci gates fail closed on real-state defects:
       # an unfilled alpha-required role, a customer surface missing required
       # content, and a malformed/incomplete active CCR each force a failure.

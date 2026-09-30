@@ -3,9 +3,13 @@ import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { readRequiredSecret } from "@/lib/security/requestGuards";
 
-export const TARGET_REVISION = process.env.P6_NAMED_TESTER_TARGET_REVISION ?? "furlong-core-00107-6z7";
-export const TARGET_IMAGE_DIGEST = process.env.P6_NAMED_TESTER_TARGET_IMAGE_DIGEST ?? "sha256:070a56b808ced75447266e4eeb3ff2819c0c423b1dc5608e065751f6145baf11";
-export const TARGET_APPLICATION_ID = process.env.P6_NAMED_TESTER_TARGET_APPLICATION_ID ?? "staging-p4-furlong-core-00107-6z7-application";
+export const TARGET_REVISION =
+  process.env.P6_NAMED_TESTER_TARGET_REVISION ?? process.env.K_REVISION ?? "";
+export const TARGET_IMAGE_DIGEST =
+  process.env.P6_NAMED_TESTER_TARGET_IMAGE_DIGEST ?? "";
+export const TARGET_APPLICATION_ID =
+  process.env.P6_NAMED_TESTER_TARGET_APPLICATION_ID ??
+  (TARGET_REVISION ? `staging-${TARGET_REVISION}-application` : "");
 export const TESTERS = {
   "chudson@aresfarmsinc.com": "Caitlin Hudson",
 } as const;
@@ -16,8 +20,17 @@ export type Attestation = { testerEmail: TesterEmail; testerName: string; target
 const memoryAttestations = new Map<TesterEmail, Attestation>();
 export function normalizeTester(value: string | null): TesterEmail | null { const email = value?.trim().toLowerCase() ?? ""; return email in TESTERS ? email as TesterEmail : null; }
 function requireDatabaseStore(): void { if (process.env.NAMED_TESTER_ACCEPTANCE_BACKEND !== "postgres" && process.env.NAMED_TESTER_ACCEPTANCE_BACKEND !== "memory-test") throw new Error("Named-tester acceptance is unavailable until its durable PostgreSQL store is configured."); }
+function requireTargetBinding(): void {
+  if (!TARGET_REVISION || !TARGET_APPLICATION_ID) {
+    throw new Error("Named-tester acceptance is unavailable until the current Cloud Run revision is bound.");
+  }
+  if (!/^sha256:[a-f0-9]{64}$/.test(TARGET_IMAGE_DIGEST)) {
+    throw new Error("Named-tester acceptance is unavailable until the current immutable image digest is bound.");
+  }
+}
 export async function recordAttestation(input: { testerEmail: TesterEmail; verdict: Verdict; findings: Finding[] }): Promise<Attestation> {
   requireDatabaseStore();
+  requireTargetBinding();
   if (input.verdict !== "PASS" && input.findings.length === 0) throw new Error("Findings are required unless the verdict is PASS.");
   const attestation: Attestation = { testerEmail: input.testerEmail, testerName: TESTERS[input.testerEmail], targetRevision: TARGET_REVISION, targetImageDigest: TARGET_IMAGE_DIGEST, targetApplicationId: TARGET_APPLICATION_ID, verdict: input.verdict, findings: input.findings, attestedAtUtc: new Date().toISOString(), statement: "I personally reviewed the named P6 staging workflow and this verdict is my own." };
   if (process.env.NAMED_TESTER_ACCEPTANCE_BACKEND === "memory-test") { if (memoryAttestations.has(attestation.testerEmail)) throw new Error("This tester has already submitted an immutable attestation for the governed target."); memoryAttestations.set(attestation.testerEmail, attestation); return attestation; }
@@ -27,6 +40,7 @@ export async function recordAttestation(input: { testerEmail: TesterEmail; verdi
 }
 export async function buildRollup() {
   requireDatabaseStore();
+  requireTargetBinding();
   if (process.env.NAMED_TESTER_ACCEPTANCE_BACKEND === "memory-test") return buildSignedRollup([...memoryAttestations.values()]);
   const result = await db.execute(sql`SELECT tester_email, tester_name, verdict, findings, statement, attested_at_utc FROM named_tester_attestations WHERE target_revision = ${TARGET_REVISION} ORDER BY tester_email`);
   const submitted = result.rows.map((row: any) => ({ testerEmail: row.tester_email as TesterEmail, testerName: row.tester_name, targetRevision: TARGET_REVISION, targetImageDigest: TARGET_IMAGE_DIGEST, targetApplicationId: TARGET_APPLICATION_ID, verdict: row.verdict as Verdict, findings: row.findings ?? [], attestedAtUtc: new Date(row.attested_at_utc).toISOString(), statement: row.statement })) as Attestation[];

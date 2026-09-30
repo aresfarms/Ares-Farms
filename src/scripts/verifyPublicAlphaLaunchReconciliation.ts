@@ -50,7 +50,7 @@ const security = securityHardeningStatus();
 
 assert.match(
   doctrine,
-  /Environmental-compliance \(Module 21\).*\*\*FEATURED\*\*/s,
+  /Environmental-compliance \\(Module 21\\)[\\s\\S]*\\*\\*FEATURED\\*\\*/,
   "Signed Public Alpha doctrine must keep Module 21 FEATURED.",
 );
 assert.match(

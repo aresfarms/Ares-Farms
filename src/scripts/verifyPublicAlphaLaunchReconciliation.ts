@@ -48,9 +48,30 @@ const ceremony = composePublicAlphaSignoffCeremonyPacket({
 });
 const security = securityHardeningStatus();
 
+// TECH-TEST-001 / CONST-RESILIENCE-001: the verifier must recognize the
+// signed Module 21 decision without accepting another module's FEATURED state.
+// Regex literals need one escape, not the double escapes used in strings.
+const module21FeaturedPattern =
+  /Environmental-compliance \(Module 21\)\*\*:[ \t]*\*\*FEATURED\*\*/;
+const featuredDecisionFixture =
+  "3. **Environmental-compliance (Module 21)**: **FEATURED** — independent review required.";
+assert.match(featuredDecisionFixture, module21FeaturedPattern);
+assert.doesNotMatch(
+  featuredDecisionFixture.replace("**FEATURED**", "**DEFERRED**"),
+  module21FeaturedPattern,
+);
+assert.doesNotMatch(
+  featuredDecisionFixture.replace("Module 21", "Module 22"),
+  module21FeaturedPattern,
+);
+assert.doesNotMatch(
+  featuredDecisionFixture.replace("**FEATURED**", "**DEFERRED**") +
+    "\n4. **Another module**: **FEATURED**",
+  module21FeaturedPattern,
+);
 assert.match(
   doctrine,
-  /Environmental-compliance \\(Module 21\\)[\\s\\S]*\\*\\*FEATURED\\*\\*/,
+  module21FeaturedPattern,
   "Signed Public Alpha doctrine must keep Module 21 FEATURED.",
 );
 assert.match(

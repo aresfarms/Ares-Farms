@@ -70,11 +70,13 @@ async function main() {
     const acceptedAt = new Date("2026-09-30T12:00:00.000Z");
     await store.recordPublicOrderAgreementAcceptance({
       orderId: created.order.id,
-      productName: PUBLIC_PRODUCTS.focused_property_report.publicName,
+      productName:
+        PUBLIC_PRODUCTS.focused_property_report.publicName ??
+        PUBLIC_PRODUCTS.focused_property_report.code,
       productDescription:
         PUBLIC_PRODUCTS.focused_property_report.description,
-      includedScope: PUBLIC_PRODUCTS.focused_property_report.includedScope,
-      excludedScope: PUBLIC_PRODUCTS.focused_property_report.excludedScope,
+      includedScope: PUBLIC_PRODUCTS.focused_property_report.included,
+      excludedScope: PUBLIC_PRODUCTS.focused_property_report.excluded,
       acceptedAt,
       networkAddress: "127.0.0.1",
       userAgent: "furlong-isolated-db-acceptance",

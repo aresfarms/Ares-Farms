@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "p5-b09-database-recovery-governance-attestation-v1",
+  "environment": "staging",
+  "blockerId": "P5-B09",
+  "outcome": "PASS",
+  "cleanupVerified": true,
+  "liveDatabaseModifiedByDrill": false,
+  "checks": [
+    { "name": "point-in-time recovery controls verified", "pass": true },
+    { "name": "point-in-time clone completed", "pass": true },
+    { "name": "migration replay succeeded", "pass": true },
+    { "name": "schema and application reads succeeded", "pass": true },
+    { "name": "temporary recovery resources deleted", "pass": true },
+    { "name": "source database remained runnable", "pass": true }
+  ],
+  "rawEvidenceRef": "artifacts/deployments/staging/2026-08-07T01-13-09-563Z-p5-b09-database-recovery.json",
+  "rawEvidenceGeneratedAtUtc": "2026-08-07T01:13:09.563Z",
+  "purpose": "Build-context-safe governance attestation derived from the signed staging recovery drill evidence. The raw deployment artifact remains excluded from Cloud Build uploads by .gcloudignore.",
+  "productionAuthorized": false
+}

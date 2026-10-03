@@ -56,7 +56,7 @@ jobs:
         with: { node-version: "24.15.0", cache: npm }
       - run: npm ci --no-audit --no-fund
       - name: Generate CycloneDX SBOM
-        run: npx --no-install cyclonedx-npm --output-file sbom.cdx.json
+        run: npm sbom --sbom-format cyclonedx > sbom.cdx.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: { name: sbom, path: sbom.cdx.json }
 

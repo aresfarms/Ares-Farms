@@ -5,6 +5,9 @@ const dir = mkdtempSync(path.join(tmpdir(), "p6-acceptance-"));
 process.env.FURLONG_RUNTIME_STATE_DIR = dir;
 process.env.REPORT_SIGNING_SECRET = "p6-smoke-secret-at-least-32-characters";
 process.env.NAMED_TESTER_ACCEPTANCE_BACKEND = "memory-test";
+process.env.P6_NAMED_TESTER_TARGET_REVISION = "furlong-core-alpha-smoke";
+process.env.P6_NAMED_TESTER_TARGET_IMAGE_DIGEST = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+process.env.P6_NAMED_TESTER_TARGET_APPLICATION_ID = "staging-furlong-core-alpha-smoke-application";
 async function main() {
   const m = await import("@/lib/acceptance/namedTesterAcceptance");
   await m.recordAttestation({ testerEmail: "chudson@aresfarmsinc.com", verdict: "PASS", findings: [] });

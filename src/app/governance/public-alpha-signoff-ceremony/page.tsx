@@ -24,7 +24,8 @@ export default function PublicAlphaSignoffCeremonyPage() {
         {packet.decisions.map((decision) => (
           <article key={decision.decisionId} style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}>
             <b>{decision.label}</b><br />
-            {decision.doctrineProposal ? <>Doctrine proposal: {decision.doctrineProposal}<br /></> : null}
+            Owner decision: {decision.ownerRecordedDecision}<br />
+            Recorded by {decision.ownerDecisionRecordedBy} · {decision.ownerDecisionRecordedAt}<br />
             Status: {decision.status}
           </article>
         ))}

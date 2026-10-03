@@ -49,10 +49,11 @@ steward change never moves a page.
 
 Future domains may be added without changing homepage architecture.
 
-> **Environmental note (CCR-2026-002):** technical environmental engineering
-> review remains **held for Public Alpha** and is conducted only by a qualified
-> environmental reviewer when activated. Stewardship of the domain (continuity)
-> is distinct from activating regulated technical review.
+> **Environmental note (CCR-2026-005):** Module 21 Environmental Compliance is
+> **FEATURED for Public Alpha**, but regulated technical environmental review
+> remains fail-closed until a qualified independent environmental reviewer is
+> assigned and the required founder activation quorum is recorded. Stewardship
+> of the domain (continuity) is distinct from activating regulated technical review.
 
 ## Positioning rules
 

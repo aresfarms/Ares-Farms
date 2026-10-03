@@ -29,8 +29,10 @@ profile routes as public (no internal chrome); npm scripts + CI steps added.
 
 Financing & Capital → Furlong Capital Desk · Environmental & Compliance → Caitlin Hudson
 · Communications & Public Trust → Furlong Trust Desk. `profileRoute` derives from
-`domainId`, so a steward change never moves a page. Environmental technical
-review remains **held for Alpha** (CCR-2026-002).
+`domainId`, so a steward change never moves a page. Module 21 Environmental
+Compliance is **FEATURED for Alpha**; regulated technical review remains
+fail-closed pending an independent qualified reviewer and founder activation
+quorum (CCR-2026-005).
 
 ## Constitutional posture
 

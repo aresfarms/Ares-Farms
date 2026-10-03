@@ -194,9 +194,10 @@ function main() {
   // Classification Change Registry — canonical file (default path).
   // Scenario A reads docs/CLASSIFICATION_CHANGE_REGISTRY.md from the
   // repo root. Per VIA-GOVERNANCE-CLASSIFICATION-001 it must parse and
-  // surface the active entries. CCR-2026-001 resolved (its resolution
-  // criteria are met since verify:human-authority exits 0); -002/-003/
-  // -004 remain ACTIVE (held for Alpha until their capabilities lift).
+  // surface the active entries. CCR-2026-001 is resolved because its
+  // authority-resolution criteria were met; CCR-2026-002 is historical
+  // after the signed August environmental-scope decision; -003/-004/-005
+  // remain ACTIVE until their respective activation conditions resolve.
   // ────────────────────────────────────────────────────────────────────
   const ccr = result.classificationChangeRegistry;
   assert(
@@ -209,7 +210,11 @@ function main() {
     ccrById("CCR-2026-001")?.status === "RESOLVED",
     "CCR-2026-001 must be RESOLVED (resolution criteria met at Build 39).",
   );
-  for (const activeId of ["CCR-2026-002", "CCR-2026-003", "CCR-2026-004"]) {
+  assert(
+    ccrById("CCR-2026-002")?.status === "RESOLVED",
+    "CCR-2026-002 must be RESOLVED after the signed August environmental-scope decision.",
+  );
+  for (const activeId of ["CCR-2026-003", "CCR-2026-004", "CCR-2026-005"]) {
     const entry = ccrById(activeId);
     assert(
       entry?.status === "ACTIVE",
@@ -220,10 +225,12 @@ function main() {
       `${activeId} must appear in activeEntries[].`,
     );
   }
-  assert(
-    !ccr.activeEntries.some((e) => e.id === "CCR-2026-001"),
-    "CCR-2026-001 (RESOLVED) must NOT count as active.",
-  );
+  for (const resolvedId of ["CCR-2026-001", "CCR-2026-002"]) {
+    assert(
+      !ccr.activeEntries.some((e) => e.id === resolvedId),
+      `${resolvedId} (RESOLVED) must NOT count as active.`,
+    );
+  }
   // Every active entry must carry the full required field set.
   for (const entry of ccr.activeEntries) {
     assert(
@@ -244,7 +251,7 @@ function main() {
     ccrMd.includes("## Active Classification Changes"),
     "Markdown must include the Active Classification Changes section.",
   );
-  for (const activeId of ["CCR-2026-002", "CCR-2026-003", "CCR-2026-004"]) {
+  for (const activeId of ["CCR-2026-003", "CCR-2026-004", "CCR-2026-005"]) {
     assert(
       ccrMd.includes(activeId),
       `Markdown active-changes section must render ${activeId}.`,

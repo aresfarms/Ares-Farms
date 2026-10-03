@@ -262,3 +262,34 @@ jobs:
 
       - name: Next.js production build
         run: npm run build
+
+  paid-journey:
+    name: Paid report database acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: furlong_checkout_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci -d furlong_checkout_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/furlong_checkout_test?sslmode=disable"
+      FURLONG_ISOLATED_CHECKOUT_TEST: "true"
+      LEDGER_MODE: "OPTION_C"
+      DRY_RUN: "true"
+      REBUILD_MODE: "STRICT"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24.15.0"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run verify:public-order-billing
+      - run: npm run verify:public-order-database

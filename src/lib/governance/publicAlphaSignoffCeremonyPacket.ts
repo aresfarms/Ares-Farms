@@ -133,7 +133,7 @@ const CONDITIONS: CeremonyEntryCondition[] = [
     label: "Staging point-in-time restore, migration replay, application-read verification, and cleanup completed",
     status: "PASS",
     evidenceRef:
-      "artifacts/deployments/staging/2026-08-07T01-13-09-563Z-p5-b09-database-recovery.json",
+      "docs/governance/P5_B09_DATABASE_RECOVERY_ATTESTATION_2026-08-07.json",
   },
   {
     conditionId: "participant_terms",

@@ -185,7 +185,7 @@ export function PropertyComparisonFrontDoor(props: {
         {item.reportPreparation?.sourceSnapshot ? <div className={styles.sourceFindings}>
           {item.reportPreparation.sourceSnapshot.warnings.length ? <div>
             <strong>Source warnings to consider now</strong>
-            <ul>{item.reportPreparation.sourceSnapshot.warnings.map((warning, i) => <li key={i}>
+            <ul>{(item.reportPreparation.sourceSnapshot.warningDetails ?? item.reportPreparation.sourceSnapshot.warnings.map(summary => ({ summary, detail: null, source: null }))).map((warning, i) => <li key={i}>
               <p>{warning.summary}</p>
               {warning.detail || warning.source ? <details>
                 <summary>Warning details and source</summary>

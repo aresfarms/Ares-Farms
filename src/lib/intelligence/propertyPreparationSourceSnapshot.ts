@@ -4,7 +4,8 @@ export type PropertyPreparationSourceSnapshot = {
   version: "property-preparation-source-snapshot-v2";
   capturedAt: string;
   facts: Array<{ label: string; value: string; source: string }>;
-  warnings: Array<{ summary: string; detail: string | null; source: string | null }>;
+  warnings: string[];
+  warningDetails: Array<{ summary: string; detail: string | null; source: string | null }>;
   unknowns: Array<{ label: string; action: string }>;
 };
 
@@ -53,7 +54,7 @@ export function propertyPreparationSourceSnapshot(item: {
   if (typeof property.squareFeet === "number" && Number.isFinite(property.squareFeet) && property.squareFeet > 0 && source) {
     observations.push({ label: "Reported building area", value: `${property.squareFeet.toLocaleString("en-US")} sq ft`, source });
   }
-  const warnings: PropertyPreparationSourceSnapshot["warnings"] = [...strings(verification.warnings), ...strings(verification.restrictions)]
+  const warnings: PropertyPreparationSourceSnapshot["warningDetails"] = [...strings(verification.warnings), ...strings(verification.restrictions)]
     .map(summary => ({ summary, detail: null, source: null }));
   for (const value of Array.isArray(brief.verifiedFacts) ? brief.verifiedFacts : []) {
     const fact = record(value);
@@ -71,6 +72,9 @@ export function propertyPreparationSourceSnapshot(item: {
   return { version: "property-preparation-source-snapshot-v2", capturedAt,
     facts: observations.filter((value, index) => observations.findIndex(other =>
       other.label === value.label && other.value === value.value && other.source === value.source) === index),
-    warnings: warnings.filter((value, index) => warnings.findIndex(other =>
+    // Keep the original text field for already-open clients during deployment.
+    warnings: [...new Set(warnings.map(warning => [warning.summary, warning.detail,
+      warning.source ? `Source: ${warning.source}` : null].filter(Boolean).join(". ")))],
+    warningDetails: warnings.filter((value, index) => warnings.findIndex(other =>
       other.summary === value.summary && other.detail === value.detail && other.source === value.source) === index), unknowns };
 }

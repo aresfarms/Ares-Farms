@@ -136,7 +136,7 @@ async function main() {
   const captured = propertyReportPreparation(capturedItem, asOf);
   assert(!captured.evidenceReady, "Public-source observations do not make a report sale-ready");
   assert(captured.sourceSnapshot?.facts.some(f => f.label === "Reported acreage" && f.value === "20 acres"));
-  assert(captured.sourceSnapshot?.warnings.some(w => w.summary.includes("Synthetic test data")), "Saved source warnings must be visible before completion");
+  assert(captured.sourceSnapshot?.warnings.some(w => w.includes("Synthetic test data")), "Saved source warnings must be visible before completion");
   assert(captured.sourceSnapshot?.unknowns.some(u => u.label === "Operating costs"));
   assert.equal(propertyReportPreparation({ ...capturedItem, propertyId: "another-property" }, asOf).sourceSnapshot, null);
   assert.equal(propertyReportPreparation({ ...capturedItem, normalizedAddress: "999 Wrong Road, Testville, MD 00000" }, asOf).sourceSnapshot, null);
@@ -151,7 +151,8 @@ async function main() {
   const caution = propertyReportPreparation({ ...capturedItem, resultSnapshot: { evidenceCapture: {
     ...readiness.evidenceCapture, facts: cautionFacts,
   } } }, asOf);
-  assert(caution.sourceSnapshot?.warnings.some(w => w.summary.includes("Further investigation required") && w.detail === "Point screening is not a parcel survey." && w.source === "Synthetic official source; 2026-09-01"));
+  assert(caution.sourceSnapshot?.warnings.some(w => w.includes("Point screening is not a parcel survey")), "Existing clients retain the complete warning text");
+  assert(caution.sourceSnapshot?.warningDetails.some(w => w.summary.includes("Further investigation required") && w.detail === "Point screening is not a parcel survey." && w.source === "Synthetic official source; 2026-09-01"));
   const badFacts = structuredClone(facts);
   if (badFacts.ok && "verification" in badFacts) badFacts.verification.normalizedAddress = "999 Wrong Road, Testville, MD 00000";
   await assert.rejects(() => buildPropertyComparisonAnalysisReadiness(item, { resolveFacts: async () => badFacts, now: () => asOf }));

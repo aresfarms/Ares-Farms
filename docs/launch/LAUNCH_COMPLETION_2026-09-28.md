@@ -4,7 +4,7 @@
 
 The public release includes the free Property Snapshot and the complete $49 automated Property Report. The $49 product cannot be deferred. The existing $249 human-reviewed Decision Report must meet its promised scope before being sold. A customer must identify the correct property, understand sourced findings and uncertainties, save/reopen their work, and receive the correct private report after one payment. Repeated use, failures, refunds, disputes and access isolation must be tested before launch.
 
-No public deployment, sales activation or DNS cutover is authorized by this record. This is an implementation and acceptance record, not a signoff. The initial geography and required property types still need owner confirmation; no product reduction is presumed.
+No public deployment, sales activation or DNS cutover is authorized by this record. This is an implementation and acceptance record, not a signoff. Nationwide coverage across property types remains the goal; evidence availability determines what can actually be completed without inventing results.
 
 ## Baseline and verified infrastructure changes
 
@@ -19,7 +19,7 @@ No public deployment, sales activation or DNS cutover is authorized by this reco
 
 - The portal and report preparation share one server-owned property-facts resolver. Parcel classification precedes lane-specific narratives; a farm must not inherit homebuyer answers or financing copy.
 - Long-range economics now deduct any remaining loan principal at maturity and stop scheduled payments at actual payoff. Blocked uses cannot outrank viable/conditioned uses on income alone. Regression tests cover both.
-- Browser report models, object references, prices and digests cannot authorize payment. Only an owner-authorized, completed property-comparison evidence package can supply economic inputs. Three packages are revalidated against property identity, exact address, source freshness at report generation, distinct candidate roles and supported calculations.
+- Browser report models, object references, prices and digests cannot authorize payment. Only an owner-authorized, completed property-comparison evidence package can supply economic inputs. Economic packages and reviewed exclusions are revalidated against property identity, exact address, source freshness at report generation, distinct candidate roles and supported calculations.
 - A preliminary investigation outline remains an internal review output. It cannot authorize payment. Missing economic evidence is not replaced with zeros or generic planning scores.
 - The report is rendered, safety scanned, structurally checked, written once to private storage, read back and hashed before Stripe checkout is created. Order, artifact, source snapshot, report model and digests are retained together.
 - Distinct signed confirmations of the same payment preserve processing/completion; they cannot reset a finished report or replenish a consumed grant. Payment during a pending refund cannot reopen fulfillment. Supervised completion retries remain idempotent, and the manual fulfillment path cannot bypass automated-report verification.
@@ -49,7 +49,7 @@ No public deployment, sales activation or DNS cutover is authorized by this reco
 
 ## Ordered remaining critical path
 
-1. Confirm the initial supported geography/property types and keep one candidate release; finish all required checks.
+1. Keep one candidate release and finish required checks; prioritize demonstrable source coverage without silently narrowing the nationwide objective.
 2. Complete approved-source collection into property-specific economic/use packages for normal single-property intake. Reject an unready purchase honestly; do not sell the investigation outline.
 3. Validate real properties and finished reports, including bad addresses, stale/conflicting sources, adverse findings and insufficient-data cases. Correct factual, calculation and usability defects before product acceptance.
 4. Verify the candidate privately with sales off. Prove the full Stripe test-mode journey and both products' delivery, recovery, refund/dispute, credit and capacity behavior. Re-run authenticated scanning and resolve material findings.
@@ -66,3 +66,10 @@ Resumed the interrupted exclusion work. The property report now permits zero to 
 The private worker, authorized operator endpoint, durable comparison and child case, report-preparation view, checkout snapshot and report PDF now carry the same exclusions. Finalization and purchase re-evaluate freshness. Customers can see no-go findings before payment; an exclusion-only report describes the scoped negative conclusion instead of offering a viable-use recommendation. A partially evidenced competing use cannot disappear behind a complete winner.
 
 Verification includes zero/one/two/three candidate cases; stale, wrong-property, future, unreviewed, unauthorized and malformed evidence; persisted source lineage; worker handoff; report rendering; and wrong-customer access. Synthetic fixtures prove implementation behavior only. Live-source economic completion, real Stripe/storage acceptance, owner acceptance and independent launch approvals remain open. No public activation is authorized by these checks.
+
+
+The completed-report PDF now discloses acquisition/startup costs, all thirteen operating expense categories and their separate escalation rates, revenue growth, staffing and owner time, loan/cash/other-capital reconciliation, scheduled debt and maturity payoff, milestone cash flows, and each input's method/source references. Cumulative operating cash flow is explicitly distinguished from investment profit and excludes resale/appreciation assumptions. These schedules are part of the frozen report model and digest; exclusion-only reports do not invent them. Synthetic reports with zero/one/two/three economic uses contain 5/9/13/18 pages; all eighteen pages of the full fixture were visually inspected, and all variants passed page-boundary checks.
+
+Local production build, TypeScript and report contracts passed after this addition. Mobile (390px) and desktop (1440px) browser checks show the documented no-go findings before payment, no invented candidate selector, no horizontal overflow, and a disabled payment action when evidence remains missing even after agreement acceptance. These browser responses are synthetic. The merged candidate's expanded real-PostgreSQL suite also passed; the updated final commit must retain its own CI results.
+
+A live read of the existing Stripe test account found only four of the ten required event subscriptions. The test endpoint `we_1U1fTcDVUdDb7LlbcxGHy7CE` was updated and read back on October 5 to include delayed-payment success/failure, checkout expiry, charge refunds, failed refunds and dispute closure. Its URL, enabled state, existing subscriptions and test mode were preserved. This corrects test configuration; it does not prove signed event processing, enable public sales or establish live-mode acceptance. API reference: https://docs.stripe.com/api/webhook_endpoints/update.

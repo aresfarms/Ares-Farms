@@ -13,8 +13,9 @@ import { buildScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan
 import { generatePropertyEvaluationPdf } from "@/lib/pdf/generatePropertyEvaluationPdf";
 import { buildReportBranding } from "@/lib/reports/reportBranding";
 import { reportPolicy } from "@/lib/reports/reportPolicy";
+import { economicReportSchedules } from "@/lib/reports/economicReportSchedules";
 
-export const AUTOMATED_PROPERTY_REPORT_VERSION = "automated-property-report-v1.1.0";
+export const AUTOMATED_PROPERTY_REPORT_VERSION = "automated-property-report-v1.2.0";
 export const MAX_AUTOMATED_REPORT_BYTES = 25 * 1024 * 1024;
 export class AutomatedReportNotReadyError extends Error {
   constructor(readonly reasons: string[]) {
@@ -231,6 +232,8 @@ export function buildAutomatedPropertyReport(input: {
     // repeated domain text before the customer reaches the actual comparison.
     model.laneAnswers = null;
     model.scenarioEvidence = [...findings, ...exclusionLines];
+    model.economicSchedules = candidates.flatMap(candidate => economicReportSchedules(
+      economic.packages.find(p => p.candidate.id === candidate.id)!, candidate));
     model.honestUnknowns = [...conditions, "Borrower-specific financial eligibility and lender approval have not been evaluated."];
     model.keyQuestions = [...conditions];
     model.readinessSectionNotes = []; // Borrower limitations are already stated in honestUnknowns.

@@ -48,6 +48,22 @@ async function main() {
   assert(supported.model.scenarioEvidence?.some(line => line.includes("operating-costs")));
   assert.equal(supported.model.verifiedCriteria.length, 0, "parcel size is not a statutory tax lever");
   assert.equal(supported.model.laneAnswers, null, "detailed evidence must not bury the use comparison");
+  const schedules = supported.model.economicSchedules!;
+  const renderedBudget = JSON.stringify(schedules);
+  assert.equal(schedules.length, 15, "Every candidate discloses the same five schedules");
+  for (const label of ["Payroll", "Employee benefits", "Health insurance", "Retirement", "Utilities", "Insurance", "Property tax", "Maintenance", "Replacement reserve", "Marketing", "Materials", "Professional fees", "Other operating costs", "Modeled purchase price", "Project cash contribution", "Annual interest rate", "Owner time", "Maturity principal payoff"]) {
+    assert(renderedBudget.includes(label), "The report must disclose " + label);
+  }
+  assert(renderedBudget.includes("$900,000.00"), "Project cost and funding reconcile in the report");
+  assert(renderedBudget.includes("$420,000.00"), "Complete annual expenses are visible");
+  assert(renderedBudget.includes("annual escalation 3%"), "Each expense growth rate is disclosed");
+  assert(renderedBudget.includes("not investment profit"), "Cumulative cash flow is not mislabeled as investment return");
+  assert(renderedBudget.includes("[M1]") && renderedBudget.includes(basePackage.operations.baseAnnualRevenue.method), "Input methods travel with the schedule");
+  const changedInput = structuredClone(packages);
+  changedInput[0].operations.baseAnnualRevenue.method = "Alternative supported calculation method.";
+  assert.notEqual(buildAutomatedPropertyReport({ ...input, customerVision: null,
+    economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages: changedInput } }).modelDigest,
+    supported.modelDigest, "Changing an input method changes the frozen report digest");
   const chosen = buildAutomatedPropertyReport({ ...input, customerVision: packages[0].candidate.title,
     selectedReportCandidateId: packages[0].candidate.id,
     economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });
@@ -77,6 +93,7 @@ async function main() {
     assert(!reduced.model.executiveSummary.includes("Three preliminary scenarios"));
     assert.notEqual(reduced.evidenceDigest, supported.evidenceDigest, "exclusions must be bound into report integrity");
     if (!count) {
+      assert.equal(reduced.model.economicSchedules?.length, 0, "No costs or financing are invented for excluded uses");
       assert.equal(reduced.model.verdict.label, "No supported use within the reviewed scope");
       assert(!reduced.model.conceptSummary.some(s => /first-year revenue|DSCR: [0-9]/.test(s)));
     }

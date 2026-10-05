@@ -1,3 +1,4 @@
+import type { EconomicReportSchedule } from "@/lib/reports/economicReportSchedules";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -58,6 +59,8 @@ type PropertyEvaluationPdfInput = {
   scenarioComparison?: string[];
   /** Source-supported use findings, displayed with the evidence after the comparison. */
   scenarioEvidence?: string[];
+  /** Auditable cost, financing and assumption schedules from the frozen calculation. */
+  economicSchedules?: EconomicReportSchedule[];
   strengths: string[];
   risks: string[];
   pathwayAnalysis: string[];
@@ -909,6 +912,12 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   if (input.scenarioEvidence?.length) {
     heading("Evidence Behind the Use Comparison");
     bullets(input.scenarioEvidence);
+  }
+
+  for (const schedule of input.economicSchedules ?? []) {
+    heading(schedule.title);
+    factsTable(schedule.rows);
+    bullets(schedule.notes);
   }
 
   // Financing lanes — a guide to how ground like this is paid for (not a

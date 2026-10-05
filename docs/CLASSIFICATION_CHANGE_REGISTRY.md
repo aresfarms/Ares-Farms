@@ -57,7 +57,7 @@ Finding automatically resolves when:
 <!-- ccr:meta
 id: CCR-2026-002
 title: Environmental Engineering Reviewer Reclassification (Step-3 assumption correction)
-status: ACTIVE
+status: RESOLVED
 previousState: Role ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER classified ACTIVE_FILL (ASSUMED during Step-3 Annex projection; assumed former placeholder holder).
 newState: Role ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER classified HELD_FOR_ALPHA.
 reason: Environmental review is deferred from Alpha (Module 21 deferred per the open §9 B4 decision, default deferred); the former placeholder holder was not qualified to perform environmental engineering review, so the assumed fill was invalid; the role is correctly held, not filled. A held role requires no Alpha fill, so no gate green was bought.
@@ -86,8 +86,59 @@ _[recorded at ceremony]_
 Activates only when **both**: (a) an environmental workflow is featured in scope, **and** (b) a qualified environmental reviewer is assigned. NOTE: this is a regulated-competency single point of failure — only Caitlin currently qualifies; the Environmental & Compliance successor plan must account for this competency, not just governance continuity.
 
 ### Audit Notes
-- A held role requires no Alpha fill, so the Alpha gate is unaffected (no green was bought by this change).
-- The capability is genuinely deferred; the requirement is not removed, only dormant until activation.
+- A held role required no Alpha fill while the environmental workflow was genuinely deferred.
+- This entry records the June correction only; it no longer describes current Alpha scope.
+
+### Resolution / Supersession
+**RESOLVED by CCR-2026-005.** The named governance authority recorded the Public Alpha §9 decision on August 11, 2026 to FEATURE Environmental Compliance in Alpha. CCR-2026-005 preserves the new state without pretending the independent reviewer or founder-quorum activation prerequisites have been satisfied.
+
+---
+
+## CCR-2026-005 — Environmental Compliance Featured-Scope Reconciliation
+
+<!-- ccr:meta
+id: CCR-2026-005
+title: Environmental Compliance Featured-Scope Reconciliation
+status: ACTIVE
+previousState: Module 21 environmental compliance deferred from Public Alpha; ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER held under CCR-2026-002.
+newState: Module 21 is FEATURED in Public Alpha; technical activation remains blocked pending a qualified independent environmental reviewer and required 2-of-3 founder sign-off.
+reason: The signed Public Alpha decision recorded 2026-08-11 supersedes the earlier default-defer posture. No reviewer fill is claimed. Caitlin holds the relevant qualification but is the builder and deciding founder, so she may not self-clear the independent technical-review requirement.
+approver: Owner scope decision recorded by Caitlin L. Hudson, PhD, PE on 2026-08-11; independent ceremony review remains pending.
+effectiveDate: Owner scope decision recorded 2026-08-11; workflow activation remains pending its independent-review prerequisites.
+resolutionCriteria: Assign a qualified independent environmental reviewer and record the required 2-of-3 founder sign-off; then remove the held operational role posture and re-run Public Alpha launch reconciliation.
+-->
+
+### Previous State
+- Module 21 Environmental Compliance: **deferred from Public Alpha**.
+- `ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER`: **HELD_FOR_ALPHA** under CCR-2026-002.
+
+### New State
+- Module 21 Environmental Compliance: **FEATURED in Public Alpha** by the signed August 11, 2026 owner decision.
+- Technical environmental review: **not activated yet**.
+- `ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER`: remains operationally held only as a fail-closed activation posture until an independent qualified reviewer is actually assigned.
+- Required founder activation quorum: **not yet recorded**.
+
+### Reason for Change
+The earlier June classification accurately corrected an invalid placeholder reviewer while Environmental Compliance was deferred. It became stale when the named governance authority later chose to feature Environmental Compliance during Alpha. This entry reconciles the machine-readable governance state with that signed decision without manufacturing a reviewer assignment or treating the founder/builder as her own independent reviewer.
+
+### Governance Authority / Review Posture
+Owner scope decision recorded by Caitlin L. Hudson, PhD, PE. Independent ceremony review and the required founder quorum remain outstanding. This CCR does **not** authorize Alpha entry, production, an official environmental report, environmental clearance, or regulated reliance.
+
+### Effective Date
+Owner scope decision recorded August 11, 2026. Technical workflow activation remains pending the resolution criteria below.
+
+### Activation / Resolution Criteria
+All of the following must be recorded:
+1. A qualified **independent** environmental reviewer is assigned.
+2. The required **2-of-3 founder sign-off** records the FEATURED Module 21 activation decision.
+3. The operational Annex no longer represents the reviewer requirement as a deferred capability.
+4. The Public Alpha ceremony and launch-reconciliation checks are rerun successfully.
+
+### Audit Notes
+- CCR-2026-002 is retained as historical evidence and marked RESOLVED.
+- No reviewer assignment is inferred from professional credentials alone.
+- No gate is made green by reclassification.
+- Production and external-action holds remain unchanged.
 
 ---
 

@@ -128,6 +128,10 @@ async function main() {
             orderId: result.order.id, targetRef, artifactId, evidenceSha256: sourceDigest, modelSha256: "c".repeat(64) } } })
           .where(eq(tables.furlongPublicOrders.id, result.order.id));
       }
+      await store.recordPublicOrderAgreementAcceptance({ orderId: result.order.id,
+        productName: product.publicName ?? product.code, productDescription: product.description,
+        includedScope: product.included, excludedScope: product.excluded,
+        acceptedAt: new Date(), networkAddress: "127.0.0.1", userAgent: "furlong-isolated-db-acceptance", traceId: randomUUID() });
       const session = "cs_test_" + randomUUID();
       await store.attachPublicOrderCheckout({ orderId: result.order.id, checkoutSessionId: session, traceId: randomUUID() });
       const event: PublicOrderStripeEventInput = { signatureVerified: true, providerEventId: "evt_test_" + randomUUID(),
@@ -144,6 +148,10 @@ async function main() {
     assert(confirmations.every(result => result.handled));
     const loaded = await store.loadPublicOrder({ orderId: order.order.id, buyerActorId: null, accessToken: order.accessToken });
     assert.equal(loaded?.order.status, "FULFILLED");
+    assert.equal(loaded?.agreementEvent?.eventType, "public_order.agreement_accepted");
+    await assert.rejects(migrations.query(
+      "UPDATE furlong_public_order_events SET event_status='TAMPERED' WHERE provider='stripe' AND provider_event_id=$1",
+      [order.event.providerEventId]), /append.only|immutable/i, "public order events must remain append-only");
     assert.equal(artifactStore.readPublicOrderReportArtifact(loaded?.order.metadata)?.status, "AVAILABLE");
     assert.equal(loaded?.grants[0].active, false);
     assert.equal(loaded?.grants[0].unitsRemaining, 0);
@@ -265,7 +273,7 @@ async function main() {
     assert.equal(heldUpgrade?.order.status, "HELD");
     await assert.rejects(store.transitionPublicOrderFulfillment(action(upgraded.value.order.id, "START")));
 
-    console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["exclusion-only database completion", "stale exclusions rejected before persistence", "exclusion child-case lineage", "free negative findings before purchase", "saved evidence and recovery", "comparison ownership denial", "completed evidence JSONB round trip", "stale saved evidence denied", "concurrent webhook replay", "atomic automatic fulfillment",
+    console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["agreement acceptance persisted", "event ledger append-only", "exclusion-only database completion", "stale exclusions rejected before persistence", "exclusion child-case lineage", "free negative findings before purchase", "saved evidence and recovery", "comparison ownership denial", "completed evidence JSONB round trip", "stale saved evidence denied", "concurrent webhook replay", "atomic automatic fulfillment",
       "missing artifact held", "cross-customer denial", "exact private PDF bytes", "changed object rejected",
       "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit", "different-event payment confirmation preserves fulfillment", "out-of-order pre-payment notifications cannot undo payment or refund", "payment during refund stays pending", "supervised completion replay", "supervised artifact required", "post-start cancellation denied", "single-use upgrade credit", "concurrent source-refund holds upgrade"] }));
   } finally {

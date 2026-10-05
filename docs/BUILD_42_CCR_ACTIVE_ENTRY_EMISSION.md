@@ -33,9 +33,10 @@ Recorded statuses (honest operational state):
 | CCR | Title | Status | Why |
 |---|---|---|---|
 | CCR-2026-001 | Build 38 Human Authority Severity Reclassification | **RESOLVED** | Resolution criteria met at Build 39 — Annex populated, `verify:human-authority` exits 0. |
-| CCR-2026-002 | Environmental Engineering Reviewer Reclassification | **ACTIVE** | Held for Alpha; activates only when an env workflow is featured AND a qualified reviewer is assigned. |
+| CCR-2026-002 | Environmental Engineering Reviewer Reclassification | **RESOLVED** | Historical June correction; superseded by the signed August Public Alpha scope decision and CCR-2026-005. |
 | CCR-2026-003 | Regulatory Liaison Authority reclassification | **ACTIVE** | Held for Alpha; activates when regulatory examination/response capabilities activate. |
 | CCR-2026-004 | Source Legal Authority reclassification | **ACTIVE** | Held for Alpha; activates when source legal/licensing review activates. |
+| CCR-2026-005 | Environmental Compliance Featured-Scope Reconciliation | **ACTIVE** | Module 21 is FEATURED for Alpha; activation remains fail-closed pending an independent qualified reviewer and required founder quorum. |
 
 CCR-2026-001 (RESOLVED) is emitted as a **historical** entry and does **not**
 count as active.
@@ -81,8 +82,8 @@ CCR list (id / title / previous → new state / status).
 
 ### 5. Smoke — `src/scripts/buildSelfReportSmokeTest.ts`
 
-- Canonical-registry assertions: parses; CCR-2026-002/-003/-004 ACTIVE and in
-  `activeEntries[]`; CCR-2026-001 RESOLVED and NOT active; every active entry
+- Canonical-registry assertions: parses; CCR-2026-003/-004/-005 ACTIVE and in
+  `activeEntries[]`; CCR-2026-001/-002 RESOLVED and NOT active; every active entry
   carries the full required field set; markdown renders the section + each id.
 - **Malformed CCR fails closed** (active entry missing `reason`; junk meta line;
   invalid status) → `parsed === false`, `exit_code === 1`, parse-fail finding +
@@ -102,7 +103,7 @@ No CI change required — the new tests run under the existing
 | Command | Result |
 |---|---|
 | `npx tsc --noEmit` | exit 0 |
-| `npm run smoke:build-self-report` | PASS — active 3, historical 1, malformedExit 1, emptyExit 0 |
+| `npm run smoke:build-self-report` | PASS — active 3, historical 2, malformedExit 1, emptyExit 0 |
 | `npm run build:self-report` | PASS — exit 0; CCR-2026-002/-003/-004 active, CCR-2026-001 resolved |
 | `npm run smoke:public-alpha-profile` | PASS (downstream consumer unaffected) |
 | `npm run build` | exit 0 |
@@ -110,7 +111,7 @@ No CI change required — the new tests run under the existing
 ## Acceptance (per spec)
 
 - [x] `npm run build:self-report` exits 0.
-- [x] Report shows CCR-2026-001 (RESOLVED), -002/-003/-004 (ACTIVE) per registry status.
+- [x] Report shows CCR-2026-001/-002 (RESOLVED), -003/-004/-005 (ACTIVE) per registry status.
 - [x] `build-self-report.json` includes `classificationChangeRegistry.activeEntries[]`.
 - [x] `build-self-report.md` includes an "Active Classification Changes" section.
 - [x] Registry parse failure → `build:self-report` fails closed.

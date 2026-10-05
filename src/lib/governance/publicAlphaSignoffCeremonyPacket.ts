@@ -7,14 +7,17 @@ export const PUBLIC_ALPHA_SIGNOFF_CEREMONY_RULE =
 export type CeremonyDecision = {
   decisionId: string;
   label: string;
-  doctrineProposal: string | null;
-  status: "PENDING_OWNER_DECISION";
+  ownerRecordedDecision: string;
+  ownerDecisionRecordedAt: string;
+  ownerDecisionRecordedBy: string;
+  status: "OWNER_DECISION_RECORDED_PENDING_INDEPENDENT_REVIEW";
 };
 
 export type CeremonyEntryCondition = {
   conditionId: string;
   label: string;
   status: "PASS" | "EXTERNAL_EVIDENCE_REQUIRED";
+  evidenceRef: string | null;
 };
 
 export type PublicAlphaSignoffCeremonyPacket = {
@@ -25,6 +28,7 @@ export type PublicAlphaSignoffCeremonyPacket = {
   ceremonyStatus: "READY_FOR_OWNER_AND_INDEPENDENT_REVIEW";
   quorumRule: "OWNER_PLUS_INDEPENDENT_REVIEW";
   minimumAffirmativeVotes: 2;
+  ownerDecisionRecordCount: 5;
   reviewDecisionCount: 0;
   voteRecordingPermitted: false;
   decisions: CeremonyDecision[];
@@ -37,48 +41,127 @@ export type PublicAlphaSignoffCeremonyPacket = {
   evidenceSnapshotHash: string;
 };
 
+const OWNER = "Caitlin L. Hudson, PhD, PE";
+const OWNER_DECISION_AT = "2026-08-11T22:48:00-04:00";
+
 const DECISIONS: CeremonyDecision[] = [
   {
     decisionId: "sustained_window_duration",
     label: "Sustained clean-window duration for Alpha exit",
-    doctrineProposal: "30 days",
-    status: "PENDING_OWNER_DECISION",
+    ownerRecordedDecision:
+      "Thirty days is the ceiling; Alpha may exit sooner when all exit criteria hold.",
+    ownerDecisionRecordedAt: OWNER_DECISION_AT,
+    ownerDecisionRecordedBy: OWNER,
+    status: "OWNER_DECISION_RECORDED_PENDING_INDEPENDENT_REVIEW",
   },
   {
     decisionId: "cohort_size",
     label: "Invited borrower and partner-lender cohort size",
-    doctrineProposal: null,
-    status: "PENDING_OWNER_DECISION",
+    ownerRecordedDecision: "No more than 15 testers total.",
+    ownerDecisionRecordedAt: OWNER_DECISION_AT,
+    ownerDecisionRecordedBy: OWNER,
+    status: "OWNER_DECISION_RECORDED_PENDING_INDEPENDENT_REVIEW",
   },
   {
     decisionId: "module_21_environmental_compliance_featured_or_deferred",
     label: "Feature or defer environmental-compliance workflow",
-    doctrineProposal: "Deferred for Alpha unless a qualified independent reviewer is assigned",
-    status: "PENDING_OWNER_DECISION",
+    ownerRecordedDecision:
+      "FEATURED for Public Alpha, but activation remains blocked until a qualified independent environmental reviewer is assigned and the required 2-of-3 founder sign-off is recorded.",
+    ownerDecisionRecordedAt: "2026-08-11T22:54:00-04:00",
+    ownerDecisionRecordedBy: OWNER,
+    status: "OWNER_DECISION_RECORDED_PENDING_INDEPENDENT_REVIEW",
   },
   {
     decisionId: "module_10_connectors_live_or_simulated",
     label: "Use simulated review or a live lender connector",
-    doctrineProposal: "Simulated review; live external connectors remain blocked",
-    status: "PENDING_OWNER_DECISION",
+    ownerRecordedDecision:
+      "Simulated/non-binding lender review only; live lender connectors remain blocked for Public Alpha.",
+    ownerDecisionRecordedAt: OWNER_DECISION_AT,
+    ownerDecisionRecordedBy: OWNER,
+    status: "OWNER_DECISION_RECORDED_PENDING_INDEPENDENT_REVIEW",
   },
   {
     decisionId: "named_governance_authority",
     label: "Named governance authority for Alpha entry and exit",
-    doctrineProposal: null,
-    status: "PENDING_OWNER_DECISION",
+    ownerRecordedDecision:
+      "Caitlin L. Hudson, PhD, PE is the named governance authority for Public Alpha entry and exit.",
+    ownerDecisionRecordedAt: OWNER_DECISION_AT,
+    ownerDecisionRecordedBy: OWNER,
+    status: "OWNER_DECISION_RECORDED_PENDING_INDEPENDENT_REVIEW",
   },
 ];
 
 const CONDITIONS: CeremonyEntryCondition[] = [
-  { conditionId: "self_report", label: "Build Self-Report passes for the Alpha set", status: "PASS" },
-  { conditionId: "disclosures", label: "Module 44 disclosure audit is green", status: "PASS" },
-  { conditionId: "human_authority", label: "Module 45 authority coverage is complete", status: "PASS" },
-  { conditionId: "claims", label: "Customer-surface claims controls pass", status: "PASS" },
-  { conditionId: "pii_audit_fetch", label: "PII, audit-chain, and live-fetch controls pass", status: "PASS" },
-  { conditionId: "promotion_ledger", label: "Three controlled-promotion requirements are enumerated", status: "PASS" },
-  { conditionId: "dr_restore", label: "Committed/tagged tree and recorded DR restore test", status: "EXTERNAL_EVIDENCE_REQUIRED" },
-  { conditionId: "participant_terms", label: "Signed Alpha participation terms for every invited participant", status: "EXTERNAL_EVIDENCE_REQUIRED" },
+  {
+    conditionId: "self_report",
+    label: "Build Self-Report passes for the Alpha set",
+    status: "PASS",
+    evidenceRef: "CI: build:self-report:ci",
+  },
+  {
+    conditionId: "disclosures",
+    label: "Module 44 disclosure audit is green",
+    status: "PASS",
+    evidenceRef: "CI: smoke:disclosure-audit-gate",
+  },
+  {
+    conditionId: "human_authority",
+    label: "Module 45 structural authority coverage is complete",
+    status: "PASS",
+    evidenceRef: "CI: verify:human-authority:ci",
+  },
+  {
+    conditionId: "claims",
+    label: "Customer-surface claims controls pass",
+    status: "PASS",
+    evidenceRef: "CI: smoke:claims-public",
+  },
+  {
+    conditionId: "pii_audit_fetch",
+    label: "PII, audit-chain, and live-fetch controls pass",
+    status: "PASS",
+    evidenceRef: "Build Self-Report Alpha profile",
+  },
+  {
+    conditionId: "promotion_ledger",
+    label: "Three controlled-promotion requirements are enumerated",
+    status: "PASS",
+    evidenceRef: "Build Self-Report requirements ledger",
+  },
+  {
+    conditionId: "dr_restore",
+    label: "Staging point-in-time restore, migration replay, application-read verification, and cleanup completed",
+    status: "PASS",
+    evidenceRef:
+      "docs/governance/P5_B09_DATABASE_RECOVERY_ATTESTATION_2026-08-07.json",
+  },
+  {
+    conditionId: "participant_terms",
+    label: "Signed Alpha participation terms exist for every invited external participant",
+    status: "EXTERNAL_EVIDENCE_REQUIRED",
+    evidenceRef: null,
+  },
+  {
+    conditionId: "environmental_independent_reviewer",
+    label:
+      "A qualified independent environmental reviewer is assigned before the FEATURED Module 21 workflow is exercised",
+    status: "EXTERNAL_EVIDENCE_REQUIRED",
+    evidenceRef: null,
+  },
+  {
+    conditionId: "environmental_founder_quorum",
+    label:
+      "Required 2-of-3 founder sign-off records the FEATURED Module 21 activation decision",
+    status: "EXTERNAL_EVIDENCE_REQUIRED",
+    evidenceRef: null,
+  },
+  {
+    conditionId: "security_human_review",
+    label:
+      "A human security review of the Alpha-blocking control results is recorded",
+    status: "EXTERNAL_EVIDENCE_REQUIRED",
+    evidenceRef: null,
+  },
 ];
 
 export function composePublicAlphaSignoffCeremonyPacket(input?: {
@@ -117,6 +200,7 @@ export function composePublicAlphaSignoffCeremonyPacket(input?: {
     predecessor: "4D_CONTROLLED_PROMOTION_READINESS_RECONCILIATION",
     readinessEvidenceSnapshotHash: readiness.evidenceSnapshotHash,
     quorumRule: "OWNER_PLUS_INDEPENDENT_REVIEW",
+    ownerDecisionRecordCount: DECISIONS.length,
     decisions: DECISIONS,
     entryConditions: CONDITIONS,
     productionStatus: "BLOCKED",
@@ -134,6 +218,7 @@ export function composePublicAlphaSignoffCeremonyPacket(input?: {
     ceremonyStatus: "READY_FOR_OWNER_AND_INDEPENDENT_REVIEW",
     quorumRule: "OWNER_PLUS_INDEPENDENT_REVIEW",
     minimumAffirmativeVotes: 2,
+    ownerDecisionRecordCount: 5,
     reviewDecisionCount: 0,
     voteRecordingPermitted: false,
     decisions: DECISIONS,

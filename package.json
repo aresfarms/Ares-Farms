@@ -486,6 +486,7 @@
     "verify:property-comparison-ranking": "tsx src/scripts/verifyPropertyComparisonRanking.ts",
     "verify:economic-evidence-package": "tsx src/scripts/verifyEconomicEvidencePackage.ts",
     "verify:public-order-billing": "tsx src/scripts/verifyPublicOrderBilling.ts",
+    "verify:public-order-database": "tsx src/scripts/verifyPublicOrderDatabase.ts",
     "verify:public-report-commerce": "tsx src/scripts/verifyPublicReportCommerce.ts",
     "verify:unified-property-risk": "tsx src/scripts/verifyUnifiedPropertyRiskRanking.ts",
     "verify:water-insurance-evidence": "tsx src/scripts/verifyWaterInsuranceEvidence.ts",
@@ -546,6 +547,8 @@
     "verify:official-evidence-external-notification-institutional-closure": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationInstitutionalClosure.ts",
     "verify:controlled-promotion-readiness-reconciliation": "tsx src/scripts/verifyControlledPromotionReadinessReconciliation.ts",
     "verify:public-alpha-signoff-ceremony-packet": "tsx src/scripts/verifyPublicAlphaSignoffCeremonyPacket.ts",
+    "verify:public-alpha-launch-reconciliation": "tsx src/scripts/verifyPublicAlphaLaunchReconciliation.ts",
+    "gate:public-alpha-launch": "tsx src/scripts/verifyPublicAlphaLaunchReconciliation.ts --require-ready",
     "verify:governed-evidence-review-portal": "tsx src/scripts/verifyGovernedEvidenceReviewPortal.ts",
     "verify:institutional-credential-verification": "tsx src/scripts/verifyInstitutionalCredentialVerification.ts",
     "verify:institutional-legal-authority": "tsx src/scripts/verifyInstitutionalLegalAuthority.ts",
@@ -626,8 +629,7 @@
     "verify:property-comparison-analysis-worker": "tsx src/scripts/verifyPropertyComparisonAnalysisWorker.ts",
     "verify:property-decision-front-page": "tsx src/scripts/verifyPropertyDecisionFrontPage.ts",
     "verify:progressive-intelligence": "tsx src/scripts/verifyProgressiveIntelligence.ts",
-    "verify:automated-property-report": "tsx src/scripts/verifyAutomatedPropertyReport.ts",
-    "verify:public-order-database": "tsx src/scripts/verifyPublicOrderDatabase.ts"
+    "verify:automated-property-report": "tsx src/scripts/verifyAutomatedPropertyReport.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -638,7 +640,7 @@
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "framer-motion": "^12.40.0",
-    "next": "16.3.4",
+    "next": "16.3.6",
     "next-auth": "^4.24.15",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.18.0",
@@ -653,7 +655,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
-    "@cyclonedx/cyclonedx-npm": "^6.0.0",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -663,18 +664,17 @@
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.10",
     "eslint": "9.39.3",
-    "eslint-config-next": "^16.3.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "8.71.0",
+    "eslint-plugin-react-hooks": "7.1.1"
   },
   "overrides": {
     "@esbuild-kit/core-utils": {
       "esbuild": "0.25.0"
     },
-    "brace-expansion@<1.1.18": "1.1.18",
-    "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
     "js-yaml": "4.3.2",
     "next": {
       "postcss": "8.5.26",
@@ -682,6 +682,12 @@
     },
     "tsx": {
       "esbuild": "0.28.1"
-    }
+    },
+    "brace-expansion@<2.0.0": "1.1.21",
+    "brace-expansion@>=2.0.0 <3.0.0": "2.1.7",
+    "brace-expansion@>=3.0.0 <4.0.0": "3.0.9",
+    "brace-expansion@>=4.0.0 <5.0.12": "5.0.12",
+    "fast-uri": "3.1.8",
+    "ip-address": "10.7.2"
   }
 }

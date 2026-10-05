@@ -7,10 +7,11 @@ import {
 import type {
   ComparablePropertyAnalysis,
 } from "@/lib/intelligence/propertyComparisonRanking";
+import { assessCandidateExclusion, candidateRoleCoverageProblems, type CandidateExclusionEvidence } from "./candidateExclusionEvidence";
 import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
 
 export const PROPERTY_COMPARISON_ECONOMIC_ANALYSIS_VERSION =
-  "property-comparison-economic-analysis-v1.0.0" as const;
+  "property-comparison-economic-analysis-v1.1.0" as const;
 
 export type PropertyComparisonEconomicAnalysisCompilation =
   | {
@@ -32,11 +33,12 @@ function packageIdentityProblems(input: {
   propertyId: string;
   address: string;
   packages: EnterpriseEconomicEvidencePackage[];
+  exclusions?: CandidateExclusionEvidence[];
+  asOf?: string;
 }): string[] {
   const problems: string[] = [];
-  if (input.packages.length !== 3) {
-    problems.push("Exactly three economic evidence packages are required.");
-  }
+  const exclusions = input.exclusions ?? [];
+  if (input.packages.length > 3 || exclusions.length > 3) problems.push("At most three decision roles may be completed.");
   const packageIds = input.packages.map((item) => item.packageId);
   if (new Set(packageIds).size !== packageIds.length) {
     problems.push("Economic evidence package IDs must be unique.");
@@ -59,28 +61,11 @@ function packageIdentityProblems(input: {
     }
   }
 
-  const roles = new Set(
-    input.packages.map((item) => item.candidate.candidateRole),
-  );
-  if (!roles.has("best-single-enterprise")) {
-    problems.push("The best single-enterprise package is missing.");
-  }
-  if (!roles.has("best-mixed-use")) {
-    problems.push("The best mixed-use package is missing.");
-  }
-  const thirdCount = input.packages.filter((item) =>
-    ["customer-vision", "best-distinct-alternative"].includes(
-      item.candidate.candidateRole,
-    ),
-  ).length;
-  if (thirdCount !== 1) {
-    problems.push(
-      "Exactly one customer-vision or best-distinct-alternative package is required.",
-    );
-  }
-  if (roles.size !== 3) {
-    problems.push("Each economic evidence package must fill a distinct candidate role.");
-  }
+  problems.push(...candidateRoleCoverageProblems([
+    ...input.packages.map(p => p.candidate.candidateRole), ...exclusions.map(e => e.candidateRole),
+  ]));
+  const recordIds = [...packageIds, ...exclusions.map(e => e.exclusionId)];
+  if (new Set(recordIds).size !== recordIds.length) problems.push("Economic package and exclusion IDs must be unique.");
   if (!input.comparisonItemId.trim()) {
     problems.push("A comparison item ID is required.");
   }
@@ -98,11 +83,25 @@ export function compilePropertyComparisonEconomicAnalysis(input: {
   propertyId: string;
   address: string;
   packages: EnterpriseEconomicEvidencePackage[];
+  exclusions?: CandidateExclusionEvidence[];
+  asOf?: string;
 }): PropertyComparisonEconomicAnalysisCompilation {
-  const assessments = input.packages.map((item) =>
-    assessEnterpriseEconomicEvidencePackage(item),
-  );
+  const exclusions = input.exclusions ?? [];
+  const latestDate = Math.max(...[...input.packages, ...exclusions].map(item => Date.parse(item.generatedAt)));
+  const asOf = input.asOf ?? (Number.isFinite(latestDate) ? new Date(latestDate).toISOString() : "invalid");
+  const currentPackages = input.packages.map(item => ({ ...item, generatedAt: asOf }));
+  const assessments = currentPackages.map(assessEnterpriseEconomicEvidencePackage);
   const missingEvidence = packageIdentityProblems(input);
+  if (!Number.isFinite(Date.parse(asOf))) missingEvidence.push("A valid assessment date is required.");
+  for (const item of input.packages) {
+    if (!Number.isFinite(Date.parse(item.generatedAt)) || Date.parse(item.generatedAt) > Date.parse(asOf)) {
+      missingEvidence.push("Package " + item.packageId + " has an invalid or future generation date.");
+    }
+  }
+  for (const exclusion of exclusions) {
+    const assessment = assessCandidateExclusion(exclusion, { propertyId: input.propertyId, address: input.address, asOf });
+    missingEvidence.push(...assessment.missingEvidence.map(problem => `${exclusion.exclusionId}: ${problem}`));
+  }
 
   for (let index = 0; index < assessments.length; index += 1) {
     const assessment = assessments[index];
@@ -140,6 +139,10 @@ export function compilePropertyComparisonEconomicAnalysis(input: {
     }
   }
 
+  for (const exclusion of exclusions) {
+    evidenceRefs.add(exclusion.replayRef);
+    for (const source of exclusion.sources) evidenceRefs.add(source.replayRef);
+  }
   return {
     ok: true,
     version: PROPERTY_COMPARISON_ECONOMIC_ANALYSIS_VERSION,
@@ -148,7 +151,9 @@ export function compilePropertyComparisonEconomicAnalysis(input: {
       propertyId: input.propertyId,
       address: input.address,
       status: "completed",
-      candidates: input.packages.map((item) =>
+      assessmentAsOf: asOf,
+      exclusions,
+      candidates: currentPackages.map((item) =>
         buildComparableCandidateFromEconomicEvidence(item),
       ),
     },

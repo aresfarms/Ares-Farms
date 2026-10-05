@@ -11,6 +11,7 @@ import {
   finalizePropertyComparison,
   recordCompletedPropertyComparisonAnalysis,
 } from "@/lib/intelligence/propertyComparisonStore";
+import { isCandidateExclusionEvidence } from "@/lib/intelligence/candidateExclusionEvidence";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   readJsonBodyWithLimit,
@@ -70,6 +71,7 @@ export async function POST(
 
   const parsed = await readJsonBodyWithLimit<{
     evidencePackages?: unknown;
+    candidateExclusions?: unknown;
   }>(req, { maxBytes: 2 * 1024 * 1024 });
   if (!parsed.ok) {
     return NextResponse.json({
@@ -78,15 +80,18 @@ export async function POST(
     }, { status: parsed.status });
   }
 
-  if (!Array.isArray(parsed.body.evidencePackages) ||
-      parsed.body.evidencePackages.length !== 3 ||
+  const candidateExclusions = parsed.body.candidateExclusions ?? [];
+  if (!Array.isArray(candidateExclusions) || candidateExclusions.length > 3 ||
+      !candidateExclusions.every(isCandidateExclusionEvidence) ||
+      !Array.isArray(parsed.body.evidencePackages) ||
+      parsed.body.evidencePackages.length > 3 ||
       !parsed.body.evidencePackages.every(
         isEnterpriseEconomicEvidencePackage,
       )) {
     return NextResponse.json({
       ok: false,
       error:
-        "Exactly three structurally valid economic evidence packages are required.",
+        "Provide structurally valid economic packages and reviewed exclusions covering all three decision roles.",
     }, { status: 400 });
   }
 
@@ -99,6 +104,7 @@ export async function POST(
         comparisonId,
         itemId,
         evidencePackages,
+        candidateExclusions,
         traceId,
       });
     if (!recorded) {
@@ -119,6 +125,7 @@ export async function POST(
       comparisonId,
       itemId,
       candidateCount: evidencePackages.length,
+      exclusionCount: candidateExclusions.length,
       finalization,
       traceId,
     }, {

@@ -3,7 +3,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
-import { storedEconomicPackages, supportedReportChoices, assessStoredEconomicEvidence } from "@/lib/intelligence/storedEconomicEvidence";
+import { storedEconomicPackages, storedCandidateExclusions, supportedReportChoices, assessStoredEconomicEvidence } from "@/lib/intelligence/storedEconomicEvidence";
 import { preparePublicAutomatedReport } from "@/lib/billing/preparePublicAutomatedReport";
 import { verifiedAutomatedReportForOrder } from "@/lib/billing/publicAutomatedReportPolicy";
 import { AutomatedReportNotReadyError } from "@/lib/reports/automatedPropertyReport";
@@ -139,12 +139,13 @@ async function resolveTarget(input: {
       normalizedListingAddress(item.normalizedAddress ?? item.submittedAddress) === normalizedListingAddress(String(target.snapshot.exactAddress)));
     if (!item) return null;
     const packages = storedEconomicPackages(item.resultSnapshot);
-    if (!packages || !assessStoredEconomicEvidence(item, new Date())?.ok) return null;
+    const exclusions = storedCandidateExclusions(item.resultSnapshot);
+    if (!packages || !exclusions || !assessStoredEconomicEvidence(item, new Date())?.ok) return null;
     const choice = selectedCandidateId ? supportedReportChoices(packages).find(c => c.id === selectedCandidateId) : null;
     if (selectedCandidateId && !choice) return null;
     target.snapshot.selectedReportCandidateId = choice?.id ?? null;
     target.snapshot.customerVision = choice?.title ?? null;
-    target.snapshot.economicEvidence = { propertyId: item.propertyId, comparisonItemId: item.id, packages };
+    target.snapshot.economicEvidence = { propertyId: item.propertyId, comparisonItemId: item.id, packages, exclusions };
     target.snapshot.analysisComparisonId = comparisonId;
     return target;
   }

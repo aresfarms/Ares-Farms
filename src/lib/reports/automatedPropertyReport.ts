@@ -6,6 +6,7 @@ import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
 import { compilePropertyComparisonEconomicAnalysis } from "@/lib/intelligence/propertyComparisonEconomicAnalysis";
 import { supportedReportChoices } from "@/lib/intelligence/storedEconomicEvidence";
 import type { EnterpriseEconomicEvidencePackage } from "@/lib/intelligence/economicEvidencePackage";
+import type { CandidateExclusionEvidence } from "@/lib/intelligence/candidateExclusionEvidence";
 import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
@@ -13,7 +14,7 @@ import { generatePropertyEvaluationPdf } from "@/lib/pdf/generatePropertyEvaluat
 import { buildReportBranding } from "@/lib/reports/reportBranding";
 import { reportPolicy } from "@/lib/reports/reportPolicy";
 
-export const AUTOMATED_PROPERTY_REPORT_VERSION = "automated-property-report-v1.0.0";
+export const AUTOMATED_PROPERTY_REPORT_VERSION = "automated-property-report-v1.1.0";
 export const MAX_AUTOMATED_REPORT_BYTES = 25 * 1024 * 1024;
 export class AutomatedReportNotReadyError extends Error {
   constructor(readonly reasons: string[]) {
@@ -49,7 +50,7 @@ export function buildAutomatedPropertyReport(input: {
   customerVision: string | null;
   generatedAt: Date;
   selectedReportCandidateId?: string | null;
-  economicEvidence?: { propertyId: string; comparisonItemId: string; packages: EnterpriseEconomicEvidencePackage[] } | null;
+  economicEvidence?: { propertyId: string; comparisonItemId: string; packages: EnterpriseEconomicEvidencePackage[]; exclusions?: CandidateExclusionEvidence[] } | null;
 }) {
   const { facts } = input;
   if (!facts.ok || !("verification" in facts) || !facts.verification ||
@@ -99,7 +100,7 @@ export function buildAutomatedPropertyReport(input: {
     propertyId: economic.propertyId, comparisonItemId: economic.comparisonItemId,
     address: verification.normalizedAddress!,
     // Re-assess freshness at report generation, not at the old package date.
-    packages: economic.packages.map(p => ({ ...p, generatedAt: input.generatedAt.toISOString() })),
+    packages: economic.packages, exclusions: economic.exclusions ?? [], asOf: input.generatedAt.toISOString(),
   }) : null;
   const identityMatches = Boolean(economic && economic.propertyId === facts.propertyId);
   const selectedChoice = input.selectedReportCandidateId && economic
@@ -193,6 +194,11 @@ export function buildAutomatedPropertyReport(input: {
         b.projection.cumulativeNet.year5 - a.projection.cumulativeNet.year5 ||
         (b.dscr ?? 0) - (a.dscr ?? 0) || b.confidenceScore - a.confidenceScore || a.id.localeCompare(b.id);
     });
+    const exclusions = economics.analysis.exclusions ?? [];
+    const exclusionLines = exclusions.flatMap(exclusion => [
+      `Ruled out within the reviewed scope: ${exclusion.screeningScope}. ${exclusion.summary}`,
+      ...exclusion.consideredUses.map(use => `${use.title}: ${use.summary} Blocking finding: ${use.blockingDomain}. Sources: ${use.sourceRefs.join("; ")}`),
+    ]);
     model.scenarioComparison = candidates.flatMap((candidate, index) => [
       `${index + 1}. ${candidate.title}. ${Object.values(candidate.constraints).includes("blocked") ? "Cannot proceed under the documented constraints." : "Subject to the conditions below."}`,
       ...Object.entries(economic.packages.find(p => p.candidate.id === candidate.id)!.constraints)
@@ -201,6 +207,8 @@ export function buildAutomatedPropertyReport(input: {
       `Constraints: ${Object.entries(candidate.constraints).map(([domain, status]) => `${domain}: ${status}`).join("; ")}.`,
       `Sources: ${candidate.sourceRefs.join("; ")}`,
     ]);
+    model.scenarioComparison.push(...exclusions.map(exclusion =>
+      `Ruled out within the reviewed scope: ${exclusion.screeningScope}. ${exclusion.summary}`));
     model.conceptSummary = candidates.flatMap(candidate => {
       if (candidate.projection.status !== "complete") return [];
       const projection = candidate.projection, year = projection.years[0];
@@ -222,19 +230,31 @@ export function buildAutomatedPropertyReport(input: {
     // The latter belong in the report's evidence chapter, not three pages of
     // repeated domain text before the customer reaches the actual comparison.
     model.laneAnswers = null;
-    model.scenarioEvidence = findings;
+    model.scenarioEvidence = [...findings, ...exclusionLines];
     model.honestUnknowns = [...conditions, "Borrower-specific financial eligibility and lender approval have not been evaluated."];
-    model.keyQuestions = [...model.honestUnknowns];
-    model.nextMoves = conditions.length ? conditions : ["Reconfirm source dates and the stated project terms before committing to a purchase."];
+    model.keyQuestions = [...conditions];
+    model.readinessSectionNotes = []; // Borrower limitations are already stated in honestUnknowns.
+    const noSupportedUse = !supportedReportChoices(economic.packages).length;
+    model.nextMoves = noSupportedUse
+      ? ["Do not proceed with a reviewed use that is ruled out. A change of scope or new evidence requires a new feasibility review."]
+      : conditions.length ? conditions : ["Reconfirm source dates and the stated project terms before committing to a purchase."];
+    model.verdict = noSupportedUse
+      ? { label: "No supported use within the reviewed scope", explanation: "Every reviewed decision role has a documented blocking finding. Missing evidence is not treated as a no-go finding, and no income is projected for excluded uses." }
+      : { label: "Source-supported use comparison", explanation: "Compare the evaluated uses and their conditions. Documented exclusions remain visible and are not ranked as opportunities." };
+    if (!candidates.length) model.conceptSummary = ["All reviewed roles were excluded by supported feasibility findings. Income, project costs and DSCR are not projected for those excluded uses."];
     model.executiveSummary = `This report evaluates ${verification.normalizedAddress} as ${profile.label.toLowerCase()}. ` +
       (selectedChoice ? `Your selected interest is ${selectedChoice.title}; all evaluated uses remain in the comparison. ` : "") +
-      "Three preliminary scenarios have complete source-backed economic packages. Viable or conditional candidates appear before blocked uses; within each group, the order uses first-year net after debt and capital, then five-year cumulative net, DSCR and evidence confidence. Documented conditions still govern each use.";
-    model.risks = [...warnings, ...economic.packages.flatMap(p => Object.values(p.constraints)
+      (candidates.length ? `${candidates.length} evaluated use${candidates.length === 1 ? " has" : "s have"} complete source-backed economics; ${exclusions.length} decision role${exclusions.length === 1 ? " is" : "s are"} closed by reviewed exclusion evidence. `
+        : "The review ruled out all uses considered within the documented scope. The findings and sources are listed below; no economic projections are presented for excluded uses. ") +
+      (noSupportedUse ? "No supported use remains within the reviewed scope. " : "Supported uses appear before blocked uses; their order uses first-year net after debt and capital, then five-year cumulative net, DSCR and evidence confidence. ") +
+      "Documented conditions and the reviewed scope govern these conclusions.";
+    model.risks = [...new Set([...warnings, ...exclusions.map(e => e.summary), ...economic.packages.flatMap(p => Object.values(p.constraints)
       .filter(finding => finding.status !== "clear").map(finding => `${p.candidate.title}: ${finding.summary} ${finding.conditions.join(" ")}`)),
-      "Source-supported projections depend on the stated assumptions. They are not guaranteed outcomes or borrower underwriting."];
+      candidates.length ? "Source-supported projections depend on the stated assumptions. They are not guaranteed outcomes or borrower underwriting."
+        : "The exclusions apply to the documented scope and source dates. A new use or changed evidence requires a new review."])];
     model.explainabilityNotes = model.explainabilityNotes.filter(line => line !== scenarios.rankingRule);
-    model.explainabilityNotes.push(...economic.packages.flatMap(p => p.sources.map(source =>
-      `${source.title}: ${source.reference}; source date ${source.asOf}; captured ${source.capturedAt}; ${source.contentHash}`)));
+    model.explainabilityNotes.push(...new Set([...economic.packages, ...exclusions].flatMap(p => p.sources.map(source =>
+      `${source.title}: ${source.reference}; source date ${source.asOf}; captured ${source.capturedAt}; ${source.contentHash}`))));
   }
   return { model, evidenceDigest, modelDigest: reportSnapshotDigest(model), saleReadiness,
     quality: { identityMatched: true, parcelMatched: true, sourceAttributed: true,

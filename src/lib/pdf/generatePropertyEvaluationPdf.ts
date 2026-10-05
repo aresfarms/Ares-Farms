@@ -564,8 +564,12 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       return h;
     };
     const totalH = Math.max(colH(left), colH(right));
+    // Keep the section heading with the measured columns. The generic
+    // heading reserve can fit while the columns themselves move overleaf.
+    ensure(Math.min(totalH + 52, PAGE.contentBottom - PAGE.contentTop));
+    heading("Your Bearings");
     // Too tall for one page → stack instead of forcing a box.
-    if (totalH > PAGE.contentBottom - PAGE.contentTop - 20) {
+    if (totalH > PAGE.contentBottom - PAGE.contentTop - 64) {
       panel({ title: left.title, lines: left.lines, asBullets: true });
       panel({ title: right.title, lines: right.lines, asBullets: true });
       return;
@@ -867,7 +871,6 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   // ── SIGNALS / RISKS side by side ───────────────────────────────────────────
 
-  heading("Your Bearings");
   twoColumns(
     {
       title: "Compass — working in your favor",

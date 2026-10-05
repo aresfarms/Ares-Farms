@@ -1,4 +1,5 @@
 import { isEnterpriseEconomicEvidencePackage, type EnterpriseEconomicEvidencePackage } from "./economicEvidencePackage";
+import { isCandidateExclusionEvidence, type CandidateExclusionEvidence } from "./candidateExclusionEvidence";
 import { compilePropertyComparisonEconomicAnalysis } from "./propertyComparisonEconomicAnalysis";
 
 /** Vol III TECH-PROV-001 / Vol V CANON-EXPL-001. Read server-owned snapshots,
@@ -8,7 +9,7 @@ import { compilePropertyComparisonEconomicAnalysis } from "./propertyComparisonE
 export function storedEconomicPackages(snapshot: unknown): EnterpriseEconomicEvidencePackage[] | null {
   if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
   const entries = (snapshot as Record<string, unknown>).economicEvidencePackages;
-  if (!Array.isArray(entries) || entries.length !== 3) return null;
+  if (!Array.isArray(entries) || entries.length > 3) return null;
   const packages = entries.map(entry => {
     if (isEnterpriseEconomicEvidencePackage(entry)) return entry;
     return entry && typeof entry === "object" ? (entry as Record<string, unknown>).package : null;
@@ -16,16 +17,24 @@ export function storedEconomicPackages(snapshot: unknown): EnterpriseEconomicEvi
   return packages.every(isEnterpriseEconomicEvidencePackage) ? packages : null;
 }
 
+export function storedCandidateExclusions(snapshot: unknown): CandidateExclusionEvidence[] | null {
+  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
+  const entries = (snapshot as Record<string, unknown>).candidateExclusions;
+  if (entries === undefined) return []; // Legacy three-package snapshots remain readable.
+  return Array.isArray(entries) && entries.length <= 3 && entries.every(isCandidateExclusionEvidence) ? entries : null;
+}
+
 export function assessStoredEconomicEvidence(item: {
   id: string; propertyId: string | null; submittedAddress: string;
   normalizedAddress: string | null; resultSnapshot: unknown;
 }, asOf: Date) {
   const packages = storedEconomicPackages(item.resultSnapshot);
-  if (!packages || !item.propertyId || !Number.isFinite(asOf.getTime())) return null;
+  const exclusions = storedCandidateExclusions(item.resultSnapshot);
+  if (!packages || !exclusions || !item.propertyId || !Number.isFinite(asOf.getTime())) return null;
   return compilePropertyComparisonEconomicAnalysis({
     comparisonItemId: item.id, propertyId: item.propertyId,
     address: item.normalizedAddress || item.submittedAddress,
-    packages: packages.map(p => ({ ...p, generatedAt: asOf.toISOString() })),
+    packages, exclusions, asOf: asOf.toISOString(),
   });
 }
 

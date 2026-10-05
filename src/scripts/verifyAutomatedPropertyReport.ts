@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { NextRequest } from "next/server";
 import { PDFDocument } from "pdf-lib";
+import { exclusionFixture } from "./fixtures/candidateExclusion";
 import { basePackage } from "./fixtures/economicEvidence";
 import { captureGeneratedEvidenceArtifactDurably } from "@/lib/property/durableEvidenceGenerationCapture";
 import { verifySignedReplayPacket } from "@/lib/property/officialEvidenceReplayPacketStore";
@@ -67,6 +68,23 @@ async function main() {
   const stale = buildAutomatedPropertyReport({ ...input, customerVision: null, generatedAt: new Date("2028-01-01T00:00:00Z"),
     economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages } });
   assert.equal(stale.saleReadiness.allowed, false, "source freshness must be evaluated at purchase time");
+  for (const count of [0, 1, 2]) {
+    const exclusions = packages.slice(count).map(p => exclusionFixture(p.candidate.candidateRole, p.propertyId, p.address));
+    const reduced = buildAutomatedPropertyReport({ ...input, customerVision: null,
+      economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages: packages.slice(0, count), exclusions } });
+    assert(reduced.saleReadiness.allowed, JSON.stringify(reduced.saleReadiness));
+    assert(reduced.model.scenarioComparison?.some(s => s.includes("Ruled out within the reviewed scope")));
+    assert(!reduced.model.executiveSummary.includes("Three preliminary scenarios"));
+    assert.notEqual(reduced.evidenceDigest, supported.evidenceDigest, "exclusions must be bound into report integrity");
+    if (!count) {
+      assert.equal(reduced.model.verdict.label, "No supported use within the reviewed scope");
+      assert(!reduced.model.conceptSummary.some(s => /first-year revenue|DSCR: [0-9]/.test(s)));
+    }
+    assert((await PDFDocument.load(await renderAutomatedPropertyReport(reduced.model))).getPageCount() >= 2);
+    exclusions[0].sources[0].asOf = "2020-01-01";
+    assert(!buildAutomatedPropertyReport({ ...input, customerVision: null,
+      economicEvidence: { propertyId: "synthetic-report-property", comparisonItemId: "fixture-item", packages: packages.slice(0, count), exclusions } }).saleReadiness.allowed);
+  }
   const priorKey = process.env.EVIDENCE_REPLAY_SIGNING_SECRET;
   process.env.EVIDENCE_REPLAY_SIGNING_SECRET = "synthetic-ephemeral-signing-key-for-unit-test";
   let persisted = false;

@@ -3,6 +3,7 @@ import { eq, sql } from "drizzle-orm";
 import { furlongPublicOrderEvents, furlongPublicOrders } from "@/db/schema";
 import { db } from "@/lib/db";
 import { isEnterpriseEconomicEvidencePackage } from "@/lib/intelligence/economicEvidencePackage";
+import { isCandidateExclusionEvidence } from "@/lib/intelligence/candidateExclusionEvidence";
 import { resolvePropertyFacts } from "@/lib/property/propertyFactsService";
 import { analyzeSignaturePdf } from "@/lib/signature-execution";
 import { scanBytesForMalware } from "@/lib/documents/malwareScan";
@@ -34,8 +35,10 @@ export async function preparePublicAutomatedReport(input: {
   const generatedAt = new Date();
   const captured = record(target.economicEvidence);
   const packages = Array.isArray(captured.packages) && captured.packages.every(isEnterpriseEconomicEvidencePackage) ? captured.packages : null;
-  const economicEvidence = packages && typeof captured.propertyId === "string" && typeof captured.comparisonItemId === "string"
-    ? { propertyId: captured.propertyId, comparisonItemId: captured.comparisonItemId, packages } : null;
+  const exclusions = captured.exclusions === undefined ? []
+    : Array.isArray(captured.exclusions) && captured.exclusions.every(isCandidateExclusionEvidence) ? captured.exclusions : null;
+  const economicEvidence = packages && exclusions && typeof captured.propertyId === "string" && typeof captured.comparisonItemId === "string"
+    ? { propertyId: captured.propertyId, comparisonItemId: captured.comparisonItemId, packages, exclusions } : null;
   const selectedReportCandidateId = typeof target.selectedReportCandidateId === "string" ? target.selectedReportCandidateId : null;
   const report = buildAutomatedPropertyReport({ facts, requestedAddress: exactAddress, customerVision, selectedReportCandidateId, generatedAt, economicEvidence });
   // A parseable PDF is not product acceptance. The current planning-only

@@ -323,12 +323,16 @@ export function PublicOrderCheckoutAgreement(props: {
       {needsPreparation ? <div>
         {preparationBlocked ? <p role="status">{preparationError || (preparation ? "This report still needs evidence before payment." : "Checking the saved property analysis…")}</p> : null}
         {preparation?.missingEvidence.length ? <ul>{preparation.missingEvidence.map((gap, i) => <li key={i}>{gap}</li>)}</ul> : null}
+        {preparation?.outcome === "no-supported-use" ? <p role="status"><strong>No supported use remains within the reviewed scope.</strong> This report explains the documented exclusions; it does not offer a viable-use recommendation.</p> : null}
+        {preparation?.exclusions?.length ? <ul>{preparation.exclusions.map((finding, i) => <li key={i}>{finding}</li>)}</ul> : null}
+        {preparation?.choices.length ? <>
         <label htmlFor="report-candidate-choice">Which supported use interests you most?</label>
         <select id="report-candidate-choice" value={selectedReportCandidateId} disabled={busy || preparationBlocked}
           onChange={event => setSelectedReportCandidateId(event.target.value)}>
           <option value="">No preference — compare the supported uses</option>
           {preparation?.choices.map(choice => <option key={choice.id} value={choice.id}>{choice.title}</option>)}
         </select>
+        </> : null}
         <p>The report compares all evaluated uses. A different idea needs a separate feasibility review before it can enter the automated comparison.</p>
         {preparationBlocked ? <a href={`/property-evidence?${new URLSearchParams({ address: targetAddress, ...(analysisId ? { comparisonId: analysisId } : {}) })}`}>Return to report preparation</a> : null}
       </div> : null}

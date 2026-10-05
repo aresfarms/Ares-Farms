@@ -8,6 +8,9 @@ import {
 } from "@/lib/intelligence/economicEvidencePackage";
 import { compilePropertyComparisonEconomicAnalysis } from "@/lib/intelligence/propertyComparisonEconomicAnalysis";
 
+import { exclusionFixture } from "./fixtures/candidateExclusion";
+import type { CandidateExclusionEvidence } from "@/lib/intelligence/candidateExclusionEvidence";
+import { isComparablePropertyAnalysis, rankPropertyComparisonAnalyses } from "@/lib/intelligence/propertyComparisonRanking";
 import { basePackage, metric } from "./fixtures/economicEvidence";
 
 const complete = assessEnterpriseEconomicEvidencePackage(basePackage);
@@ -141,4 +144,61 @@ assert.equal(
   "blocked",
 );
 
-console.log("Economic evidence package governance verified.");
+// Exclusions complete decision roles only when reviewed, current evidence
+// rules out the scoped alternatives. They never fill a missing-data slot.
+for (const remaining of [0, 1, 2, 3]) {
+  const all = [basePackage, mixedPackage, alternativePackage];
+  const exclusions = all.slice(remaining).map(p => exclusionFixture(p.candidate.candidateRole));
+  const result = compilePropertyComparisonEconomicAnalysis({ comparisonItemId: "synthetic-exclusions",
+    propertyId: basePackage.propertyId, address: basePackage.address,
+    packages: all.slice(0, remaining), exclusions, asOf: basePackage.generatedAt });
+  assert(result.ok, JSON.stringify(result));
+  assert.equal(result.analysis.candidates.length, remaining);
+  assert.equal(result.analysis.exclusions?.length, 3 - remaining);
+  assert(isComparablePropertyAnalysis(result.analysis));
+  const ranked = rankPropertyComparisonAnalyses({ analyses: [result.analysis], expectedPropertyCount: 1,
+    requestedResultCount: 1, asOf: basePackage.generatedAt });
+  assert.notEqual(ranked.portfolioVerdict, "NOT_READY_TO_RANK");
+  if (!remaining) {
+    assert.equal(ranked.portfolioVerdict, "RUN_FROM_ALL");
+    assert.equal(ranked.status, "completed");
+    assert.equal(ranked.ranked.length, 0);
+    assert(ranked.excluded[0].reasons.some(s => s.includes("prohibited")));
+  }
+}
+const exclusionInput = {
+  comparisonItemId: "synthetic-one-use", propertyId: basePackage.propertyId, address: basePackage.address,
+  packages: [basePackage], exclusions: [exclusionFixture("best-mixed-use"), exclusionFixture("best-distinct-alternative")],
+  asOf: basePackage.generatedAt,
+};
+for (const mutate of [
+  (e: CandidateExclusionEvidence) => { e.propertyId = "wrong-property"; },
+  (e: CandidateExclusionEvidence) => { e.address = "999 Wrong Street"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].asOf = "2020-01-01"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].reviewStatus = "captured"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].useRights = "unreviewed" as never; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].contentHash = "missing"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].capturedAt = "2030-01-01"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].authorityTier = "invented" as never; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].sourceRefs = ["invented-source"]; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].status = "unknown" as never; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].confidenceScore = 59; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].enterpriseComponents = ["Use A"]; },
+  (e: CandidateExclusionEvidence) => { e.review.allMaterialAlternativesReviewed = false as never; },
+  (e: CandidateExclusionEvidence) => { e.review.reviewedAt = "2026-08-01"; },
+  (e: CandidateExclusionEvidence) => { e.candidateRole = "best-single-enterprise"; },
+]) {
+  const changed = structuredClone(exclusionInput); mutate(changed.exclusions[0]);
+  assert.equal(compilePropertyComparisonEconomicAnalysis(changed).ok, false, JSON.stringify(changed.exclusions[0]));
+}
+assert.equal(compilePropertyComparisonEconomicAnalysis({ ...exclusionInput, exclusions: [] }).ok, false);
+assert.equal(compilePropertyComparisonEconomicAnalysis({ ...exclusionInput, asOf: "2028-01-01" }).ok, false);
+const future = structuredClone(exclusionInput); future.packages[0].generatedAt = "2030-01-01";
+assert.equal(compilePropertyComparisonEconomicAnalysis(future).ok, false);
+const missingOne = structuredClone(compilation);
+if (missingOne.ok) {
+  missingOne.analysis.candidates[1].missingEvidence.push("Unresolved competitor economics");
+  const withheld = rankPropertyComparisonAnalyses({ analyses: [missingOne.analysis], expectedPropertyCount: 1, requestedResultCount: 1 });
+  assert.equal(withheld.portfolioVerdict, "NOT_READY_TO_RANK", "a complete winner cannot conceal an unresolved alternative");
+}
+console.log("Economic packages and reviewed exclusions verified, including 0–3 candidate coverage and adverse evidence cases.");

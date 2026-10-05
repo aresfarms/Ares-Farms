@@ -53,6 +53,9 @@ async function main() {
     const packages = (["best-single-enterprise", "best-mixed-use", "best-distinct-alternative"] as const).map((role, index) => {
       const p = structuredClone(basePackage);
       p.propertyId = "synthetic-comparison-property"; p.address = address;
+      p.generatedAt = new Date().toISOString();
+      p.professionalReview.reviewedAt = p.generatedAt;
+      p.sources = p.sources.map(source => ({ ...source, asOf: p.generatedAt, capturedAt: p.generatedAt }));
       p.packageId = `database-fixture-${index}`; p.candidate.id = `candidate-${index}`;
       p.candidate.title = `Synthetic use ${index}`; p.candidate.candidateRole = role;
       p.candidate.enterpriseComponents = index === 1 ? ["A", "B"] : ["A"];
@@ -64,9 +67,45 @@ async function main() {
     const readyCase = await comparisons.loadPropertyComparison(access);
     assert(readyCase);
     assert.equal((readyCase.items[0].resultSnapshot as { evidenceCapture: { synthetic: boolean } }).evidenceCapture.synthetic, true, "completion must preserve captured source evidence");
-    assert(propertyReportPreparation(readyCase.items[0], new Date("2026-09-29")).evidenceReady, "stored JSONB wrappers must reopen for report preparation");
+    assert(propertyReportPreparation(readyCase.items[0], new Date()).evidenceReady, "stored JSONB wrappers must reopen for report preparation");
     assert(!propertyReportPreparation(readyCase.items[0], new Date("2028-01-01")).evidenceReady);
     assert.equal(await comparisons.loadPropertyComparison({ ...access, accessToken: "another-customer-token" }), null);
+
+    const { exclusionFixture } = await import("./fixtures/candidateExclusion");
+    const noGoCase = await comparisons.createPropertyComparison({
+      intake: { addresses: [address], excludedAddresses: [], requestedResultCount: 1 }, ownerActorId: null, traceId: randomUUID(),
+    });
+    const noGoAccess = { comparisonId: noGoCase.comparisonId, ownerActorId: null, accessToken: noGoCase.accessToken };
+    const [noGoClaim] = await comparisons.claimQueuedPropertyComparisonItems({ comparisonId: noGoCase.comparisonId, limit: 1, traceId: randomUUID() });
+    await comparisons.recordPropertyComparisonVerification({ itemId: noGoClaim.id, comparisonId: noGoCase.comparisonId,
+      verified: true, normalizedAddress: address, propertyId: "synthetic-comparison-property", traceId: randomUUID(),
+      resultSnapshot: { verificationStatus: "verified" } });
+    const exclusions = packages.map(p => {
+      const exclusion = exclusionFixture(p.candidate.candidateRole, p.propertyId, p.address);
+      exclusion.generatedAt = p.generatedAt; exclusion.review.reviewedAt = p.generatedAt;
+      exclusion.sources = structuredClone(p.sources); return exclusion;
+    });
+    const staleExclusions = structuredClone(exclusions); staleExclusions[0].sources[0].asOf = "2020-01-01";
+    await assert.rejects(comparisons.recordCompletedPropertyComparisonAnalysis({ itemId: noGoClaim.id,
+      comparisonId: noGoCase.comparisonId, evidencePackages: [], candidateExclusions: staleExclusions, traceId: randomUUID() }), /incomplete/);
+    assert.equal((await comparisons.loadPropertyComparison(noGoAccess))?.items[0].status, "VERIFIED", "failed review must not mark the item complete");
+    await comparisons.recordCompletedPropertyComparisonAnalysis({ itemId: noGoClaim.id,
+      comparisonId: noGoCase.comparisonId, evidencePackages: [], candidateExclusions: exclusions, traceId: randomUUID() });
+    const noGoFinal = await comparisons.finalizePropertyComparison({ comparisonId: noGoCase.comparisonId, traceId: randomUUID() });
+    assert(noGoFinal?.ranking);
+    assert.equal(noGoFinal.ranking.portfolioVerdict, "RUN_FROM_ALL");
+    assert.equal(noGoFinal.ranking.status, "completed");
+    const noGoLoaded = await comparisons.loadPropertyComparison(noGoAccess);
+    assert(noGoLoaded);
+    assert.equal(noGoLoaded.comparison.status, "COMPLETED");
+    assert.equal(propertyReportPreparation(noGoLoaded.items[0], new Date()).outcome, "no-supported-use");
+    assert.equal(propertyReportPreparation(noGoLoaded.items[0], new Date()).exclusions.length, 3);
+    const childEvidence = await migrations.query("SELECT property_snapshot FROM furlong_cases WHERE case_id=$1", [noGoLoaded.items[0].childCaseId]);
+    assert.equal(childEvidence.rows[0].property_snapshot.candidateExclusions.length, 3);
+    const exclusionEvent = await migrations.query("SELECT detail, evidence_refs FROM furlong_case_events WHERE case_id=$1", [noGoLoaded.items[0].childCaseId]);
+    assert.equal(exclusionEvent.rows[0].detail.exclusionCount, 3);
+    assert(exclusionEvent.rows[0].evidence_refs.includes(exclusions[0].replayRef));
+    assert.equal(await comparisons.loadPropertyComparison({ ...noGoAccess, accessToken: "wrong-customer" }), null);
 
     const bytes = Buffer.from("%PDF-1.7\nsynthetic delivery-byte fixture\n%%EOF");
     const digest = createHash("sha256").update(bytes).digest("hex");
@@ -226,7 +265,7 @@ async function main() {
     assert.equal(heldUpgrade?.order.status, "HELD");
     await assert.rejects(store.transitionPublicOrderFulfillment(action(upgraded.value.order.id, "START")));
 
-    console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["saved evidence and recovery", "comparison ownership denial", "completed evidence JSONB round trip", "stale saved evidence denied", "concurrent webhook replay", "atomic automatic fulfillment",
+    console.log(JSON.stringify({ ok: true, synthetic: true, checks: ["exclusion-only database completion", "stale exclusions rejected before persistence", "exclusion child-case lineage", "free negative findings before purchase", "saved evidence and recovery", "comparison ownership denial", "completed evidence JSONB round trip", "stale saved evidence denied", "concurrent webhook replay", "atomic automatic fulfillment",
       "missing artifact held", "cross-customer denial", "exact private PDF bytes", "changed object rejected",
       "refund revocation", "late payment cannot restore refund", "dispute revocation", "concurrent capacity limit", "different-event payment confirmation preserves fulfillment", "out-of-order pre-payment notifications cannot undo payment or refund", "payment during refund stays pending", "supervised completion replay", "supervised artifact required", "post-start cancellation denied", "single-use upgrade credit", "concurrent source-refund holds upgrade"] }));
   } finally {

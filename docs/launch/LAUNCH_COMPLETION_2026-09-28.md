@@ -57,3 +57,12 @@ No public deployment, sales activation or DNS cutover is authorized by this reco
 6. Complete edge/domain/rollback acceptance and obtain explicit launch approval. Only then change public routing and approved sales flags.
 
 A passed build, a generated PDF, or a successful passive scan is not evidence that the complete product is ready for customers.
+
+
+## October 5 continuation: evidence-backed candidate exclusions
+
+Resumed the interrupted exclusion work. The property report now permits zero to three economic candidates only when reviewed, current, property-bound negative findings close the remaining single-use, mixed-use and vision/alternative decision roles. Missing data never closes a role. Each exclusion preserves the reviewed scope, considered uses, source rights and dates, confidence, classification, trace and replay references. No economics are invented for ruled-out uses.
+
+The private worker, authorized operator endpoint, durable comparison and child case, report-preparation view, checkout snapshot and report PDF now carry the same exclusions. Finalization and purchase re-evaluate freshness. Customers can see no-go findings before payment; an exclusion-only report describes the scoped negative conclusion instead of offering a viable-use recommendation. A partially evidenced competing use cannot disappear behind a complete winner.
+
+Verification includes zero/one/two/three candidate cases; stale, wrong-property, future, unreviewed, unauthorized and malformed evidence; persisted source lineage; worker handoff; report rendering; and wrong-customer access. Synthetic fixtures prove implementation behavior only. Live-source economic completion, real Stripe/storage acceptance, owner acceptance and independent launch approvals remain open. No public activation is authorized by these checks.

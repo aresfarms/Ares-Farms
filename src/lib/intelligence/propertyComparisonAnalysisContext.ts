@@ -1,9 +1,11 @@
 import type { EnterpriseEconomicEvidencePackage } from "./economicEvidencePackage";
 import { REQUIRED_ECONOMIC_EVIDENCE_DOMAINS } from "./economicEvidencePackage";
-import { assessStoredEconomicEvidence, storedEconomicPackages } from "./storedEconomicEvidence";
+import { assessStoredEconomicEvidence, storedEconomicPackages, storedCandidateExclusions } from "./storedEconomicEvidence";
 import { resolvePropertyFacts, type PropertyFactsSnapshot } from "@/lib/property/propertyFactsService";
 import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
 import { classifyPropertyProfile } from "@/lib/property/propertyProfile";
+
+import type { CandidateExclusionEvidence } from "./candidateExclusionEvidence";
 
 export interface PropertyComparisonAnalysisItem {
   id: string;
@@ -33,6 +35,7 @@ export interface PropertyComparisonAnalysisContext {
 export interface PropertyComparisonAnalysisReadiness {
   context: PropertyComparisonAnalysisContext;
   evidencePackages: EnterpriseEconomicEvidencePackage[] | null;
+  candidateExclusions?: CandidateExclusionEvidence[];
   missingEvidence: string[];
   evidenceCapture?: {
     version: "property-evidence-capture-v1";
@@ -80,7 +83,8 @@ export async function buildPropertyComparisonAnalysisReadiness(
       !("recordBasis" in facts.propertyRecord) ||
       !["verified", "partial"].includes(facts.verification.status) ||
       normalizedListingAddress(facts.verification.normalizedAddress ?? "") !== normalizedListingAddress(address) ||
-      facts.verification.restrictions.length) {
+      facts.verification.restrictions.length ||
+      (item.propertyId && facts.propertyId !== item.propertyId)) {
     throw new Error("Property evidence did not resolve to the verified address.");
   }
   const property = facts.propertyRecord;
@@ -112,6 +116,7 @@ export async function buildPropertyComparisonAnalysisReadiness(
   const packages = storedEconomicPackages(item.resultSnapshot);
   const assessment = packages ? assessStoredEconomicEvidence(item, dependencies.now()) : null;
   return { context, evidenceCapture, evidencePackages: assessment?.ok ? packages : null,
+    candidateExclusions: assessment?.ok ? storedCandidateExclusions(item.resultSnapshot)! : [],
     missingEvidence: assessment ? (assessment.ok ? [] : assessment.missingEvidence) : [
       ...checklist.map(item => (item.status === "captured" ? "Evidence found; review still required. " : "Evidence needed. ") + item.action),
       "Complete property-specific evidence packages are needed before the automated report can be offered for payment.",

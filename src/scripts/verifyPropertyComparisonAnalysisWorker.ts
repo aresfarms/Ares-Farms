@@ -4,6 +4,7 @@ import { propertyReportPreparation } from "@/lib/intelligence/propertyReportPrep
 import { storedEconomicPackages } from "@/lib/intelligence/storedEconomicEvidence";
 import { readComparisonAccess, saveComparisonAccess } from "@/lib/intelligence/propertyComparisonAccess";
 import { automatedReportFixture } from "./fixtures/automatedReportFixture";
+import { exclusionFixture } from "./fixtures/candidateExclusion";
 import { basePackage } from "./fixtures/economicEvidence";
 
 import { processPropertyComparisonAnalysisBatch } from "@/lib/intelligence/propertyComparisonAnalysisWorker";
@@ -154,6 +155,25 @@ async function main() {
   assert.equal(propertyReportPreparation({ ...completedItem, status: "ANALYZING" }, asOf).evidenceReady, false);
   const reopened = await buildPropertyComparisonAnalysisReadiness(completedItem, { resolveFacts: resolver, now: () => asOf });
   assert.equal(reopened.evidencePackages?.length, 3);
+  const exclusions = packages.map(p => exclusionFixture(p.candidate.candidateRole, item.propertyId, item.normalizedAddress));
+  const noGoItem = { ...completedItem, resultSnapshot: { economicEvidencePackages: [], candidateExclusions: exclusions } };
+  const noGo = await buildPropertyComparisonAnalysisReadiness(noGoItem, { resolveFacts: resolver, now: () => asOf });
+  assert.deepEqual(noGo.evidencePackages, []);
+  assert.equal(noGo.candidateExclusions?.length, 3);
+  const noGoPreparation = propertyReportPreparation(noGoItem, asOf);
+  assert.equal(noGoPreparation.outcome, "no-supported-use");
+  assert.equal(noGoPreparation.exclusions.length, 3, "show documented negative findings before payment");
+  assert.equal(noGoPreparation.evidenceReady, true);
+  let exclusionHandoff = false;
+  await processPropertyComparisonAnalysisBatch({ traceId }, { ...dependencies,
+    claim: (async () => [noGoItem]) as any, buildReadiness: async () => noGo,
+    recordCompleted: (async (value: { evidencePackages: unknown[]; candidateExclusions?: unknown[] }) => {
+      assert.equal(value.evidencePackages.length, 0); assert.equal(value.candidateExclusions?.length, 3);
+      exclusionHandoff = true; return { id: noGoItem.id };
+    }) as any,
+  });
+  assert(exclusionHandoff, "private worker must carry exclusions to the durable completion boundary");
+  assert(!propertyReportPreparation({ ...noGoItem, resultSnapshot: { economicEvidencePackages: [] } }, asOf).evidenceReady);
   const expired = await buildPropertyComparisonAnalysisReadiness(completedItem, { resolveFacts: resolver, now: () => new Date("2028-01-01") });
   assert.equal(expired.evidencePackages, null);
   assert(expired.missingEvidence.some(gap => /stale|fresh|age/i.test(gap)));

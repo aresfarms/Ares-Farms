@@ -62,6 +62,7 @@ export async function processPropertyComparisonAnalysisBatch(input: {
           itemId: item.id,
           comparisonId: item.comparisonId,
           evidencePackages: readiness.evidencePackages,
+          candidateExclusions: readiness.candidateExclusions ?? [],
           traceId: input.traceId,
         });
         if (!recorded) {

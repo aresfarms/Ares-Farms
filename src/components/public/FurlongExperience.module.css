@@ -555,3 +555,14 @@
     break-inside: avoid;
   }
 }
+
+.sourceFindings li {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.sourceFindings li strong {
+  white-space: normal;
+}
+.sourceFindings li p {
+  margin: 6px 0;
+}

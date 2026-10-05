@@ -130,6 +130,28 @@ async function main() {
   assert.equal(readiness.evidenceCapture?.checklist.find(c => c.domain === "property-identity")?.status, "captured");
   assert.equal(readiness.evidenceCapture?.checklist.find(c => c.domain === "acquisition-price")?.status, "needed");
   assert.equal(readiness.evidencePackages, null, "captured parcel evidence alone cannot authorize economics");
+  const capturedItem = { ...item, status: "NEEDS_EVIDENCE", resultSnapshot: {
+    missingEvidence: readiness.missingEvidence, evidenceCapture: readiness.evidenceCapture,
+  } };
+  const captured = propertyReportPreparation(capturedItem, asOf);
+  assert(!captured.evidenceReady, "Public-source observations do not make a report sale-ready");
+  assert(captured.sourceSnapshot?.facts.some(f => f.label === "Reported acreage" && f.value === "20 acres"));
+  assert(captured.sourceSnapshot?.warnings.some(w => w.includes("Synthetic test data")), "Saved source warnings must be visible before completion");
+  assert(captured.sourceSnapshot?.unknowns.some(u => u.label === "Operating costs"));
+  assert.equal(propertyReportPreparation({ ...capturedItem, propertyId: "another-property" }, asOf).sourceSnapshot, null);
+  assert.equal(propertyReportPreparation({ ...capturedItem, normalizedAddress: "999 Wrong Road, Testville, MD 00000" }, asOf).sourceSnapshot, null);
+  assert.equal(propertyReportPreparation(capturedItem, new Date("2026-09-28")).sourceSnapshot, null, "Future captures must be rejected");
+  assert.equal(propertyReportPreparation(capturedItem, new Date("2028-01-01")).sourceSnapshot?.capturedAt,
+    asOf.toISOString(), "Historical findings retain their original date; reopening does not refresh them");
+  const cautionFacts = structuredClone(facts);
+  if (cautionFacts.ok && "placeIntelligence" in cautionFacts) cautionFacts.placeIntelligence.verifiedFacts.push({
+    label: "Synthetic flood limitation", value: "Further investigation required", text: "Point screening is not a parcel survey.",
+    provenance: "Synthetic official source; 2026-09-01", tone: "caution",
+  });
+  const caution = propertyReportPreparation({ ...capturedItem, resultSnapshot: { evidenceCapture: {
+    ...readiness.evidenceCapture, facts: cautionFacts,
+  } } }, asOf);
+  assert(caution.sourceSnapshot?.warnings.some(w => w.includes("Point screening is not a parcel survey")));
   const badFacts = structuredClone(facts);
   if (badFacts.ok && "verification" in badFacts) badFacts.verification.normalizedAddress = "999 Wrong Road, Testville, MD 00000";
   await assert.rejects(() => buildPropertyComparisonAnalysisReadiness(item, { resolveFacts: async () => badFacts, now: () => asOf }));

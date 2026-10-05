@@ -1,3 +1,4 @@
+import { propertyPreparationSourceSnapshot, type PropertyPreparationSourceSnapshot } from "./propertyPreparationSourceSnapshot";
 import { assessCandidateExclusion } from "./candidateExclusionEvidence";
 import { assessStoredEconomicEvidence, storedEconomicPackages, storedCandidateExclusions, supportedReportChoices } from "./storedEconomicEvidence";
 
@@ -9,6 +10,7 @@ export type PropertyReportPreparation = {
   choices: Array<{ id: string; title: string }>;
   outcome: "supported-uses" | "no-supported-use" | "needs-evidence";
   exclusions: string[];
+  sourceSnapshot: PropertyPreparationSourceSnapshot | null;
 };
 
 /** A readiness read is not permission to charge. Checkout re-resolves facts and
@@ -37,6 +39,7 @@ export function propertyReportPreparation(item: {
     missingEvidence: assessment && !assessment.ok ? assessment.missingEvidence :
       evidenceReady ? [] : gaps.length ? gaps : ["Property verification and source-supported analysis must finish before a report can be prepared."],
     choices,
+    sourceSnapshot: propertyPreparationSourceSnapshot(item, asOf),
     outcome: !evidenceReady ? "needs-evidence" : choices.length ? "supported-uses" : "no-supported-use",
     exclusions: [
       ...currentExclusions.map(e => `${e.screeningScope}: ${e.summary}`),

@@ -182,6 +182,23 @@ export function PropertyComparisonFrontDoor(props: {
         <h3>{item.normalizedAddress || item.submittedAddress}</h3>
         <p>{item.status === "NEEDS_EVIDENCE" ? "Evidence needed before the report can be completed." : item.status.replaceAll("_", " ").toLowerCase()}</p>
         {item.resultSnapshot?.evidenceCapture ? <p>Public-source check: {new Date(item.resultSnapshot.evidenceCapture.capturedAt).toLocaleString()}. Evidence found still needs to support the specific proposed uses.</p> : null}
+        {item.reportPreparation?.sourceSnapshot ? <div className={styles.sourceFindings}>
+          {item.reportPreparation.sourceSnapshot.warnings.length ? <div>
+            <strong>Source warnings to consider now</strong>
+            <ul>{item.reportPreparation.sourceSnapshot.warnings.map((warning, i) => <li key={i}>{warning}</li>)}</ul>
+          </div> : null}
+          <details open={single}>
+            <summary>Saved public-source findings</summary>
+            <p>Collected {new Date(item.reportPreparation.sourceSnapshot.capturedAt).toLocaleString()}. These are saved observations; their source dates and limits still apply. They do not establish complete use feasibility.</p>
+            <ul>{item.reportPreparation.sourceSnapshot.facts.map((fact, i) => <li key={i}>
+              <strong>{fact.label}</strong><p>{fact.value}</p><p className={styles.note}>Source: {fact.source}</p>
+            </li>)}</ul>
+          </details>
+          {item.reportPreparation.sourceSnapshot.unknowns.length ? <details>
+            <summary>Unresolved property checks</summary>
+            <ul>{item.reportPreparation.sourceSnapshot.unknowns.map((unknown, i) => <li key={i}><strong>{unknown.label}</strong><p>{unknown.action}</p></li>)}</ul>
+          </details> : null}
+        </div> : null}
         {item.reportPreparation?.missingEvidence.length ? <details open={single}>
           <summary>What this property still needs</summary>
           <ul>{item.reportPreparation.missingEvidence.map((gap, i) => <li key={i}>{gap}</li>)}</ul>

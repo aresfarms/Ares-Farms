@@ -2,178 +2,16 @@ import { strict as assert } from "node:assert";
 
 import {
   ECONOMIC_EVIDENCE_PACKAGE_VERSION,
-  REQUIRED_ECONOMIC_EVIDENCE_DOMAINS,
   assessEnterpriseEconomicEvidencePackage,
   buildComparableCandidateFromEconomicEvidence,
   isEnterpriseEconomicEvidencePackage,
-  type EconomicMetricBasis,
-  type EconomicMetricUnit,
-  type EnterpriseEconomicEvidencePackage,
-  type SupportedEconomicMetric,
 } from "@/lib/intelligence/economicEvidencePackage";
-import type { ExpenseCategory } from "@/lib/intelligence/enterpriseProjection";
 import { compilePropertyComparisonEconomicAnalysis } from "@/lib/intelligence/propertyComparisonEconomicAnalysis";
 
-const SOURCE_REF = "evidence:verified";
-const generatedAt = "2026-09-15T00:00:00.000Z";
-
-function metric(
-  value: number,
-  unit: EconomicMetricUnit,
-  basis: EconomicMetricBasis = "source-observed",
-): SupportedEconomicMetric {
-  return {
-    value,
-    unit,
-    basis,
-    sourceRefs: basis === "customer-assumption" ? [] : [SOURCE_REF],
-    confidenceScore: 82,
-    method: "Deterministic verification fixture.",
-  };
-}
-
-const expenses: Record<ExpenseCategory, SupportedEconomicMetric> = {
-  payroll: metric(120_000, "usd-per-year"),
-  employeeBenefits: metric(20_000, "usd-per-year"),
-  healthInsurance: metric(15_000, "usd-per-year"),
-  retirement: metric(10_000, "usd-per-year"),
-  utilities: metric(60_000, "usd-per-year"),
-  insurance: metric(20_000, "usd-per-year"),
-  propertyTax: metric(15_000, "usd-per-year"),
-  maintenance: metric(20_000, "usd-per-year"),
-  replacementReserve: metric(15_000, "usd-per-year"),
-  marketing: metric(10_000, "usd-per-year"),
-  materials: metric(100_000, "usd-per-year"),
-  professionalFees: metric(10_000, "usd-per-year"),
-  other: metric(5_000, "usd-per-year"),
-};
-
-const inflation = Object.fromEntries(
-  Object.keys(expenses).map((category) => [
-    category,
-    metric(3, "percent", "source-derived"),
-  ]),
-) as Record<ExpenseCategory, SupportedEconomicMetric>;
-
-const basePackage: EnterpriseEconomicEvidencePackage = {
-  version: ECONOMIC_EVIDENCE_PACKAGE_VERSION,
-  packageId: "economic-package:test-property:single",
-  propertyId: "property:test-property",
-  address: "100 Main Street, Testville, MD 21601",
-  generatedAt,
-  classification: "CONFIDENTIAL",
-  traceId: "trace:economic-package-test",
-  replayRef: "replay:economic-package-test",
-  candidate: {
-    id: "test-property:laundromat",
-    candidateRole: "best-single-enterprise",
-    title: "Laundromat",
-    enterpriseComponents: ["Laundromat"],
-  },
-  findings: REQUIRED_ECONOMIC_EVIDENCE_DOMAINS.map((domain) => ({
-    domain,
-    status: domain === "grants-incentives"
-      ? "not-applicable" as const
-      : "supported" as const,
-    summary: "Fixture support for " + domain + ".",
-    sourceRefs: [SOURCE_REF],
-    confidenceScore: 82,
-  })),
-  sources: [
-    {
-      id: SOURCE_REF,
-      sourceId: "fixture-source",
-      title: "Verified economic fixture",
-      authorityTier: "Tier 2 certified institutional/commercial",
-      kind: "commercial-data",
-      reference: "fixture://economic-evidence/verified",
-      jurisdiction: "Maryland",
-      asOf: "2026-09-01T00:00:00.000Z",
-      capturedAt: "2026-09-14T00:00:00.000Z",
-      maxAgeDays: 90,
-      reviewStatus: "reviewed",
-      useRights: "approved",
-      contentHash: "sha256:" + "a".repeat(64),
-      replayRef: "replay:fixture-source",
-    },
-  ],
-  projectCosts: {
-    askingPrice: metric(525_000, "usd"),
-    proposedPurchasePrice: metric(500_000, "usd"),
-    closingCosts: metric(20_000, "usd"),
-    conversionCosts: metric(100_000, "usd"),
-    equipmentCosts: metric(200_000, "usd"),
-    workingCapital: metric(50_000, "usd"),
-    otherProjectCosts: metric(30_000, "usd"),
-  },
-  operations: {
-    baseAnnualRevenue: metric(600_000, "usd-per-year"),
-    annualRevenueGrowthPct: metric(2, "percent", "source-derived"),
-    annualExpenses: expenses,
-    annualExpenseInflationPct: inflation,
-    periodicCapitalCosts: [
-      {
-        year: 10,
-        label: "Major equipment refresh",
-        amount: metric(50_000, "usd", "vendor-quote"),
-      },
-    ],
-  },
-  labor: {
-    fullTimeEquivalentEmployees: metric(4, "count"),
-    ownerHoursPerWeek: metric(40, "hours-per-week"),
-    ownerLaborTreatment: "included-in-payroll",
-    sourceRefs: [SOURCE_REF],
-  },
-  financing: {
-    programFamily: "SBA 7(a) modeled acquisition",
-    loanAmount: metric(720_000, "usd", "source-derived"),
-    cashContribution: metric(180_000, "usd", "source-derived"),
-    annualRatePct: metric(7, "percent", "source-derived"),
-    amortizationYears: metric(25, "years", "source-derived"),
-    termYears: metric(25, "years", "source-derived"),
-    sourceRefs: [SOURCE_REF],
-    otherCapitalSources: [],
-  },
-  constraints: {
-    environmental: {
-      status: "conditioned",
-      summary: "Environmental screen complete with ordinary diligence condition.",
-      conditions: ["Confirm lender-scope environmental diligence before closing."],
-      sourceRefs: [SOURCE_REF],
-    },
-    zoning: {
-      status: "clear",
-      summary: "Use is supported by reviewed zoning evidence.",
-      conditions: [],
-      sourceRefs: [SOURCE_REF],
-    },
-    engineering: {
-      status: "conditioned",
-      summary: "Conversion budget includes identified utility work.",
-      conditions: ["Confirm final utility capacity and contractor scope."],
-      sourceRefs: [SOURCE_REF],
-    },
-    market: {
-      status: "clear",
-      summary: "Demand and competition evidence support the revenue case.",
-      conditions: [],
-      sourceRefs: [SOURCE_REF],
-    },
-  },
-  controls: {
-    employeeBenefitsExcludeHealthInsuranceAndRetirement: true,
-    maintenanceExcludesReplacementReserve: true,
-    periodicCapitalCostsExcludeAnnualReplacementReserve: true,
-    enterpriseComponentDoubleCountingReviewPassed: true,
-  },
-  professionalReview: {
-    status: "reviewed",
-    reviewerRole: "economic-evidence reviewer",
-    reviewedAt: "2026-09-15T00:00:00.000Z",
-    note: "Fixture review.",
-  },
-};
+import { exclusionFixture } from "./fixtures/candidateExclusion";
+import type { CandidateExclusionEvidence } from "@/lib/intelligence/candidateExclusionEvidence";
+import { isComparablePropertyAnalysis, rankPropertyComparisonAnalyses } from "@/lib/intelligence/propertyComparisonRanking";
+import { basePackage, metric } from "./fixtures/economicEvidence";
 
 const complete = assessEnterpriseEconomicEvidencePackage(basePackage);
 assert.equal(complete.status, "complete");
@@ -183,6 +21,21 @@ assert.equal(complete.missingEvidence.length, 0);
 assert.ok((complete.annualDebtService ?? 0) > 0);
 assert.ok((complete.dscr ?? 0) > 1.25);
 assert.equal(complete.projection.status, "complete");
+
+// A short term must not erase outstanding principal from long-range returns.
+const balloonPackage = structuredClone(basePackage);
+balloonPackage.financing.annualRatePct.value = 0;
+balloonPackage.financing.amortizationYears.value = 30;
+balloonPackage.financing.termYears.value = 5;
+const balloon = assessEnterpriseEconomicEvidencePackage(balloonPackage);
+assert.equal(balloon.status, "complete");
+assert.equal(balloon.projection.status, "complete");
+if (balloon.projection.status === "complete") {
+  const principal = balloonPackage.financing.loanAmount.value!;
+  assert.equal(balloon.projection.years[4].debtService, Math.round(principal / 30 + principal * 25 / 30));
+  assert.equal(balloon.projection.years[5].debtService, 0);
+  assert(balloon.projection.assumptions.some(line => line.includes("outstanding-principal payoff")));
+}
 
 const candidate = buildComparableCandidateFromEconomicEvidence(basePackage);
 assert.equal(candidate.evidenceStatus, "source-supported");
@@ -291,4 +144,61 @@ assert.equal(
   "blocked",
 );
 
-console.log("Economic evidence package governance verified.");
+// Exclusions complete decision roles only when reviewed, current evidence
+// rules out the scoped alternatives. They never fill a missing-data slot.
+for (const remaining of [0, 1, 2, 3]) {
+  const all = [basePackage, mixedPackage, alternativePackage];
+  const exclusions = all.slice(remaining).map(p => exclusionFixture(p.candidate.candidateRole));
+  const result = compilePropertyComparisonEconomicAnalysis({ comparisonItemId: "synthetic-exclusions",
+    propertyId: basePackage.propertyId, address: basePackage.address,
+    packages: all.slice(0, remaining), exclusions, asOf: basePackage.generatedAt });
+  assert(result.ok, JSON.stringify(result));
+  assert.equal(result.analysis.candidates.length, remaining);
+  assert.equal(result.analysis.exclusions?.length, 3 - remaining);
+  assert(isComparablePropertyAnalysis(result.analysis));
+  const ranked = rankPropertyComparisonAnalyses({ analyses: [result.analysis], expectedPropertyCount: 1,
+    requestedResultCount: 1, asOf: basePackage.generatedAt });
+  assert.notEqual(ranked.portfolioVerdict, "NOT_READY_TO_RANK");
+  if (!remaining) {
+    assert.equal(ranked.portfolioVerdict, "RUN_FROM_ALL");
+    assert.equal(ranked.status, "completed");
+    assert.equal(ranked.ranked.length, 0);
+    assert(ranked.excluded[0].reasons.some(s => s.includes("prohibited")));
+  }
+}
+const exclusionInput = {
+  comparisonItemId: "synthetic-one-use", propertyId: basePackage.propertyId, address: basePackage.address,
+  packages: [basePackage], exclusions: [exclusionFixture("best-mixed-use"), exclusionFixture("best-distinct-alternative")],
+  asOf: basePackage.generatedAt,
+};
+for (const mutate of [
+  (e: CandidateExclusionEvidence) => { e.propertyId = "wrong-property"; },
+  (e: CandidateExclusionEvidence) => { e.address = "999 Wrong Street"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].asOf = "2020-01-01"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].reviewStatus = "captured"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].useRights = "unreviewed" as never; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].contentHash = "missing"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].capturedAt = "2030-01-01"; },
+  (e: CandidateExclusionEvidence) => { e.sources[0].authorityTier = "invented" as never; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].sourceRefs = ["invented-source"]; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].status = "unknown" as never; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].confidenceScore = 59; },
+  (e: CandidateExclusionEvidence) => { e.consideredUses[0].enterpriseComponents = ["Use A"]; },
+  (e: CandidateExclusionEvidence) => { e.review.allMaterialAlternativesReviewed = false as never; },
+  (e: CandidateExclusionEvidence) => { e.review.reviewedAt = "2026-08-01"; },
+  (e: CandidateExclusionEvidence) => { e.candidateRole = "best-single-enterprise"; },
+]) {
+  const changed = structuredClone(exclusionInput); mutate(changed.exclusions[0]);
+  assert.equal(compilePropertyComparisonEconomicAnalysis(changed).ok, false, JSON.stringify(changed.exclusions[0]));
+}
+assert.equal(compilePropertyComparisonEconomicAnalysis({ ...exclusionInput, exclusions: [] }).ok, false);
+assert.equal(compilePropertyComparisonEconomicAnalysis({ ...exclusionInput, asOf: "2028-01-01" }).ok, false);
+const future = structuredClone(exclusionInput); future.packages[0].generatedAt = "2030-01-01";
+assert.equal(compilePropertyComparisonEconomicAnalysis(future).ok, false);
+const missingOne = structuredClone(compilation);
+if (missingOne.ok) {
+  missingOne.analysis.candidates[1].missingEvidence.push("Unresolved competitor economics");
+  const withheld = rankPropertyComparisonAnalyses({ analyses: [missingOne.analysis], expectedPropertyCount: 1, requestedResultCount: 1 });
+  assert.equal(withheld.portfolioVerdict, "NOT_READY_TO_RANK", "a complete winner cannot conceal an unresolved alternative");
+}
+console.log("Economic packages and reviewed exclusions verified, including 0–3 candidate coverage and adverse evidence cases.");

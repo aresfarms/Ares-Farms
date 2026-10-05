@@ -1,4 +1,11 @@
 import assert from "node:assert/strict";
+import { buildPropertyComparisonAnalysisReadiness } from "@/lib/intelligence/propertyComparisonAnalysisContext";
+import { propertyReportPreparation } from "@/lib/intelligence/propertyReportPreparation";
+import { storedEconomicPackages } from "@/lib/intelligence/storedEconomicEvidence";
+import { readComparisonAccess, saveComparisonAccess } from "@/lib/intelligence/propertyComparisonAccess";
+import { automatedReportFixture } from "./fixtures/automatedReportFixture";
+import { exclusionFixture } from "./fixtures/candidateExclusion";
+import { basePackage } from "./fixtures/economicEvidence";
 
 import { processPropertyComparisonAnalysisBatch } from "@/lib/intelligence/propertyComparisonAnalysisWorker";
 import type { PropertyComparisonAnalysisItem, PropertyComparisonAnalysisReadiness } from "@/lib/intelligence/propertyComparisonAnalysisContext";
@@ -108,6 +115,107 @@ async function main() {
     [claimed[0].comparisonId, claimed[2].comparisonId].sort(),
     "each touched comparison must finalize once regardless of item count",
   );
+
+  const asOf = new Date("2026-09-29T00:00:00Z");
+  const facts = automatedReportFixture();
+  const item = { ...claimed[0], propertyId: "synthetic-report-property",
+    submittedAddress: "123 Fixture Road, Testville, MD 00000", normalizedAddress: "123 Fixture Rd, Testville, MD 00000" };
+  let fresh = false;
+  const resolver = async (_input: unknown, options?: { fresh?: boolean }) => { fresh = options?.fresh === true; return facts; };
+  const readiness = await buildPropertyComparisonAnalysisReadiness(item, { resolveFacts: resolver, now: () => asOf });
+  assert(fresh, "analysis collection must recheck current evidence");
+  assert.equal(readiness.context.profileId, "farm", "assessor-resolved farm must not fall back to residential");
+  assert.equal(readiness.context.askingPrice, null, "assessment must not become asking price");
+  assert.equal(readiness.evidenceCapture?.checklist.length, 19);
+  assert.equal(readiness.evidenceCapture?.checklist.find(c => c.domain === "property-identity")?.status, "captured");
+  assert.equal(readiness.evidenceCapture?.checklist.find(c => c.domain === "acquisition-price")?.status, "needed");
+  assert.equal(readiness.evidencePackages, null, "captured parcel evidence alone cannot authorize economics");
+  const capturedItem = { ...item, status: "NEEDS_EVIDENCE", resultSnapshot: {
+    missingEvidence: readiness.missingEvidence, evidenceCapture: readiness.evidenceCapture,
+  } };
+  const captured = propertyReportPreparation(capturedItem, asOf);
+  assert(!captured.evidenceReady, "Public-source observations do not make a report sale-ready");
+  assert(captured.sourceSnapshot?.facts.some(f => f.label === "Reported acreage" && f.value === "20 acres"));
+  assert(captured.sourceSnapshot?.warnings.some(w => w.includes("Synthetic test data")), "Saved source warnings must be visible before completion");
+  assert(captured.sourceSnapshot?.unknowns.some(u => u.label === "Operating costs"));
+  assert.equal(propertyReportPreparation({ ...capturedItem, propertyId: "another-property" }, asOf).sourceSnapshot, null);
+  assert.equal(propertyReportPreparation({ ...capturedItem, normalizedAddress: "999 Wrong Road, Testville, MD 00000" }, asOf).sourceSnapshot, null);
+  assert.equal(propertyReportPreparation(capturedItem, new Date("2026-09-28")).sourceSnapshot, null, "Future captures must be rejected");
+  assert.equal(propertyReportPreparation(capturedItem, new Date("2028-01-01")).sourceSnapshot?.capturedAt,
+    asOf.toISOString(), "Historical findings retain their original date; reopening does not refresh them");
+  const cautionFacts = structuredClone(facts);
+  if (cautionFacts.ok && "placeIntelligence" in cautionFacts) cautionFacts.placeIntelligence.verifiedFacts.push({
+    label: "Synthetic flood limitation", value: "Further investigation required", text: "Point screening is not a parcel survey.",
+    provenance: "Synthetic official source; 2026-09-01", tone: "caution",
+  });
+  const caution = propertyReportPreparation({ ...capturedItem, resultSnapshot: { evidenceCapture: {
+    ...readiness.evidenceCapture, facts: cautionFacts,
+  } } }, asOf);
+  assert(caution.sourceSnapshot?.warnings.some(w => w.includes("Point screening is not a parcel survey")), "Existing clients retain the complete warning text");
+  assert(caution.sourceSnapshot?.warningDetails.some(w => w.summary.includes("Further investigation required") && w.detail === "Point screening is not a parcel survey." && w.source === "Synthetic official source; 2026-09-01"));
+  const badFacts = structuredClone(facts);
+  if (badFacts.ok && "verification" in badFacts) badFacts.verification.normalizedAddress = "999 Wrong Road, Testville, MD 00000";
+  await assert.rejects(() => buildPropertyComparisonAnalysisReadiness(item, { resolveFacts: async () => badFacts, now: () => asOf }));
+  const packages = (["best-single-enterprise", "best-mixed-use", "best-distinct-alternative"] as const).map((role, index) => {
+    const p = structuredClone(basePackage);
+    p.propertyId = item.propertyId; p.address = item.normalizedAddress;
+    p.packageId = `intake-fixture-${index}`; p.candidate.id = `candidate-${index}`;
+    p.candidate.title = `Synthetic use ${index}`; p.candidate.candidateRole = role;
+    p.candidate.enterpriseComponents = index === 1 ? ["Use A", "Use B"] : ["Use A"];
+    return p;
+  });
+  const completedItem = { ...item, status: "COMPLETED", resultSnapshot: {
+    economicEvidencePackages: packages.map(p => ({ package: p, assessment: { status: "complete" } })),
+  } };
+  assert.equal(storedEconomicPackages(completedItem.resultSnapshot)?.length, 3, "read actual persisted wrappers");
+  assert.equal(storedEconomicPackages({ economicEvidencePackages: [{ package: {} }, {}, {}] }), null);
+  assert(propertyReportPreparation(completedItem, asOf).evidenceReady);
+  assert.equal(propertyReportPreparation(completedItem, asOf).choices.length, 3);
+  packages[0].constraints.zoning.status = "blocked";
+  assert.equal(propertyReportPreparation(completedItem, asOf).choices.length, 2, "a blocked use is not a selectable vision");
+  assert.equal(propertyReportPreparation(completedItem, new Date("2028-01-01")).evidenceReady, false, "saved assessment cannot conceal stale sources");
+  assert.equal(propertyReportPreparation({ ...completedItem, propertyId: "another-property" }, asOf).evidenceReady, false);
+  assert.equal(propertyReportPreparation({ ...completedItem, status: "ANALYZING" }, asOf).evidenceReady, false);
+  const reopened = await buildPropertyComparisonAnalysisReadiness(completedItem, { resolveFacts: resolver, now: () => asOf });
+  assert.equal(reopened.evidencePackages?.length, 3);
+  const exclusions = packages.map(p => exclusionFixture(p.candidate.candidateRole, item.propertyId, item.normalizedAddress));
+  const noGoItem = { ...completedItem, resultSnapshot: { economicEvidencePackages: [], candidateExclusions: exclusions } };
+  const noGo = await buildPropertyComparisonAnalysisReadiness(noGoItem, { resolveFacts: resolver, now: () => asOf });
+  assert.deepEqual(noGo.evidencePackages, []);
+  assert.equal(noGo.candidateExclusions?.length, 3);
+  const noGoPreparation = propertyReportPreparation(noGoItem, asOf);
+  assert.equal(noGoPreparation.outcome, "no-supported-use");
+  assert.equal(noGoPreparation.exclusions.length, 3, "show documented negative findings before payment");
+  assert.equal(noGoPreparation.evidenceReady, true);
+  const partialItem = { ...noGoItem, status: "NEEDS_EVIDENCE",
+    resultSnapshot: { economicEvidencePackages: [], candidateExclusions: exclusions.slice(0, 1) } };
+  const partialPreparation = propertyReportPreparation(partialItem, asOf);
+  assert(!partialPreparation.evidenceReady && partialPreparation.outcome === "needs-evidence");
+  assert.equal(partialPreparation.exclusions.length, 1, "A completed adverse finding must remain visible while other roles need evidence");
+  assert.equal(propertyReportPreparation({ ...partialItem, propertyId: "wrong-property" }, asOf).exclusions.length, 0, "Never disclose another property's finding");
+  assert.equal(propertyReportPreparation(partialItem, new Date("2028-01-01")).exclusions.length, 0, "Expired exclusions are not presented as current findings");
+  let exclusionHandoff = false;
+  await processPropertyComparisonAnalysisBatch({ traceId }, { ...dependencies,
+    claim: (async () => [noGoItem]) as any, buildReadiness: async () => noGo,
+    recordCompleted: (async (value: { evidencePackages: unknown[]; candidateExclusions?: unknown[] }) => {
+      assert.equal(value.evidencePackages.length, 0); assert.equal(value.candidateExclusions?.length, 3);
+      exclusionHandoff = true; return { id: noGoItem.id };
+    }) as any,
+  });
+  assert(exclusionHandoff, "private worker must carry exclusions to the durable completion boundary");
+  assert(!propertyReportPreparation({ ...noGoItem, resultSnapshot: { economicEvidencePackages: [] } }, asOf).evidenceReady);
+  const expired = await buildPropertyComparisonAnalysisReadiness(completedItem, { resolveFacts: resolver, now: () => new Date("2028-01-01") });
+  assert.equal(expired.evidencePackages, null);
+  assert(expired.missingEvidence.some(gap => /stale|fresh|age/i.test(gap)));
+  const store = new Map<string, string>();
+  const storage = { getItem: (key: string) => store.get(key) ?? null, setItem: (key: string, value: string) => { store.set(key, value); } };
+  const saved = { comparisonId: claimed[0].comparisonId, accessToken: "furlong-comparison-" + "a".repeat(43), propertyCount: 1, requestedResultCount: 1, expiresAt: "2099-01-01" };
+  saveComparisonAccess(storage, saved);
+  saveComparisonAccess(storage, { ...saved, comparisonId: claimed[2].comparisonId, accessToken: "furlong-comparison-" + "b".repeat(43) });
+  assert.equal(readComparisonAccess(storage, saved.comparisonId)?.accessToken, saved.accessToken, "opening a second case must not lose the first credential");
+  assert.equal(readComparisonAccess(storage, "unknown-case"), null, "never borrow another case's recovery token");
+  assert.equal(readComparisonAccess({ getItem: () => "malformed" }), null);
+  assert.equal(readComparisonAccess({ getItem: () => JSON.stringify({ ...saved, expiresAt: "2020-01-01" }) }), null);
 
   console.log(JSON.stringify({
     ok: true,

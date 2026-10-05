@@ -185,7 +185,7 @@ export function evaluatePublicOrderPaymentEvent(
 
   if (
     PAYMENT_EVENTS.has(event.eventType) &&
-    ["HELD", "REFUNDED", "DISPUTED", "DISPUTE_WON", "DISPUTE_LOST"].includes(
+    ["HELD", "REFUND_PENDING", "REFUNDED", "DISPUTED", "DISPUTE_WON", "DISPUTE_LOST"].includes(
       order.status,
     )
   ) {

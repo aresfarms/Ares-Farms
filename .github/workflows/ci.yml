@@ -203,6 +203,12 @@ jobs:
       - name: Data Transparency Posture v1
         run: npm run smoke:data-transparency-posture
 
+      - name: Property evidence intake and recovery contracts
+        run: npm run verify:property-comparison-analysis-worker
+
+      - name: Automated Property Report contracts
+        run: npm run verify:automated-property-report
+
       - name: Build Self-Report v1
         run: npm run smoke:build-self-report
 
@@ -255,6 +261,8 @@ jobs:
 
       - name: Property report commerce and payment controls
         run: |
+          npm run verify:economic-evidence-package
+          npm run verify:property-comparison-ranking
           npm run verify:public-order-billing
           npm run verify:public-report-commerce
           npm run verify:progressive-intelligence
@@ -291,5 +299,6 @@ jobs:
           node-version: "24.15.0"
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: npm run verify:automated-property-report
       - run: npm run verify:public-order-billing
       - run: npm run verify:public-order-database

@@ -613,9 +613,10 @@ async function verifyImplementationAnchors() {
   assert(checkoutComponent.includes("checked={accepted}"));
   assert(
     checkoutComponent.includes(
-      "disabled={!accepted || busy || upgradeBlocked}",
+      "disabled={!accepted || busy || upgradeBlocked || preparationBlocked}",
     ),
   );
+  assert(checkoutComponent.includes("if (!accepted || busy || upgradeBlocked || preparationBlocked) return;"));
   assert(checkoutComponent.includes("PUBLIC_ORDER_AGREEMENT_VERSION"));
   assert(purchasePage.includes("PublicOrderCheckoutAgreement"));
   assert(successPage.includes("PublicOrderStatus"));

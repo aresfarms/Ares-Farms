@@ -34,6 +34,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "A report payload is required." }, { status: 400 });
   }
 
+  if (report.tier?.id !== "free") {
+    return NextResponse.json({ ok: false, error: "Paid reports are prepared and delivered through the private purchase flow." }, { status: 403 });
+  }
+
   const context = report.context;
   if (!context || !context.title || !report.tier?.id) {
     return NextResponse.json({ ok: false, error: "Report context is incomplete for attestation." }, { status: 400 });

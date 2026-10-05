@@ -1,10 +1,11 @@
+import { assessCandidateExclusion, candidateRoleCoverageProblems, isCandidateExclusionEvidence, type CandidateExclusionEvidence } from "./candidateExclusionEvidence";
 import type { ScenarioCandidateRole } from "@/lib/intelligence/scenarioRankingPlan";
 import {
   ENTERPRISE_PROJECTION_VERSION,
   type EnterpriseProjection,
 } from "@/lib/intelligence/enterpriseProjection";
 
-export const PROPERTY_COMPARISON_RANKING_VERSION = "property-comparison-ranking-v1.0.0" as const;
+export const PROPERTY_COMPARISON_RANKING_VERSION = "property-comparison-ranking-v1.1.0" as const;
 export const MINIMUM_COMPARISON_CONFIDENCE = 60;
 
 export type ConstraintStatus = "clear" | "conditioned" | "unknown" | "blocked";
@@ -39,6 +40,8 @@ export type ComparablePropertyAnalysis = {
   address: string;
   status: "completed" | "needs-evidence" | "unverifiable" | "failed";
   candidates: ComparableEnterpriseCandidate[];
+  exclusions?: CandidateExclusionEvidence[];
+  assessmentAsOf?: string;
 };
 
 export type RankedComparisonProperty = {
@@ -115,6 +118,7 @@ export function rankPropertyComparisonAnalyses(input: {
   analyses: ComparablePropertyAnalysis[];
   expectedPropertyCount: number;
   requestedResultCount: number;
+  asOf?: string;
 }): PropertyComparisonRankingResult {
   const releaseRule =
     "Rank only completed property analyses with sourced economics, complete lifecycle projections, resolved feasibility constraints, total project cost, and property/project DSCR. Never substitute scenario-only numbers.";
@@ -132,8 +136,10 @@ export function rankPropertyComparisonAnalyses(input: {
     analysis: ComparablePropertyAnalysis;
     candidate: ComparableEnterpriseCandidate;
   }> = [];
+  let incomplete = false;
   for (const analysis of input.analyses) {
     if (analysis.status !== "completed") {
+      incomplete = true;
       excluded.push({
         comparisonItemId: analysis.comparisonItemId,
         address: analysis.address,
@@ -145,17 +151,22 @@ export function rankPropertyComparisonAnalyses(input: {
       });
       continue;
     }
-    const roles = new Set(analysis.candidates.map((candidate) => candidate.candidateRole));
-    const threeCandidateContractPresent =
-      roles.has("best-single-enterprise") &&
-      roles.has("best-mixed-use") &&
-      (roles.has("customer-vision") || roles.has("best-distinct-alternative"));
-    if (!threeCandidateContractPresent) {
-      excluded.push({
-        comparisonItemId: analysis.comparisonItemId,
-        address: analysis.address,
-        reasons: ["The required single-enterprise, mixed-use, and customer-vision/distinct-alternative comparison is incomplete."],
-      });
+    const exclusions = analysis.exclusions ?? [];
+    const coverageProblems = candidateRoleCoverageProblems([
+      ...analysis.candidates.map(c => c.candidateRole), ...exclusions.map(e => e.candidateRole),
+    ]);
+    for (const exclusion of exclusions) {
+      coverageProblems.push(...assessCandidateExclusion(exclusion, {
+        propertyId: analysis.propertyId, address: analysis.address, asOf: input.asOf ?? analysis.assessmentAsOf ?? "invalid",
+      }).missingEvidence);
+    }
+    // A negative feasibility finding is complete; missing economics or an
+    // unresolved competing candidate must not disappear behind another winner.
+    coverageProblems.push(...analysis.candidates.flatMap(c => candidateExclusionReasons(c)
+      .filter(reason => !reason.endsWith("feasibility is blocked."))));
+    if (coverageProblems.length) {
+      incomplete = true;
+      excluded.push({ comparisonItemId: analysis.comparisonItemId, address: analysis.address, reasons: [...new Set(coverageProblems)] });
       continue;
     }
     const best = bestEligibleCandidate(analysis);
@@ -163,7 +174,7 @@ export function rankPropertyComparisonAnalyses(input: {
       excluded.push({
         comparisonItemId: analysis.comparisonItemId,
         address: analysis.address,
-        reasons: [...new Set(best.assessed.flatMap((entry) => entry.reasons))],
+        reasons: [...new Set([...best.assessed.flatMap((entry) => entry.reasons), ...exclusions.map(e => e.summary)])],
       });
       continue;
     }
@@ -206,11 +217,11 @@ export function rankPropertyComparisonAnalyses(input: {
     version: PROPERTY_COMPARISON_RANKING_VERSION,
     status: ranked.length
       ? excluded.length || ranked.length < requestedResultCount ? "partial" : "completed"
-      : excluded.length ? "needs-evidence" : "completed",
+      : incomplete ? "needs-evidence" : "completed",
     requestedResultCount,
     ranked,
     excluded,
-    portfolioVerdict: ranked.length ? "VIABLE_OPTIONS_FOUND" : "RUN_FROM_ALL",
+    portfolioVerdict: ranked.length ? "VIABLE_OPTIONS_FOUND" : incomplete ? "NOT_READY_TO_RANK" : "RUN_FROM_ALL",
     releaseRule,
   };
 }
@@ -337,9 +348,10 @@ export function isComparablePropertyAnalysis(
       !Array.isArray(analysis.candidates)) {
     return false;
   }
-  if (analysis.status === "completed" &&
-      analysis.candidates.length !== 3) {
-    return false;
-  }
+  if (analysis.exclusions !== undefined && (!Array.isArray(analysis.exclusions) || !analysis.exclusions.every(isCandidateExclusionEvidence))) return false;
+  if (analysis.status === "completed" && candidateRoleCoverageProblems([
+    ...analysis.candidates.map(c => String(objectRecord(c)?.candidateRole)),
+    ...((analysis.exclusions ?? []) as CandidateExclusionEvidence[]).map(e => e.candidateRole),
+  ]).length) return false;
   return analysis.candidates.every(validCandidate);
 }

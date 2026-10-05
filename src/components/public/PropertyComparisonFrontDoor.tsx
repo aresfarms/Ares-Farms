@@ -1,38 +1,44 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  parsePropertyComparisonIntake,
-  PROPERTY_COMPARISON_MAX,
-} from "@/lib/intelligence/propertyComparisonIntake";
+import { parsePropertyComparisonIntake, PROPERTY_COMPARISON_MAX } from "@/lib/intelligence/propertyComparisonIntake";
+import { readComparisonAccess, saveComparisonAccess, type SavedComparisonAccess } from "@/lib/intelligence/propertyComparisonAccess";
+import type { PropertyReportPreparation } from "@/lib/intelligence/propertyReportPreparation";
 import styles from "./FurlongExperience.module.css";
 
-const STORAGE_KEY = "furlong:property-comparison-access:v1";
-
-type CreatedComparison = {
-  comparisonId: string;
-  accessToken: string;
-  propertyCount: number;
-  requestedResultCount: number;
-  expiresAt: string;
-};
-
 type ComparisonStatus = {
-  status: string;
-  propertyCount: number;
-  completedCount: number;
-  failedCount: number;
-  items: Array<{ id: string; submittedAddress: string; status: string }>;
+  status: string; propertyCount: number; completedCount: number; failedCount: number;
+  items: Array<{
+    id: string; submittedAddress: string; normalizedAddress: string | null;
+    propertyId: string | null; status: string; reportPreparation: PropertyReportPreparation;
+    resultSnapshot?: { evidenceCapture?: { capturedAt: string; checklist: Array<{ domain: string; status: string; action: string }> } };
+  }>;
 };
+const terminal = new Set(["COMPLETED", "PARTIAL", "FAILED", "AWAITING_EVIDENCE", "HELD"]);
 
-export function PropertyComparisonFrontDoor() {
-  const [addressesText, setAddressesText] = useState("");
+export function PropertyComparisonFrontDoor(props: {
+  initialAddress?: string; comparisonId?: string; reportSalesOpen?: boolean;
+} = {}) {
+  const single = props.initialAddress !== undefined;
+  const [addressesText, setAddressesText] = useState(props.initialAddress ?? "");
   const [excludedAddressesText, setExcludedAddressesText] = useState("");
-  const [requestedResultCount, setRequestedResultCount] = useState(5);
+  const [requestedResultCount, setRequestedResultCount] = useState(single ? 1 : 5);
   const [error, setError] = useState<string | null>(null);
-  const [created, setCreated] = useState<CreatedComparison | null>(null);
+  const [created, setCreated] = useState<SavedComparisonAccess | null>(null);
   const [status, setStatus] = useState<ComparisonStatus | null>(null);
   const [busy, setBusy] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(20);
+  const [recoveryId, setRecoveryId] = useState(props.comparisonId ?? "");
+  const [recoveryToken, setRecoveryToken] = useState("");
+
+  useEffect(() => {
+    // An address link must never silently reopen another property's last case.
+    if (!props.comparisonId && single) return;
+    const saved = readComparisonAccess(window.sessionStorage, props.comparisonId);
+    if (saved) setCreated(saved);
+  }, [props.comparisonId, single]);
 
   useEffect(() => {
     if (!created) return;
@@ -41,120 +47,181 @@ export function PropertyComparisonFrontDoor() {
     const refresh = async () => {
       try {
         const response = await fetch(`/api/public/property-comparisons/${created.comparisonId}`, {
-          headers: { Authorization: `Bearer ${created.accessToken}` },
-          cache: "no-store",
+          headers: { Authorization: `Bearer ${created.accessToken}` }, cache: "no-store",
         });
         const result = await response.json() as {
-          ok?: boolean;
-          comparison?: Omit<ComparisonStatus, "items">;
-          items?: ComparisonStatus["items"];
+          ok?: boolean; error?: string; comparison?: Omit<ComparisonStatus, "items">; items?: ComparisonStatus["items"];
         };
-        if (!stopped && response.ok && result.ok && result.comparison && result.items) {
-          const next = { ...result.comparison, items: result.items };
-          setStatus(next);
-          if (!["COMPLETED", "PARTIAL", "FAILED", "AWAITING_EVIDENCE", "HELD"].includes(next.status)) {
-            timer = setTimeout(() => void refresh(), 5_000);
-          }
+        if (stopped) return;
+        if (!response.ok || !result.ok || !result.comparison || !result.items) {
+          setError(result.error || "The saved property could not be reopened. Check its reference and recovery token.");
+          if (response.status >= 500) timer = setTimeout(() => void refresh(), 15_000);
+          return;
         }
+        const next = { ...result.comparison, items: result.items };
+        setStatus(next);
+        setError(null);
+        if (!terminal.has(next.status)) timer = setTimeout(() => void refresh(), 5_000);
       } catch {
-        if (!stopped) timer = setTimeout(() => void refresh(), 10_000);
+        if (!stopped) {
+          setError("The connection was interrupted. Your saved work remains available; retrying…");
+          timer = setTimeout(() => void refresh(), 15_000);
+        }
       }
     };
     void refresh();
-    return () => {
-      stopped = true;
-      if (timer) clearTimeout(timer);
-    };
-  }, [created]);
+    return () => { stopped = true; if (timer) clearTimeout(timer); };
+  }, [created, refreshCount]);
+
+  function remember(value: SavedComparisonAccess) {
+    setCreated(value);
+    setRecoveryId(value.comparisonId);
+    try { saveComparisonAccess(window.sessionStorage, value); }
+    catch { setError("This browser could not save the recovery token. Copy the reference and token below before leaving."); }
+    if (single) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("comparisonId", value.comparisonId);
+      window.history.replaceState(null, "", url);
+    }
+  }
 
   async function prepareComparison() {
-    const parsed = parsePropertyComparisonIntake({
-      addressesText, excludedAddressesText, requestedResultCount,
-    });
-    if (!parsed.ok) {
-      setCreated(null);
-      setError(parsed.error);
-      return;
-    }
-
-    setBusy(true);
-    setError(null);
-    setStatus(null);
+    if (busy) return;
+    const parsed = parsePropertyComparisonIntake({ addressesText, excludedAddressesText, requestedResultCount });
+    if (!parsed.ok) { setError(parsed.error); return; }
+    if (single && parsed.value.addresses.length !== 1) { setError("Enter one complete address for this report."); return; }
+    setBusy(true); setError(null);
     try {
       const response = await fetch("/api/public/property-comparisons", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ addressesText, excludedAddressesText, requestedResultCount }),
       });
-      const result = await response.json() as {
-        ok?: boolean; error?: string; comparisonId?: string; accessToken?: string;
-        propertyCount?: number; requestedResultCount?: number; expiresAt?: string;
-      };
+      const result = await response.json() as Partial<SavedComparisonAccess> & { ok?: boolean; error?: string };
       if (!response.ok || !result.ok || !result.comparisonId || !result.accessToken ||
           !result.propertyCount || !result.requestedResultCount || !result.expiresAt) {
-        throw new Error(result.error || "Furlong could not save this comparison.");
+        throw new Error(result.error || "Furlong could not save this property.");
       }
-      const value: CreatedComparison = {
-        comparisonId: result.comparisonId,
-        accessToken: result.accessToken,
-        propertyCount: result.propertyCount,
-        requestedResultCount: result.requestedResultCount,
-        expiresAt: result.expiresAt,
-      };
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-      setCreated(value);
-    } catch (caught) {
-      setCreated(null);
-      setError(caught instanceof Error ? caught.message : "Furlong could not save this comparison.");
-    } finally {
-      setBusy(false);
+      setStatus(null); setVisibleCount(20);
+      remember(result as SavedComparisonAccess);
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "Furlong could not save this property."); }
+    finally { setBusy(false); }
+  }
+
+  async function recover() {
+    if (busy) return;
+    if (!/^[0-9a-f-]{36}$/i.test(recoveryId.trim()) || !/^furlong-comparison-[A-Za-z0-9_-]{43}$/.test(recoveryToken.trim())) {
+      setError("Enter the saved reference and complete recovery token."); return;
     }
+    setBusy(true); setError(null);
+    try {
+      const response = await fetch(`/api/public/property-comparisons/${recoveryId.trim()}`, {
+        headers: { Authorization: `Bearer ${recoveryToken.trim()}` }, cache: "no-store",
+      });
+      const result = await response.json() as { ok?: boolean; error?: string; comparison?: {
+        propertyCount: number; requestedResultCount: number; expiresAt: string;
+      } };
+      if (!response.ok || !result.ok || !result.comparison) throw new Error(result.error || "This reference and recovery token could not be verified.");
+      setStatus(null); setVisibleCount(20);
+      remember({ ...result.comparison, comparisonId: recoveryId.trim(), accessToken: recoveryToken.trim() });
+      setRecoveryToken("");
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "The saved work could not be reopened."); }
+    finally { setBusy(false); }
   }
 
   return <section className={styles.compare} aria-labelledby="compare-properties-heading">
     <div>
-      <p className={styles.eyebrow}>Compare a list</p>
-      <h2 id="compare-properties-heading">Which properties should Furlong narrow down?</h2>
-      <p>Paste one complete U.S. address per line. Furlong accepts up to {PROPERTY_COMPARISON_MAX.toLocaleString("en-US")} addresses and keeps excluded properties out of the comparison.</p>
+      <p className={styles.eyebrow}>{single ? "Prepare your property report" : "Compare a list"}</p>
+      <h2 id="compare-properties-heading">{single ? "Build the evidence for this property." : "Which properties should Furlong narrow down?"}</h2>
+      <p>{single ? "Save this property, follow the source checks and reopen the results here. Payment becomes available only when the analysis and finished report pass verification." :
+        `Paste one complete U.S. address per line, up to ${PROPERTY_COMPARISON_MAX.toLocaleString("en-US")} addresses.`}</p>
     </div>
-    <label htmlFor="comparison-addresses">Properties to compare</label>
-    <textarea id="comparison-addresses" rows={8} value={addressesText}
-      onChange={(event) => setAddressesText(event.target.value)}
-      placeholder={"101 Main Street, Town, MD 21000\n205 Market Street, Town, MD 21000"} />
-    <div className={styles.compareControls}>
-      <label htmlFor="comparison-result-count">Return the best</label>
-      <select id="comparison-result-count" value={requestedResultCount}
-        onChange={(event) => setRequestedResultCount(Number(event.target.value))}>
-        {[1, 2, 3, 4, 5].map((count) => <option key={count} value={count}>{count}</option>)}
-      </select>
-    </div>
-    <details>
-      <summary>Exclude specific addresses</summary>
-      <label htmlFor="comparison-exclusions">Addresses to exclude</label>
-      <textarea id="comparison-exclusions" rows={3} value={excludedAddressesText}
-        onChange={(event) => setExcludedAddressesText(event.target.value)}
-        placeholder="One excluded address per line" />
+    {!created ? <>
+      <label htmlFor="comparison-addresses">{single ? "Property address" : "Properties to compare"}</label>
+      <textarea id="comparison-addresses" rows={single ? 2 : 8} value={addressesText}
+        onChange={event => setAddressesText(event.target.value)} placeholder="Street address, city, state and ZIP" />
+      {!single ? <>
+        <div className={styles.compareControls}>
+          <label htmlFor="comparison-result-count">Return the best</label>
+          <select id="comparison-result-count" value={requestedResultCount} onChange={event => setRequestedResultCount(Number(event.target.value))}>
+            {[1, 2, 3, 4, 5].map(count => <option key={count} value={count}>{count}</option>)}
+          </select>
+        </div>
+        <details><summary>Exclude specific addresses</summary>
+          <label htmlFor="comparison-exclusions">Addresses to exclude</label>
+          <textarea id="comparison-exclusions" rows={3} value={excludedAddressesText} onChange={event => setExcludedAddressesText(event.target.value)} />
+        </details>
+      </> : null}
+      <button type="button" className={styles.primary} onClick={() => void prepareComparison()} disabled={busy}>
+        {busy ? "Saving…" : single ? "Save and prepare this property" : "Prepare this comparison"}
+      </button>
+      <p className={styles.note}>Source checks run after the property is saved. Saving does not establish feasibility, rank uses or start a paid order.</p>
+    </> : null}
+    <details open={Boolean(props.comparisonId && !created)}>
+      <summary>Reopen saved work</summary>
+      <label htmlFor="comparison-recovery-id">Saved reference</label>
+      <input id="comparison-recovery-id" value={recoveryId} onChange={event => setRecoveryId(event.target.value)} autoComplete="off" />
+      <label htmlFor="comparison-recovery-token">Recovery token</label>
+      <input id="comparison-recovery-token" type="password" value={recoveryToken} onChange={event => setRecoveryToken(event.target.value)} autoComplete="off" />
+      <button type="button" className={styles.secondary} disabled={busy} onClick={() => void recover()}>Reopen</button>
     </details>
-    <button type="button" className={styles.primary} onClick={() => void prepareComparison()} disabled={busy}>
-      {busy ? "Saving comparison…" : "Prepare this comparison"}
-    </button>
-    <p className={styles.note}>Preparing the list does not rank it. Each retained address must pass property verification and receive the same evidence-based analysis before Furlong compares profitability.</p>
     {error ? <p role="alert" className={styles.error}>{error}</p> : null}
-    {created ? <div role="status" className={styles.accepted}>
-      <strong>{created.propertyCount.toLocaleString("en-US")} properties queued for a top-{created.requestedResultCount} comparison.</strong>
-      <p>Comparison reference: {created.comparisonId}. Keep this browser session open or save the recovery token shown below. Furlong stores only its hash.</p>
-      <code>{created.accessToken}</code>
-      <p>Batch verification and ranking have not started merely because intake succeeded.</p>
+    {created ? <div className={styles.accepted}>
+      <strong>{created.propertyCount.toLocaleString("en-US")} {created.propertyCount === 1 ? "property saved" : "properties saved"}.</strong>
+      <p>Reference: {created.comparisonId}</p>
+      <details><summary>Save your private recovery token</summary>
+        <p>Keep this reference and token together to reopen the work in another browser. Anyone with the token can access it.</p>
+        <code style={{ overflowWrap: "anywhere" }}>{created.accessToken}</code>
+      </details>
+      <button type="button" className={styles.secondary} disabled={busy} onClick={() => { setCreated(null); setStatus(null); setError(null);
+        if (single) { const url = new URL(window.location.href); url.searchParams.delete("comparisonId"); window.history.replaceState(null, "", url); } }}>Start another property or list</button>
     </div> : null}
-    {status ? <div className={styles.progress} aria-live="polite">
-      <strong>Current status: {status.status.replaceAll("_", " ").toLowerCase()}</strong>
-      <p>{status.completedCount} of {status.propertyCount} analyses completed · {status.failedCount} failed or unverifiable.</p>
-      <ul>
-        {status.items.slice(0, 10).map((item) => <li key={item.id}>
-          <span>{item.submittedAddress}</span><strong>{item.status.replaceAll("_", " ").toLowerCase()}</strong>
-        </li>)}
-      </ul>
-      {status.items.length > 10 ? <p>Showing the first 10 of {status.items.length} records.</p> : null}
-    </div> : null}
+    {status && created ? <div className={styles.progress}>
+      <p role="status">{status.completedCount} of {status.propertyCount} analyses completed · {status.failedCount} could not be verified.</p>
+      <button type="button" className={styles.secondary} onClick={() => setRefreshCount(n => n + 1)}>Refresh status</button>
+      {status.items.slice(0, visibleCount).map(item => <article key={item.id}>
+        <h3>{item.normalizedAddress || item.submittedAddress}</h3>
+        <p>{item.status === "NEEDS_EVIDENCE" ? "Evidence needed before the report can be completed." : item.status.replaceAll("_", " ").toLowerCase()}</p>
+        {item.resultSnapshot?.evidenceCapture ? <p>Public-source check: {new Date(item.resultSnapshot.evidenceCapture.capturedAt).toLocaleString()}. Evidence found still needs to support the specific proposed uses.</p> : null}
+        {item.reportPreparation?.sourceSnapshot ? <div className={styles.sourceFindings}>
+          {item.reportPreparation.sourceSnapshot.warnings.length ? <div>
+            <strong>Source warnings to consider now</strong>
+            <ul>{(item.reportPreparation.sourceSnapshot.warningDetails ?? item.reportPreparation.sourceSnapshot.warnings.map(summary => ({ summary, detail: null, source: null }))).map((warning, i) => <li key={i}>
+              <p>{warning.summary}</p>
+              {warning.detail || warning.source ? <details>
+                <summary>Warning details and source</summary>
+                {warning.detail ? <p>{warning.detail}</p> : null}
+                {warning.source ? <p className={styles.note}>Source: {warning.source}</p> : null}
+              </details> : null}
+            </li>)}</ul>
+          </div> : null}
+          <details>
+            <summary>Saved public-source findings</summary>
+            <p>Collected {new Date(item.reportPreparation.sourceSnapshot.capturedAt).toLocaleString()}. These are saved observations; their source dates and limits still apply. They do not establish complete use feasibility.</p>
+            <ul>{item.reportPreparation.sourceSnapshot.facts.map((fact, i) => <li key={i}>
+              <strong>{fact.label}</strong><p>{fact.value}</p><p className={styles.note}>Source: {fact.source}</p>
+            </li>)}</ul>
+          </details>
+          {item.reportPreparation.sourceSnapshot.unknowns.length ? <details>
+            <summary>Unresolved property checks</summary>
+            <ul>{item.reportPreparation.sourceSnapshot.unknowns.map((unknown, i) => <li key={i}><strong>{unknown.label}</strong><p>{unknown.action}</p></li>)}</ul>
+          </details> : null}
+        </div> : null}
+        {item.reportPreparation?.missingEvidence.length ? <details>
+          <summary>What this property still needs</summary>
+          <ul>{item.reportPreparation.missingEvidence.map((gap, i) => <li key={i}>{gap}</li>)}</ul>
+        </details> : null}
+        {item.reportPreparation?.exclusions?.length ? <div><strong>Documented findings to consider now</strong><ul>{item.reportPreparation.exclusions.map((finding, i) => <li key={i}>{finding}</li>)}</ul></div> : null}
+        {item.reportPreparation?.evidenceReady && item.propertyId ? <>
+          {item.reportPreparation.outcome === "no-supported-use" ? <p role="status"><strong>No supported use remains within the reviewed scope.</strong> The report documents why the reviewed uses were ruled out.</p> : null}
+          <p>The saved economic analysis passed its current evidence checks. The property facts and finished PDF are checked again before checkout.</p>
+          {props.reportSalesOpen ? <Link className={styles.primary} href={`/purchase?${new URLSearchParams({
+            product: "focused_property_report", address: item.normalizedAddress || item.submittedAddress,
+            propertyId: item.propertyId, analysisComparisonId: created.comparisonId,
+          })}`}>Prepare the $49 Property Report</Link> : props.reportSalesOpen === false ? <p>Report sales have not opened yet.</p> :
+            <Link href={`/property-evidence?${new URLSearchParams({ address: item.normalizedAddress || item.submittedAddress, comparisonId: created.comparisonId })}`}>Open report preparation</Link>}
+        </> : null}
+      </article>)}
+      {status.items.length > visibleCount ? <button type="button" className={styles.secondary} onClick={() => setVisibleCount(n => n + 20)}>Show more properties</button> : null}
+    </div> : created ? <p role="status">Loading saved work…</p> : null}
   </section>;
 }

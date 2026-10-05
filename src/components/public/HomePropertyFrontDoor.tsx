@@ -37,6 +37,7 @@ export function HomePropertyFrontDoor() {
   const [error, setError] = useState<string | null>(null);
 
   async function analyze() {
+    if (busy) return;
     const rawInput = input.trim();
     if (!rawInput) {
       setError("Enter a complete U.S. property address.");
@@ -146,6 +147,8 @@ export function HomePropertyFrontDoor() {
             onChange={(event) => setInput(event.target.value)}
             placeholder="Street address, city, state and ZIP"
             autoComplete="street-address"
+            maxLength={300}
+            aria-invalid={Boolean(error)}
             aria-describedby="front-door-support front-door-error"
           />
           <button

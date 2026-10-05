@@ -35,6 +35,14 @@ resource "google_storage_bucket_iam_member" "runtime_state_core_read" {
   member = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+# The comparison worker consumes the same approved-source snapshot as the web
+# runtime. It cannot create, replace or delete source approval records.
+resource "google_storage_bucket_iam_member" "runtime_state_comparison_read" {
+  bucket = google_storage_bucket.runtime_state.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.property_comparison_worker.email}"
+}
+
 resource "google_storage_bucket_iam_member" "runtime_state_refresh_read" {
   bucket = google_storage_bucket.runtime_state.name
   role   = "roles/storage.objectViewer"

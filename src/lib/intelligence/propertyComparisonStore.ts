@@ -16,10 +16,12 @@ import {
   compilePropertyComparisonEconomicAnalysis,
 } from "@/lib/intelligence/propertyComparisonEconomicAnalysis";
 import {
-  isComparablePropertyAnalysis,
   rankPropertyComparisonAnalyses,
   type ComparablePropertyAnalysis,
 } from "@/lib/intelligence/propertyComparisonRanking";
+
+import type { CandidateExclusionEvidence } from "./candidateExclusionEvidence";
+import { assessStoredEconomicEvidence } from "./storedEconomicEvidence";
 
 export const PROPERTY_COMPARISON_GOVERNANCE_VERSION = "property-comparison-v1.0.0";
 
@@ -360,6 +362,7 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
   itemId: string;
   comparisonId: string;
   evidencePackages: EnterpriseEconomicEvidencePackage[];
+  candidateExclusions?: CandidateExclusionEvidence[];
   traceId: string;
 }) {
   const childCaseId = "comparison-property:" + input.itemId;
@@ -375,6 +378,7 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       propertyId: furlongPropertyComparisonItems.propertyId,
       normalizedAddress: furlongPropertyComparisonItems.normalizedAddress,
       submittedAddress: furlongPropertyComparisonItems.submittedAddress,
+      resultSnapshot: furlongPropertyComparisonItems.resultSnapshot,
     }).from(furlongPropertyComparisonItems).where(and(
       eq(furlongPropertyComparisonItems.id, input.itemId),
       eq(furlongPropertyComparisonItems.comparisonId, input.comparisonId),
@@ -386,12 +390,16 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       propertyId: sourceItem.propertyId,
       address: sourceItem.normalizedAddress ?? sourceItem.submittedAddress,
       packages: input.evidencePackages,
+      exclusions: input.candidateExclusions ?? [],
+      asOf: new Date().toISOString(),
     });
     if (!compilation.ok) {
       throw new PropertyComparisonEconomicEvidenceError(
         compilation.missingEvidence,
       );
     }
+    const priorSnapshot = sourceItem.resultSnapshot && typeof sourceItem.resultSnapshot === "object" && !Array.isArray(sourceItem.resultSnapshot)
+      ? sourceItem.resultSnapshot as Record<string, unknown> : {};
     const analysis = compilation.analysis;
     const evidenceRefs = compilation.evidenceRefs;
     const packageSnapshots = input.evidencePackages.map(
@@ -439,9 +447,11 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       caseStatus: "OPEN",
       outcomeStatus: "NOT_STARTED",
       propertySnapshot: {
+        evidenceCapture: priorSnapshot.evidenceCapture ?? null,
         comparisonId: input.comparisonId,
         analysis,
         economicEvidencePackages: packageSnapshots,
+        candidateExclusions: input.candidateExclusions ?? [],
       },
       businessContext: {},
       borrowerReadiness: {},
@@ -473,6 +483,9 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       detail: {
         comparisonId: input.comparisonId,
         candidateCount: analysis.candidates.length,
+        exclusionCount: input.candidateExclusions?.length ?? 0,
+        exclusionIds: (input.candidateExclusions ?? []).map(item => item.exclusionId),
+        assessmentAsOf: analysis.assessmentAsOf,
         packageIds: input.evidencePackages.map((item) => item.packageId),
         economicAnalysisVersion:
           PROPERTY_COMPARISON_ECONOMIC_ANALYSIS_VERSION,
@@ -489,11 +502,15 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
       status: "COMPLETED",
       childCaseId,
       resultSnapshot: {
+        ...priorSnapshot,
+        missingEvidence: [],
+        rankingEligible: true,
         schemaVersion: "comparable-property-analysis-v1",
         economicAnalysisVersion:
           PROPERTY_COMPARISON_ECONOMIC_ANALYSIS_VERSION,
         analysis,
         economicEvidencePackages: packageSnapshots,
+        candidateExclusions: input.candidateExclusions ?? [],
       },
       evidenceRefs,
       completedAt: new Date(),
@@ -504,6 +521,7 @@ export async function recordCompletedPropertyComparisonAnalysis(input: {
         rankingEligible: true,
         rankingReleased: false,
         evidencePackageCount: packageSnapshots.length,
+        exclusionCount: input.candidateExclusions?.length ?? 0,
       },
     }).where(and(
       eq(furlongPropertyComparisonItems.id, input.itemId),
@@ -570,12 +588,12 @@ export async function finalizePropertyComparison(input: {
     return { finalized: false, reason: "Child property work remains active." };
   }
 
+  const assessmentDate = new Date();
   const analyses: ComparablePropertyAnalysis[] = retained.map((item) => {
-    const snapshot = item.resultSnapshot && typeof item.resultSnapshot === "object"
-      ? item.resultSnapshot as Record<string, unknown> : {};
-    if (item.status === "COMPLETED" && isComparablePropertyAnalysis(snapshot.analysis)) {
-      return snapshot.analysis;
-    }
+    // Recompute from preserved evidence. A saved completion status is not a
+    // freshness check, and missing exclusion records cannot silently disappear.
+    const assessment = item.status === "COMPLETED" ? assessStoredEconomicEvidence(item, assessmentDate) : null;
+    if (assessment?.ok) return assessment.analysis;
     return {
       comparisonItemId: item.id,
       propertyId: item.propertyId ?? "unresolved:" + item.id,
@@ -589,6 +607,7 @@ export async function finalizePropertyComparison(input: {
     analyses,
     expectedPropertyCount: comparison.propertyCount,
     requestedResultCount: comparison.requestedResultCount,
+    asOf: assessmentDate.toISOString(),
   });
   const status = ranking.status === "completed" ? "COMPLETED"
     : ranking.status === "partial" ? "PARTIAL"

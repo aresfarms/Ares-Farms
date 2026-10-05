@@ -1,13 +1,24 @@
 import { randomUUID } from "node:crypto";
+import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 
 import { processPropertyComparisonAnalysisBatch } from "@/lib/intelligence/propertyComparisonAnalysisWorker";
 import { finalizePropertyComparison } from "@/lib/intelligence/propertyComparisonStore";
 import { processPropertyComparisonVerificationBatch } from "@/lib/intelligence/propertyComparisonVerificationWorker";
 
-const MAX_BATCH = 10;
+// Full evidence collection includes bounded public-source lookups. Keep each
+// scheduled run small enough for the existing five-minute job budget.
+const MAX_BATCH = 3;
 
 async function main(): Promise<void> {
   const traceId = "property-comparison-private-job-" + randomUUID();
+
+  const guard = runRuntimeGuard({
+    operation: "property.comparison.process", module: "property-comparison-private-job",
+    traceId, replayRef: traceId, actorId: "system:property-comparison-worker",
+    schemaVersion: "property-evidence-capture-v1", governanceVersion: "master-volumes-runtime-v0.1.0",
+    classificationLevel: "CONFIDENTIAL", metadata: { boundedLimitPerStage: MAX_BATCH },
+  });
+  if (!guard.allowed) throw new Error("Governed property evidence collection is unavailable.");
 
   const verification = await processPropertyComparisonVerificationBatch({
     limit: MAX_BATCH,

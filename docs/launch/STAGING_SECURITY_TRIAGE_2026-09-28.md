@@ -1,0 +1,21 @@
+# Authenticated staging scan — disposition record
+
+Scan: GitHub Actions [36502347375](https://github.com/aresfarms/Ares-Farms/actions/runs/36502347375), against the previously deployed `pi-ba0550bb` core. The repaired IAP authentication reached the protected application. ZAP reported 55 passing rules, zero failing rules and twelve warning-rule groups, containing seventeen alert types. This is a passive scan, not penetration-test or launch acceptance. A zero-failure process exit does not close its warnings.
+
+| Finding | Evidence and action | Closure still required |
+| --- | --- | --- |
+| Missing CSP on crafted dotted application paths (10038, medium) | The old proxy excluded every path containing a dot. PR #90 removes that exclusion. A local production build confirms a dotted public 404 receives CSP and a dotted operator page redirects to sign-in. | Re-scan the deployed candidate, including encoded-path cases. |
+| Wildcard image directive (10055, medium) | `img-src` permits HTTPS images. Scripts remain nonce-bound with `strict-dynamic`; `connect-src` is limited to self and the storage host. This is not proof that image-source breadth is harmless. | Inventory external image hosts and review the minimum required policy against all customer pages. No risk acceptance is recorded here. |
+| Inline styles (10055, medium) | React style attributes currently require `style-src 'unsafe-inline'`; production scripts do not allow inline execution without a nonce. | Security review of the remaining style-injection/exfiltration surface and a tested migration or explicitly approved disposition. |
+| Application error (90022, low) | The canonical `/discover` path tried to write evidence into a read-only source-state bucket. PR #90 moves request-time captures to the existing database evidence ledger, retaining signed provenance and assertion labels. | Exercise that exact path under the candidate's restricted cloud identity; source-bucket access remains read-only. |
+| Framework header disclosure (10037, low) | PR #90 disables `X-Powered-By`. Local production responses confirm its absence. | Confirm after candidate deployment and re-scan. |
+| Email/form values in URLs (10024, informational) | The scanner submitted a synthetic email through the HTML form's implicit GET fallback. The hydrated client uses JSON POST. PR #90 sets the form method to POST as well, so an unhydrated submission cannot put those fields into a query string. | Verify the fallback request method without sending a real message; re-scan. |
+| Potential user-controlled HTML attribute (10031, informational) | Scanner-generated form values were reflected in the page. This alert is not evidence of executable injection. | Verify escaping and CSP under representative payloads on the candidate. |
+| Large redirect (10044, low) | Navigator routing generated the alert; no sensitive disclosure has been established. | Inspect the candidate response body and remove unnecessary reflected state if present. |
+| COEP / COOP / CORP headers (90004, low) | Headers were absent. Authentication/provider popups, calendar embeds and property media require compatibility review before imposing cross-origin restrictions. | Record the chosen policy and run affected flows; absence is not waived by this document. |
+| Timestamp disclosure (10096, low) | Matches appeared in static JavaScript. | Classify matched constants on the final bundle; do not assume all timestamps are confidential or suppress without inspection. |
+| Modern web app / cache findings (10109, 10049, 10015, informational) | Dynamic private/no-store responses and cacheable static assets generate these findings. | Confirm that only public immutable assets are shared-cacheable and report/order responses remain private/no-store. |
+
+PR #90 also updates the development-only `ip-address` dependency to 10.7.2, beyond the patched version for open advisories #44 and #45. The identical one-package Dependabot PR #89 has its own passing main-branch checks. Runtime images, the scanner and workers still need their exact-image launch evidence; a core-image result cannot be generalized to them.
+
+No human security signoff, compensating-control acceptance or public-launch authorization is implied by this record. Sales, delivery, capacities and domain routing remain unchanged.

@@ -118,7 +118,7 @@ output "source_refresh_run_job_name" {
 }
 
 output "property_comparison_worker_sa_email" {
-  description = "Runtime identity for the private property-comparison Job; DATABASE_URL access only."
+  description = "Runtime identity for the private property-comparison Job; DATABASE_URL plus read-only approved-source snapshots."
   value       = google_service_account.property_comparison_worker.email
 }
 

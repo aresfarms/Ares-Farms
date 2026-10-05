@@ -291,9 +291,9 @@ resource "google_cloud_run_v2_job" "source_refresh" {
 # Private property-comparison worker Job
 #
 # Scheduler calls the Cloud Run Jobs API directly. The browser-facing service
-# perimeter is never bypassed. The runtime identity can read DATABASE_URL only;
-# the scheduler identity can start this Job only. The bundled program processes
-# at most ten verification items and ten analysis items per execution.
+# perimeter is never bypassed. The runtime identity reads DATABASE_URL and the
+# approved-source snapshot (read-only); the scheduler can start this Job only.
+# The bundled program bounds verification and analysis to three items each.
 # =============================================================================
 
 resource "google_cloud_run_v2_job" "property_comparison" {
@@ -328,6 +328,14 @@ resource "google_cloud_run_v2_job" "property_comparison" {
       max_retries           = 0
       timeout               = "${var.property_comparison_job_timeout_seconds}s"
 
+      volumes {
+        name = "runtime-state"
+        gcs {
+          bucket    = google_storage_bucket.runtime_state.name
+          read_only = true
+        }
+      }
+
       vpc_access {
         egress = "PRIVATE_RANGES_ONLY"
         network_interfaces {
@@ -348,6 +356,16 @@ resource "google_cloud_run_v2_job" "property_comparison" {
         }
 
         env {
+          name  = "FURLONG_RUNTIME_STATE_DIR"
+          value = "/var/furlong-state"
+        }
+
+        volume_mounts {
+          name       = "runtime-state"
+          mount_path = "/var/furlong-state"
+        }
+
+        env {
           name = "DATABASE_URL"
           value_source {
             secret_key_ref {
@@ -362,5 +380,6 @@ resource "google_cloud_run_v2_job" "property_comparison" {
 
   depends_on = [
     google_secret_manager_secret_iam_member.property_comparison_database_url,
+    google_storage_bucket_iam_member.runtime_state_comparison_read,
   ]
 }

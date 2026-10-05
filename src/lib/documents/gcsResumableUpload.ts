@@ -56,7 +56,7 @@ export function objectKeyFromStorageUri(storageUri: string | null | undefined): 
  * per-deal envelope decryption slots in later without redesign. Returns null
  * when the provider is not configured (dev) — callers degrade honestly.
  */
-export async function fetchObjectStream(objectKey: string): Promise<{
+export async function fetchObjectStream(objectKey: string, generation?: string | null): Promise<{
   stream: ReadableStream<Uint8Array>;
   contentType: string;
   contentLength: string | null;
@@ -68,7 +68,8 @@ export async function fetchObjectStream(objectKey: string): Promise<{
   try {
     const url =
       `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucket)}/o/` +
-      `${encodeURIComponent(objectKey)}?alt=media`;
+      `${encodeURIComponent(objectKey)}?alt=media` +
+      (generation ? `&generation=${encodeURIComponent(generation)}` : "");
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
       signal: AbortSignal.timeout(30_000),
@@ -84,23 +85,61 @@ export async function fetchObjectStream(objectKey: string): Promise<{
   }
 }
 
-export async function fetchObjectBytes(objectKey: string, maxBytes = 25 * 1024 * 1024): Promise<Buffer | null> {
-  const object = await fetchObjectStream(objectKey);
+export async function fetchObjectBytes(
+  objectKey: string,
+  maxBytes = 25 * 1024 * 1024,
+  generation?: string | null,
+): Promise<Buffer | null> {
+  const object = await fetchObjectStream(objectKey, generation);
   if (!object) return null;
-  const declared = object.contentLength ? Number(object.contentLength) : null;
-  if (declared !== null && Number.isFinite(declared) && declared > maxBytes) return null;
-  const chunks: Buffer[] = [];
-  let total = 0;
   const reader = object.stream.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (!value) continue;
-    total += value.byteLength;
-    if (total > maxBytes) return null;
-    chunks.push(Buffer.from(value));
+  try {
+    const declared = object.contentLength ? Number(object.contentLength) : null;
+    if (declared !== null && Number.isFinite(declared) && declared > maxBytes) return null;
+    const chunks: Buffer[] = [];
+    let total = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) return Buffer.concat(chunks);
+      if (!value) continue;
+      total += value.byteLength;
+      if (total > maxBytes) return null;
+      chunks.push(Buffer.from(value));
+    }
+  } catch {
+    return null;
+  } finally {
+    await reader.cancel().catch(() => undefined);
+    reader.releaseLock();
   }
-  return Buffer.concat(chunks);
+}
+
+/** Write-once report storage. The returned generation pins every subsequent read. */
+export async function uploadImmutableObjectBytes(args: {
+  objectKey: string;
+  bytes: Buffer;
+  contentType: string;
+}): Promise<{ generation: string } | null> {
+  const bucket = documentStorageBucket();
+  if (!bucket) return null;
+  const token = await serviceAccountToken();
+  if (!token) return null;
+  try {
+    const url = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucket)}/o` +
+      `?uploadType=media&ifGenerationMatch=0&name=${encodeURIComponent(args.objectKey)}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": args.contentType },
+      body: new Uint8Array(args.bytes),
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!response.ok) return null;
+    const object = await response.json() as { generation?: unknown };
+    return typeof object.generation === "string" && /^[0-9]+$/.test(object.generation)
+      ? { generation: object.generation } : null;
+  } catch {
+    return null;
+  }
 }
 
 /**

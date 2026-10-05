@@ -75,6 +75,7 @@ export default async function PublicPurchasePage(props: {
           type: "PROPERTY",
           exactAddress,
           propertyId,
+          analysisComparisonId: first(params.analysisComparisonId).slice(0, 64) || null,
         }}
         amountCents={product.unitAmountCents}
         currency={product.currency}

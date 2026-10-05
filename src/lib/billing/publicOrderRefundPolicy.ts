@@ -59,7 +59,7 @@ export function evaluatePublicOrderFullRefund(
         );
   }
 
-  if (order.status !== "FULFILLMENT_PENDING") {
+  if (!["FULFILLMENT_PENDING", "HELD"].includes(order.status)) {
     return decision("DENY", false, 0, [
       "ORDER_NOT_AWAITING_FULFILLMENT",
     ]);

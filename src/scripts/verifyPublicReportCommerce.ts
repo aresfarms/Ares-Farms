@@ -255,7 +255,7 @@ async function verifyAnchors() {
   assert(artifactStore.includes('classificationLevel: "CONFIDENTIAL"'));
   assert(artifactStore.includes("public_order.report_downloaded"));
   assert(artifactRoute.includes("rawBytesAcceptedByRoute: false"));
-  assert(downloadRoute.includes("fetchObjectStream"));
+  assert(downloadRoute.includes("fetchObjectBytes"));
   assert(downloadRoute.includes("recordPublicOrderReportDownload"));
   assert(fulfillmentUi.includes("Publish verified report to customer"));
   assert(statusUi.includes("Download verified report"));

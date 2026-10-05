@@ -1,4 +1,4 @@
-import { annualLevelDebtService } from "@/lib/property/calculationMath";
+import { annualLevelDebtService, remainingLoanBalance } from "@/lib/property/calculationMath";
 import {
   projectEnterpriseEconomics,
   type EnterpriseProjection,
@@ -530,7 +530,7 @@ function inspectConstraintsAndControls(
 }
 
 function inspectReferencedSources(
-  input: EnterpriseEconomicEvidencePackage,
+  input: Pick<EnterpriseEconomicEvidencePackage, "sources" | "generatedAt">,
   collector: AssessmentCollector,
 ) {
   const generatedAt = parseIso(input.generatedAt);
@@ -575,11 +575,18 @@ function inspectReferencedSources(
         source.maxAgeDays < 1 || source.maxAgeDays > 3650) {
       collector.missing.add("Evidence source " + ref + " requires a valid freshness window.");
     }
-    if (source.reviewStatus === "captured") {
+    if (!["reviewed", "verified"].includes(source.reviewStatus)) {
       collector.missing.add("Evidence source " + ref + " has not been reviewed.");
     }
     if (source.useRights !== "approved") {
       collector.missing.add("Evidence source " + ref + " is not approved for this use.");
+    }
+    if (!["Tier 1 authoritative government/public", "Tier 2 certified institutional/commercial", "Tier 3 commercial marketplace", "Tier 4 advisory/discovery"].includes(source.authorityTier) ||
+        !["official-record", "regulated-filing", "commercial-data", "professional-analysis", "vendor-quote", "operator-record", "customer-document"].includes(source.kind)) {
+      collector.missing.add("Evidence source " + ref + " has an unsupported authority tier or source kind.");
+    }
+    if (generatedAt != null && capturedAt != null && capturedAt > generatedAt) {
+      collector.missing.add("Evidence source " + ref + " has a future capture date.");
     }
     if (generatedAt != null && asOf != null) {
       const ageDays = Math.floor((generatedAt - asOf) / 86_400_000);
@@ -596,6 +603,15 @@ function inspectReferencedSources(
       collector.warnings.add("Unused evidence source " + source.id + " is retained but does not support this candidate.");
     }
   }
+}
+
+/** Shared source controls for economic claims and negative feasibility findings. */
+export function assessEconomicSourceReferences(input: { sources: EconomicEvidenceSource[]; sourceRefs: string[]; asOf: string }) {
+  const collector: AssessmentCollector = { missing: new Set(), warnings: new Set(), sourceRefs: new Set(input.sourceRefs), confidences: [], assumptions: new Set() };
+  if (parseIso(input.asOf) == null) collector.missing.add("A valid evidence assessment date is required.");
+  if (!input.sourceRefs.length) collector.missing.add("At least one relied-upon source is required.");
+  inspectReferencedSources({ sources: input.sources, generatedAt: input.asOf }, collector);
+  return { missingEvidence: [...collector.missing].sort(), warnings: [...collector.warnings].sort() };
 }
 
 function metricValue(metric: SupportedEconomicMetric): number | null {
@@ -642,7 +658,14 @@ function projectionInput(
     annualRevenueGrowthPct:
       metricValue(input.operations.annualRevenueGrowthPct) ?? Number.NaN,
     annualDebtService: annualDebtService ?? Number.NaN,
-    debtTermYears: metricValue(input.financing.termYears) ?? Number.NaN,
+    debtTermYears: Math.min(metricValue(input.financing.termYears) ?? Number.NaN,
+      metricValue(input.financing.amortizationYears) ?? Number.NaN),
+    balloonPaymentAtMaturity: remainingLoanBalance(
+      metricValue(input.financing.loanAmount) ?? Number.NaN,
+      metricValue(input.financing.annualRatePct) ?? Number.NaN,
+      metricValue(input.financing.amortizationYears) ?? Number.NaN,
+      (metricValue(input.financing.termYears) ?? Number.NaN) * 12, 12,
+    ) ?? Number.NaN,
     periodicCapitalCosts: input.operations.periodicCapitalCosts.map((cost) => ({
       year: cost.year,
       label: cost.label,

@@ -9,6 +9,9 @@ import {
   PUBLIC_ORDER_AGREEMENT_VERSION,
   publicOrderPaymentButtonLabel,
 } from "@/lib/billing/publicOrderAgreement";
+import { readComparisonAccess } from "@/lib/intelligence/propertyComparisonAccess";
+import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
+import type { PropertyReportPreparation } from "@/lib/intelligence/propertyReportPreparation";
 import type { PublicProductCode } from "@/lib/billing/publicProductCatalog";
 import styles from "./FurlongExperience.module.css";
 
@@ -17,6 +20,7 @@ export type PublicOrderCheckoutTarget =
       type: "PROPERTY";
       exactAddress: string;
       propertyId?: string | null;
+      analysisComparisonId?: string | null;
     }
   | {
       type: "PROPERTY_COMPARISON";
@@ -29,6 +33,7 @@ type CheckoutResponse = {
   orderId?: string;
   orderAccessToken?: string;
   checkoutUrl?: string | null;
+  retryWithNewRequest?: boolean;
 };
 
 function moneyLine(amountCents: number, currency: string): string {
@@ -51,6 +56,9 @@ export function PublicOrderCheckoutAgreement(props: {
   excluded: readonly string[];
   upgradeFromOrderId: string | null;
 }) {
+  const [selectedReportCandidateId, setSelectedReportCandidateId] = useState("");
+  const [preparation, setPreparation] = useState<PropertyReportPreparation | null>(null);
+  const [preparationError, setPreparationError] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,10 +70,44 @@ export function PublicOrderCheckoutAgreement(props: {
     props.upgradeFromOrderId ? "Confirming prior-report credit…" : null,
   );
   const requestId = useRef<string | null>(null);
+  const recoveryToken = useRef<string | null>(null);
   const payableAmountCents = Math.max(0, props.amountCents - creditAmountCents);
   const upgradeBlocked = Boolean(
     props.upgradeFromOrderId && !upgradeAccessToken,
   );
+
+  const needsPreparation = props.productCode === "focused_property_report";
+  const analysisId = props.target.type === "PROPERTY" ? props.target.analysisComparisonId : null;
+  const targetPropertyId = props.target.type === "PROPERTY" ? props.target.propertyId : null;
+  const targetAddress = props.target.type === "PROPERTY" ? props.target.exactAddress : "";
+  useEffect(() => {
+    if (!needsPreparation) return;
+    let stopped = false;
+    setPreparation(null);
+    setPreparationError(null);
+    setSelectedReportCandidateId("");
+    if (!analysisId) {
+      setPreparationError("Save and complete this property's evidence review before checkout.");
+      return;
+    }
+    const access = readComparisonAccess(window.sessionStorage, analysisId);
+    void (async () => {
+      try {
+        const response = await fetch(`/api/public/property-comparisons/${analysisId}`, {
+          cache: "no-store", headers: access ? { Authorization: `Bearer ${access.accessToken}` } : {},
+        });
+        const result = await response.json() as { items?: Array<{ propertyId: string | null; normalizedAddress: string | null; submittedAddress: string; reportPreparation: PropertyReportPreparation }> };
+        const item = result.items?.find(item => item.propertyId === targetPropertyId &&
+          normalizedListingAddress(item.normalizedAddress || item.submittedAddress) === normalizedListingAddress(targetAddress));
+        if (!response.ok || !item) throw new Error("Reopen the saved property with its recovery token before checkout.");
+        if (!stopped) setPreparation(item.reportPreparation);
+      } catch (caught) {
+        if (!stopped) setPreparationError(caught instanceof Error ? caught.message : "The saved analysis could not be checked.");
+      }
+    })();
+    return () => { stopped = true; };
+  }, [needsPreparation, analysisId, targetPropertyId, targetAddress]);
+  const preparationBlocked = needsPreparation && !preparation?.evidenceReady;
 
   useEffect(() => {
     const sourceOrderId = props.upgradeFromOrderId;
@@ -143,20 +185,36 @@ export function PublicOrderCheckoutAgreement(props: {
   }, [props.currency, props.target, props.upgradeFromOrderId]);
 
   async function beginCheckout() {
-    if (!accepted || busy || upgradeBlocked) return;
+    if (!accepted || busy || upgradeBlocked || preparationBlocked) return;
     setBusy(true);
     setError(null);
-    requestId.current ??= "public-checkout-" + window.crypto.randomUUID();
+    const recoveryKey = "furlong:checkout:" + JSON.stringify([props.productCode, props.target, selectedReportCandidateId, props.upgradeFromOrderId]);
     try {
+      const saved = window.sessionStorage.getItem(recoveryKey);
+      if (saved) {
+        const value = JSON.parse(saved) as { requestId: string; token: string };
+        requestId.current = value.requestId;
+        recoveryToken.current = value.token;
+      } else {
+        requestId.current = "public-checkout-" + window.crypto.randomUUID();
+        const bytes = window.crypto.getRandomValues(new Uint8Array(32));
+        recoveryToken.current = "furlong-order-" + window.btoa(String.fromCharCode(...bytes))
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        window.sessionStorage.setItem(recoveryKey, JSON.stringify({ requestId: requestId.current, token: recoveryToken.current }));
+      }
+      const comparisonId = props.target.type === "PROPERTY" ? props.target.analysisComparisonId : props.target.comparisonId;
+      const analysisToken = comparisonId ? readComparisonAccess(window.sessionStorage, comparisonId)?.accessToken : null;
       const response = await fetch("/api/public/purchases/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Idempotency-Key": requestId.current,
+          "Idempotency-Key": requestId.current!,
+          "X-Checkout-Recovery": recoveryToken.current!,
+          ...(analysisToken ? { Authorization: `Bearer ${analysisToken}` } : {}),
         },
         body: JSON.stringify({
           productCode: props.productCode,
-          target: props.target,
+          target: props.target.type === "PROPERTY" ? { ...props.target, selectedReportCandidateId: selectedReportCandidateId || null } : props.target,
           agreement: {
             accepted: true,
             version: PUBLIC_ORDER_AGREEMENT_VERSION,
@@ -171,6 +229,7 @@ export function PublicOrderCheckoutAgreement(props: {
         }),
       });
       const result = (await response.json()) as CheckoutResponse;
+      if (result.retryWithNewRequest) window.sessionStorage.removeItem(recoveryKey);
       if (
         !response.ok ||
         !result.ok ||
@@ -188,7 +247,6 @@ export function PublicOrderCheckoutAgreement(props: {
       );
       window.location.assign(result.checkoutUrl);
     } catch (caught) {
-      requestId.current = null;
       setError(
         caught instanceof Error
           ? caught.message
@@ -262,6 +320,22 @@ export function PublicOrderCheckoutAgreement(props: {
         </p>
       ) : null}
 
+      {needsPreparation ? <div>
+        {preparationBlocked ? <p role="status">{preparationError || (preparation ? "This report still needs evidence before payment." : "Checking the saved property analysis…")}</p> : null}
+        {preparation?.missingEvidence.length ? <ul>{preparation.missingEvidence.map((gap, i) => <li key={i}>{gap}</li>)}</ul> : null}
+        {preparation?.outcome === "no-supported-use" ? <p role="status"><strong>No supported use remains within the reviewed scope.</strong> This report explains the documented exclusions; it does not offer a viable-use recommendation.</p> : null}
+        {preparation?.exclusions?.length ? <ul>{preparation.exclusions.map((finding, i) => <li key={i}>{finding}</li>)}</ul> : null}
+        {preparation?.choices.length ? <>
+        <label htmlFor="report-candidate-choice">Which supported use interests you most?</label>
+        <select id="report-candidate-choice" value={selectedReportCandidateId} disabled={busy || preparationBlocked}
+          onChange={event => setSelectedReportCandidateId(event.target.value)}>
+          <option value="">No preference — compare the supported uses</option>
+          {preparation?.choices.map(choice => <option key={choice.id} value={choice.id}>{choice.title}</option>)}
+        </select>
+        </> : null}
+        <p>The report compares all evaluated uses. A different idea needs a separate feasibility review before it can enter the automated comparison.</p>
+        {preparationBlocked ? <a href={`/property-evidence?${new URLSearchParams({ address: targetAddress, ...(analysisId ? { comparisonId: analysisId } : {}) })}`}>Return to report preparation</a> : null}
+      </div> : null}
       <div className={styles.refundTerms}>
         <h3>{PUBLIC_ORDER_AGREEMENT_TITLE}</h3>
         {PUBLIC_ORDER_AGREEMENT_TERMS.map((term) => (
@@ -281,11 +355,11 @@ export function PublicOrderCheckoutAgreement(props: {
       <button
         type="button"
         className={styles.primary}
-        disabled={!accepted || busy || upgradeBlocked}
+        disabled={!accepted || busy || upgradeBlocked || preparationBlocked}
         onClick={() => void beginCheckout()}
       >
         {busy
-          ? "OPENING SECURE CHECKOUT…"
+          ? (props.productCode === "focused_property_report" ? "VERIFYING YOUR REPORT BEFORE CHECKOUT…" : "OPENING SECURE CHECKOUT…")
           : publicOrderPaymentButtonLabel(payableAmountCents, props.currency)}
       </button>
       {error ? (

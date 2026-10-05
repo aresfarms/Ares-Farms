@@ -186,9 +186,9 @@ export function PropertyComparisonFrontDoor(props: {
           <summary>What this property still needs</summary>
           <ul>{item.reportPreparation.missingEvidence.map((gap, i) => <li key={i}>{gap}</li>)}</ul>
         </details> : null}
+        {item.reportPreparation?.exclusions?.length ? <div><strong>Documented findings to consider now</strong><ul>{item.reportPreparation.exclusions.map((finding, i) => <li key={i}>{finding}</li>)}</ul></div> : null}
         {item.reportPreparation?.evidenceReady && item.propertyId ? <>
           {item.reportPreparation.outcome === "no-supported-use" ? <p role="status"><strong>No supported use remains within the reviewed scope.</strong> The report documents why the reviewed uses were ruled out.</p> : null}
-          {item.reportPreparation.exclusions?.length ? <ul>{item.reportPreparation.exclusions.map((finding, i) => <li key={i}>{finding}</li>)}</ul> : null}
           <p>The saved economic analysis passed its current evidence checks. The property facts and finished PDF are checked again before checkout.</p>
           {props.reportSalesOpen ? <Link className={styles.primary} href={`/purchase?${new URLSearchParams({
             product: "focused_property_report", address: item.normalizedAddress || item.submittedAddress,

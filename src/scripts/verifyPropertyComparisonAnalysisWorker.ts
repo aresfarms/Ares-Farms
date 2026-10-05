@@ -164,6 +164,13 @@ async function main() {
   assert.equal(noGoPreparation.outcome, "no-supported-use");
   assert.equal(noGoPreparation.exclusions.length, 3, "show documented negative findings before payment");
   assert.equal(noGoPreparation.evidenceReady, true);
+  const partialItem = { ...noGoItem, status: "NEEDS_EVIDENCE",
+    resultSnapshot: { economicEvidencePackages: [], candidateExclusions: exclusions.slice(0, 1) } };
+  const partialPreparation = propertyReportPreparation(partialItem, asOf);
+  assert(!partialPreparation.evidenceReady && partialPreparation.outcome === "needs-evidence");
+  assert.equal(partialPreparation.exclusions.length, 1, "A completed adverse finding must remain visible while other roles need evidence");
+  assert.equal(propertyReportPreparation({ ...partialItem, propertyId: "wrong-property" }, asOf).exclusions.length, 0, "Never disclose another property's finding");
+  assert.equal(propertyReportPreparation(partialItem, new Date("2028-01-01")).exclusions.length, 0, "Expired exclusions are not presented as current findings");
   let exclusionHandoff = false;
   await processPropertyComparisonAnalysisBatch({ traceId }, { ...dependencies,
     claim: (async () => [noGoItem]) as any, buildReadiness: async () => noGo,

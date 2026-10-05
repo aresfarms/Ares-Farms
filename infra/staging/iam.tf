@@ -47,7 +47,7 @@ resource "google_service_account" "property_comparison_worker" {
   project      = var.project_id
   account_id   = "furlong-comparison-worker"
   display_name = "Furlong property comparison worker"
-  description  = "Private Cloud Run Job runtime. Reads DATABASE_URL only; no migration authority and no browser-service invocation role."
+  description  = "Private comparison Job runtime. Reads DATABASE_URL and approved-source snapshots; no source-write, migration, or browser-invocation authority."
 
   depends_on = [google_project_service.required]
 }

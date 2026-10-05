@@ -185,9 +185,16 @@ export function PropertyComparisonFrontDoor(props: {
         {item.reportPreparation?.sourceSnapshot ? <div className={styles.sourceFindings}>
           {item.reportPreparation.sourceSnapshot.warnings.length ? <div>
             <strong>Source warnings to consider now</strong>
-            <ul>{item.reportPreparation.sourceSnapshot.warnings.map((warning, i) => <li key={i}>{warning}</li>)}</ul>
+            <ul>{item.reportPreparation.sourceSnapshot.warnings.map((warning, i) => <li key={i}>
+              <p>{warning.summary}</p>
+              {warning.detail || warning.source ? <details>
+                <summary>Warning details and source</summary>
+                {warning.detail ? <p>{warning.detail}</p> : null}
+                {warning.source ? <p className={styles.note}>Source: {warning.source}</p> : null}
+              </details> : null}
+            </li>)}</ul>
           </div> : null}
-          <details open={single}>
+          <details>
             <summary>Saved public-source findings</summary>
             <p>Collected {new Date(item.reportPreparation.sourceSnapshot.capturedAt).toLocaleString()}. These are saved observations; their source dates and limits still apply. They do not establish complete use feasibility.</p>
             <ul>{item.reportPreparation.sourceSnapshot.facts.map((fact, i) => <li key={i}>
@@ -199,7 +206,7 @@ export function PropertyComparisonFrontDoor(props: {
             <ul>{item.reportPreparation.sourceSnapshot.unknowns.map((unknown, i) => <li key={i}><strong>{unknown.label}</strong><p>{unknown.action}</p></li>)}</ul>
           </details> : null}
         </div> : null}
-        {item.reportPreparation?.missingEvidence.length ? <details open={single}>
+        {item.reportPreparation?.missingEvidence.length ? <details>
           <summary>What this property still needs</summary>
           <ul>{item.reportPreparation.missingEvidence.map((gap, i) => <li key={i}>{gap}</li>)}</ul>
         </details> : null}

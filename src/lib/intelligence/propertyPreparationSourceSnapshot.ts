@@ -1,10 +1,10 @@
 import { normalizedListingAddress } from "@/lib/property/listingPriceEvidence";
 
 export type PropertyPreparationSourceSnapshot = {
-  version: "property-preparation-source-snapshot-v1";
+  version: "property-preparation-source-snapshot-v2";
   capturedAt: string;
   facts: Array<{ label: string; value: string; source: string }>;
-  warnings: string[];
+  warnings: Array<{ summary: string; detail: string | null; source: string | null }>;
   unknowns: Array<{ label: string; action: string }>;
 };
 
@@ -53,20 +53,24 @@ export function propertyPreparationSourceSnapshot(item: {
   if (typeof property.squareFeet === "number" && Number.isFinite(property.squareFeet) && property.squareFeet > 0 && source) {
     observations.push({ label: "Reported building area", value: `${property.squareFeet.toLocaleString("en-US")} sq ft`, source });
   }
-  const warnings = [...strings(verification.warnings), ...strings(verification.restrictions)];
+  const warnings: PropertyPreparationSourceSnapshot["warnings"] = [...strings(verification.warnings), ...strings(verification.restrictions)]
+    .map(summary => ({ summary, detail: null, source: null }));
   for (const value of Array.isArray(brief.verifiedFacts) ? brief.verifiedFacts : []) {
     const fact = record(value);
     const label = text(fact.label), detail = text(fact.value), provenance = text(fact.provenance);
     if (!label || !detail || !provenance) continue;
     observations.push({ label, value: [detail, text(fact.text)].filter(Boolean).join(". "), source: provenance });
-    if (fact.tone === "caution") warnings.push(`${label}: ${detail}. ${text(fact.text)} Source: ${provenance}`.trim());
+    if (fact.tone === "caution") warnings.push({
+      summary: `${label}: ${detail}`, detail: text(fact.text) || null, source: provenance,
+    });
   }
   const unknowns = (Array.isArray(brief.unknowns) ? brief.unknowns : []).flatMap(value => {
     const unknown = record(value), label = text(unknown.label), action = text(unknown.howToFind);
     return label && action ? [{ label, action }] : [];
   });
-  return { version: "property-preparation-source-snapshot-v1", capturedAt,
+  return { version: "property-preparation-source-snapshot-v2", capturedAt,
     facts: observations.filter((value, index) => observations.findIndex(other =>
       other.label === value.label && other.value === value.value && other.source === value.source) === index),
-    warnings: [...new Set(warnings)], unknowns };
+    warnings: warnings.filter((value, index) => warnings.findIndex(other =>
+      other.summary === value.summary && other.detail === value.detail && other.source === value.source) === index), unknowns };
 }

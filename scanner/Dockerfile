@@ -34,7 +34,7 @@ RUN lddtree -l /usr/sbin/clamd | sort -u \
       cp -L "$file" "/scanner-rootfs/opt/clamav-root$file"; \
     done
 
-FROM cgr.dev/chainguard/python@sha256:1f37785e5cdb70151f36aaa15e1e3cef4571424dbefbf4b0d8a9222535cb13ff
+FROM cgr.dev/chainguard/python@sha256:a57ac9d33d8ca6eb2946d1d7e93a5600153d02e0c7c1fa3a322fc343f89451f5
 
 WORKDIR /srv
 ENV PORT=8080

@@ -89,7 +89,7 @@ RUN mkdir -p /migrator \
 # the migrator principal via MIGRATOR_DATABASE_URL (Secret Manager -> env).
 # Build with: docker build --target migrator -t furlong-db-migrate .
 # -----------------------------------------------------------------------------
-FROM cgr.dev/chainguard/wolfi-base@sha256:918a593b8268c222afd4e2c4f06860ac984e60719b4697e4c71d796bc8fcd042 AS migrator
+FROM cgr.dev/chainguard/wolfi-base@sha256:24f549a7fcace88e69b9557941168c74645688ecc4acf7fb6d734a6b74e9019d AS migrator
 WORKDIR /app
 
 # Exact Wolfi Node 24 LTS package: patched zlib closure, package metadata retained
@@ -116,7 +116,7 @@ CMD ["migratorEntrypoint.mjs"]
 # -----------------------------------------------------------------------------
 # Stage 4 — runner: minimal production runtime. No npm, no source, no toolchain.
 # -----------------------------------------------------------------------------
-FROM cgr.dev/chainguard/wolfi-base@sha256:918a593b8268c222afd4e2c4f06860ac984e60719b4697e4c71d796bc8fcd042 AS runner
+FROM cgr.dev/chainguard/wolfi-base@sha256:24f549a7fcace88e69b9557941168c74645688ecc4acf7fb6d734a6b74e9019d AS runner
 WORKDIR /app
 
 # Match the migrator runtime exactly so application and migration execution share
